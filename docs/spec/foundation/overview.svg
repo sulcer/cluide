@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="360" viewBox="0 0 900 360" font-family="-apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#333"/>
+    </marker>
+  </defs>
+  <rect width="900" height="360" fill="#ffffff"/>
+
+  <!-- Browser -->
+  <rect x="30" y="80" width="220" height="150" rx="8" fill="#eef4ff" stroke="#3b5bdb" stroke-width="1.5"/>
+  <text x="140" y="108" text-anchor="middle" font-weight="600" font-size="15" fill="#1c2c66">Browser</text>
+  <text x="140" y="134" text-anchor="middle" fill="#222">React page (Vite build)</text>
+  <text x="140" y="154" text-anchor="middle" fill="#222">shadcn/ui, react-router</text>
+  <text x="140" y="174" text-anchor="middle" fill="#222">fetch /api, same origin</text>
+  <text x="140" y="194" text-anchor="middle" fill="#222">sends X-Cluide: 1 on writes</text>
+
+  <!-- arrow browser <-> server -->
+  <line x1="250" y1="155" x2="330" y2="155" stroke="#333" stroke-width="1.5" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+  <text x="290" y="143" text-anchor="middle" fill="#555" font-size="12">HTTP JSON</text>
+
+  <!-- Server -->
+  <rect x="330" y="50" width="280" height="210" rx="8" fill="#f3f8f1" stroke="#2f7d32" stroke-width="1.5"/>
+  <text x="470" y="78" text-anchor="middle" font-weight="600" font-size="15" fill="#1f4d21">Bun server · 127.0.0.1:8787</text>
+  <text x="470" y="104" text-anchor="middle" fill="#222">guard → resource → write primitive</text>
+  <rect x="350" y="118" width="240" height="70" rx="6" fill="#ffffff" stroke="#8fb58f"/>
+  <text x="470" y="140" text-anchor="middle" fill="#222">resources: projects · files</text>
+  <text x="470" y="160" text-anchor="middle" fill="#222">settings · mcp · plugins</text>
+  <text x="470" y="178" text-anchor="middle" fill="#555" font-size="12">each reads files fresh per request</text>
+  <text x="470" y="212" text-anchor="middle" fill="#222">writeText(): allowlist, etag, backup,</text>
+  <text x="470" y="230" text-anchor="middle" fill="#222">tmp + rename, git diff --no-index</text>
+  <text x="470" y="250" text-anchor="middle" fill="#555" font-size="12">serves dist/ in production</text>
+
+  <!-- arrow server <-> files -->
+  <line x1="610" y1="155" x2="680" y2="155" stroke="#333" stroke-width="1.5" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+  <text x="645" y="143" text-anchor="middle" fill="#555" font-size="12">read / write</text>
+
+  <!-- Files -->
+  <rect x="680" y="50" width="190" height="210" rx="8" fill="#fff8e6" stroke="#b8860b" stroke-width="1.5"/>
+  <text x="775" y="78" text-anchor="middle" font-weight="600" font-size="15" fill="#5c4300">Files on disk</text>
+  <text x="775" y="104" text-anchor="middle" fill="#222">~/.claude/…</text>
+  <text x="775" y="124" text-anchor="middle" fill="#222">~/.claude.json</text>
+  <text x="775" y="144" text-anchor="middle" fill="#222">&lt;repo&gt;/CLAUDE.md</text>
+  <text x="775" y="164" text-anchor="middle" fill="#222">&lt;repo&gt;/.claude/…</text>
+  <text x="775" y="184" text-anchor="middle" fill="#222">&lt;repo&gt;/.mcp.json</text>
+  <text x="775" y="214" text-anchor="middle" fill="#555" font-size="12">backups:</text>
+  <text x="775" y="232" text-anchor="middle" fill="#555" font-size="12">~/.cluide/backups/</text>
+
+  <!-- Claude Code -->
+  <rect x="680" y="290" width="190" height="50" rx="8" fill="#ffffff" stroke="#888" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <text x="775" y="311" text-anchor="middle" fill="#333">Claude Code CLI</text>
+  <text x="775" y="329" text-anchor="middle" fill="#555" font-size="12">reads and writes the same files</text>
+  <line x1="775" y1="290" x2="775" y2="262" stroke="#888" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#arrow)"/>
+</svg>

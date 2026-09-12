@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="330" viewBox="0 0 1180 330" font-family="-apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#333"/>
+    </marker>
+  </defs>
+  <rect width="1180" height="330" fill="#ffffff"/>
+  <text x="20" y="28" font-size="15" font-weight="600" fill="#222">Save flow: one write from the browser to disk</text>
+
+  <!-- main row boxes: x = 20 + i*145, w=125, y=50, h=80 -->
+  <g stroke="#333" stroke-width="1.2" fill="#eef4ff">
+    <rect x="20"   y="50" width="125" height="80" rx="6"/>
+    <rect x="165"  y="50" width="125" height="80" rx="6" fill="#f3f8f1"/>
+    <rect x="310"  y="50" width="125" height="80" rx="6" fill="#f3f8f1"/>
+    <rect x="455"  y="50" width="125" height="80" rx="6" fill="#f3f8f1"/>
+    <rect x="600"  y="50" width="125" height="80" rx="6" fill="#fff8e6"/>
+    <rect x="745"  y="50" width="125" height="80" rx="6" fill="#fff8e6"/>
+    <rect x="890"  y="50" width="125" height="80" rx="6" fill="#fff8e6"/>
+    <rect x="1035" y="50" width="125" height="80" rx="6" fill="#eef4ff"/>
+  </g>
+  <g fill="#222" text-anchor="middle">
+    <text x="82"   y="76" font-weight="600">1. Browser</text>
+    <text x="82"   y="94">PUT /api/file</text>
+    <text x="82"   y="110">{path, content, etag}</text>
+
+    <text x="227"  y="76" font-weight="600">2. Guard</text>
+    <text x="227"  y="94">Host, Origin,</text>
+    <text x="227"  y="110">X-Cluide: 1</text>
+
+    <text x="372"  y="76" font-weight="600">3. Allowlist</text>
+    <text x="372"  y="94">realpath(path)</text>
+    <text x="372"  y="110">inside roots?</text>
+
+    <text x="517"  y="76" font-weight="600">4. Etag</text>
+    <text x="517"  y="94">sha256(current)</text>
+    <text x="517"  y="110">== etag sent?</text>
+
+    <text x="662"  y="76" font-weight="600">5. Backup</text>
+    <text x="662"  y="94">copy current to</text>
+    <text x="662"  y="110">~/.cluide/backups</text>
+
+    <text x="807"  y="76" font-weight="600">6. Write</text>
+    <text x="807"  y="94">path.cluide-tmp</text>
+    <text x="807"  y="110">then rename</text>
+
+    <text x="952"  y="76" font-weight="600">7. Diff</text>
+    <text x="952"  y="94">git diff --no-index</text>
+    <text x="952"  y="110">backup path</text>
+
+    <text x="1097" y="76" font-weight="600">8. Response</text>
+    <text x="1097" y="94">200</text>
+    <text x="1097" y="110">{etag, diff}</text>
+  </g>
+
+  <!-- horizontal arrows -->
+  <g stroke="#333" stroke-width="1.4" marker-end="url(#arrow)">
+    <line x1="145"  y1="90" x2="163"  y2="90"/>
+    <line x1="290"  y1="90" x2="308"  y2="90"/>
+    <line x1="435"  y1="90" x2="453"  y2="90"/>
+    <line x1="580"  y1="90" x2="598"  y2="90"/>
+    <line x1="725"  y1="90" x2="743"  y2="90"/>
+    <line x1="870"  y1="90" x2="888"  y2="90"/>
+    <line x1="1015" y1="90" x2="1033" y2="90"/>
+  </g>
+
+  <!-- failure boxes -->
+  <g stroke="#b00020" stroke-width="1.2" fill="#fdecec">
+    <rect x="165" y="200" width="125" height="70" rx="6"/>
+    <rect x="310" y="200" width="125" height="70" rx="6"/>
+    <rect x="455" y="200" width="125" height="70" rx="6"/>
+    <rect x="600" y="200" width="125" height="70" rx="6"/>
+    <rect x="745" y="200" width="125" height="70" rx="6"/>
+  </g>
+  <g fill="#7a0016" text-anchor="middle">
+    <text x="227" y="224" font-weight="600">403 forbidden</text>
+    <text x="227" y="242">not the cluide page</text>
+    <text x="227" y="258">nothing written</text>
+
+    <text x="372" y="224" font-weight="600">400 bad_request</text>
+    <text x="372" y="242">path outside roots</text>
+    <text x="372" y="258">nothing written</text>
+
+    <text x="517" y="224" font-weight="600">409 conflict</text>
+    <text x="517" y="242">{current, etag}</text>
+    <text x="517" y="258">nothing written</text>
+
+    <text x="662" y="224" font-weight="600">500 internal</text>
+    <text x="662" y="242">backup failed</text>
+    <text x="662" y="258">nothing written</text>
+
+    <text x="807" y="224" font-weight="600">500 internal</text>
+    <text x="807" y="242">tmp or rename failed</text>
+    <text x="807" y="258">original intact</text>
+  </g>
+  <g stroke="#b00020" stroke-width="1.2" marker-end="url(#arrow)">
+    <line x1="227" y1="130" x2="227" y2="198"/>
+    <line x1="372" y1="130" x2="372" y2="198"/>
+    <line x1="517" y1="130" x2="517" y2="198"/>
+    <line x1="662" y1="130" x2="662" y2="198"/>
+    <line x1="807" y1="130" x2="807" y2="198"/>
+  </g>
+  <g fill="#7a0016" font-size="11" text-anchor="start">
+    <text x="232" y="168">fail</text>
+    <text x="377" y="168">fail</text>
+    <text x="522" y="168">differs</text>
+    <text x="667" y="168">fail</text>
+    <text x="812" y="168">fail</text>
+  </g>
+
+  <text x="20" y="310" fill="#555" font-size="11">Typed resources (settings, mcp, plugins) run the same steps; their etag in step 4 is the hash of the slice they manage, not the whole file.</text>
+</svg>
