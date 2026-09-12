@@ -79,3 +79,15 @@ trigger to revisit, reference. Add an item when deferring. Remove it when it lan
 - **Trigger:** An observed lost write, or Claude Code starting to store something in that file that
   it does not regenerate.
 - **Reference:** [`write-safety.md`](spec/foundation/write-safety.md), known ceiling.
+
+---
+
+## Per-source errors in the MCP list
+
+- **What:** When one source file does not parse (a plugin's `.mcp.json`, a repo's `.mcp.json`),
+  return the other sources and mark the broken one with its parse error, instead of failing the
+  whole list with `422`.
+- **Why deferred:** The settings screen has a raw-text repair path; adding one for every MCP
+  source is a shape change to `McpEntry` and a screen change, for a file state that is rare.
+- **Trigger:** The first time a broken plugin file hides a user's own servers.
+- **Reference:** [`api/mcp.md`](spec/api/mcp.md), `readJsonOrEmpty` in the write-safety spec.

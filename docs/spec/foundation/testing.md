@@ -1,6 +1,6 @@
 # Testing
 
-Status: Draft · Planned · 2026-09-12 · What is tested, how tests stay off the real configuration, and what is deliberately untested in v1.
+Status: Stable · Planned · 2026-09-12 · What is tested, how tests stay off the real configuration, and what is deliberately untested in v1.
 
 ## At a glance
 

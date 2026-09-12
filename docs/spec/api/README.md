@@ -1,6 +1,6 @@
 # API
 
-Status: Draft · Planned · 2026-09-12 · The HTTP contract between the Bun server and the page, and the conventions every resource follows.
+Status: Stable · Planned · 2026-09-12 · The HTTP contract between the Bun server and the page, and the conventions every resource follows.
 
 ## At a glance
 
@@ -10,6 +10,8 @@ location. Four are typed, because their view spans more than one file: `projects
 `mcp`, `plugins`. This document holds the conventions; each resource has its own file with its
 endpoints, shapes and errors. `shared/api.ts` mirrors these shapes in TypeScript; when they
 disagree, this spec wins and the code is fixed.
+
+Decided in: [`2026-09-12-hybrid-config-model.md`](../../adr/2026-09-12-hybrid-config-model.md).
 
 ## Conventions
 

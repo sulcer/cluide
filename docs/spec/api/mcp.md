@@ -1,6 +1,6 @@
 # MCP resource
 
-Status: Draft · Planned · 2026-09-12 · The merged list of MCP servers a scope sees, where each one comes from, and how to change it.
+Status: Stable · Planned · 2026-09-12 · The merged list of MCP servers a scope sees, where each one comes from, and how to change it.
 
 ## At a glance
 

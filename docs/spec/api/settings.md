@@ -1,6 +1,6 @@
 # Settings resource
 
-Status: Draft · Planned · 2026-09-12 · Reading and writing `settings.json` and `settings.local.json` per scope, with schema validation.
+Status: Stable · Planned · 2026-09-12 · Reading and writing `settings.json` and `settings.local.json` per scope, with schema validation.
 
 ## At a glance
 
@@ -48,9 +48,12 @@ caches it at `~/.cluide/schema-cache.json`, and refreshes when the cache is olde
 the fetch fails and there is no cache, `errors` is empty and the response carries
 `schema: "unavailable"` so the UI can show a badge. ajv compiles the schema once per process.
 
-The reference machine's `~/.claude/settings.json` has an `mcpServers` key that is not in the
-schema. It shows up as an unknown-property warning, which is the intended behaviour: the user sees
-it, cluide does not touch it.
+The schema permits additional properties, so ajv alone would say nothing about a key it does not
+know. cluide adds one warning per top-level key absent from the schema's `properties`, with
+`message: "not a documented setting"`. The reference machine's `~/.claude/settings.json` has an
+`mcpServers` key that triggers exactly this: the user sees it, cluide does not touch it. Format
+keywords (`uri`, `date-time`) are not validated; that would need a second dependency for no
+decision the user can act on.
 
 ## Errors specific to this resource
 

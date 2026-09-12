@@ -1,6 +1,6 @@
 # Plugins resource
 
-Status: Draft · Planned · 2026-09-12 · Installed plugins, where they come from, and their enabled state.
+Status: Stable · Planned · 2026-09-12 · Installed plugins, where they come from, and their enabled state.
 
 ## At a glance
 
@@ -38,9 +38,10 @@ Enabling and disabling never moves or deletes plugin files; it edits one key in 
 | `enabled` | boolean | `enabledPlugins[id]`, `false` when the key is absent |
 | `hasMcp` | boolean | `.mcp.json` exists at `installPath` |
 | `hasHooks` | boolean | `hooks/hooks.json` exists at `installPath` |
+| `etag` | string | Hash of the `enabledPlugins` slice; the same value on every entry |
 
-The etag on `PUT` and in the list is the hash of the `enabledPlugins` slice, so a concurrent edit to
-another settings key does not block a toggle, and two toggles racing each other do.
+The etag is the hash of the `enabledPlugins` slice, so a concurrent edit to another settings key
+does not block a toggle, and two toggles racing each other do.
 
 ## Open questions
 

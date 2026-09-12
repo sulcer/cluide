@@ -1,6 +1,6 @@
 # Write safety
 
-Status: Draft · Planned · 2026-09-12 · The single function every write goes through, and what it guarantees.
+Status: Stable · Planned · 2026-09-12 · The single function every write goes through, and what it guarantees.
 
 ## At a glance
 
@@ -9,6 +9,8 @@ hand. So a write must never leave a half-written file, must never silently overw
 elsewhere, must always be reversible, and must show the user what changed. All four come from one
 function, `writeText`, in `server/fs.ts`. Every resource calls it; nothing writes a file any other
 way.
+
+Decided in: [`2026-09-12-one-write-primitive.md`](../../adr/2026-09-12-one-write-primitive.md).
 
 ## Diagram
 

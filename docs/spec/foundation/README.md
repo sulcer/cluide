@@ -1,6 +1,6 @@
 # Foundation
 
-Status: Draft · Planned · 2026-09-12 · The stack, repository shape and safety rules every part of cluide builds on.
+Status: Stable · Planned · 2026-09-12 · The stack, repository shape and safety rules every part of cluide builds on.
 
 ## At a glance
 
@@ -45,6 +45,8 @@ files on its own schedule, which is why conflict detection exists.
 | Diff | `git diff --no-index` via `Bun.spawn` | Always present on a dev box; no diff library. |
 | Tests | `bun test` for server modules | Playwright smoke test later. |
 
+Vite over Bun's own bundler is decided in [`2026-09-12-vite-builds-the-page.md`](../../adr/2026-09-12-vite-builds-the-page.md).
+
 Not used, on purpose: Next, TanStack Query, a form library, a state library, a database. Each is
 added when a concrete need appears, not before.
 
@@ -61,11 +63,14 @@ cluide/
   shared/
     api.ts                # request/response types; mirrors docs/spec/api, the spec wins on conflict
   server/
-    index.ts              # Bun.serve, route table, static dist/, --open, --port
+    index.ts              # CLI entry: --port, --open, starts the app
+    app.ts                # Bun.serve, route table, handler wrapper, static dist/
+    errors.ts             # ApiError and the error response shape, body validation helpers
     security.ts           # host + origin + header guard for mutating requests
     paths.ts              # roots, scope -> file paths, allowlist check
-    fs.ts                 # readText, writeText (backup, atomic, etag, diff)
+    fs.ts                 # readText, writeText, JSON helpers (backup, atomic, etag, diff)
     schema.ts             # settings schema fetch, disk cache, ajv validate
+    testing.ts            # temp HOME helper for tests; tests sit next to modules as *.test.ts
     resources/
       projects.ts, files.ts, settings.ts, mcp.ts, plugins.ts
   src/

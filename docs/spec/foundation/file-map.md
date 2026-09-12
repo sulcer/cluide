@@ -1,6 +1,6 @@
 # File map
 
-Status: Draft · Planned · 2026-09-12 · Every path cluide reads or writes, per scope, and the paths it never touches.
+Status: Stable · Planned · 2026-09-12 · Every path cluide reads or writes, per scope, and the paths it never touches.
 
 ## At a glance
 

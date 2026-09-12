@@ -1,6 +1,6 @@
 # Dev and build
 
-Status: Draft · Planned · 2026-09-12 · How to run cluide while developing it and how it runs when built.
+Status: Stable · Planned · 2026-09-12 · How to run cluide while developing it and how it runs when built.
 
 ## At a glance
 

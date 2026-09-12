@@ -10,8 +10,8 @@ markers: a lifecycle `Status` (`Draft` or `Stable`) and a **build state** (`Buil
 
 | Spec | Status | Built | Scope |
 |---|---|---|---|
-| [`foundation`](./foundation/README.md) | Draft | Planned | The stack, repository shape, the files cluide reads and writes, the write primitive, security, dev and build, testing. Everything both halves stand on. |
-| [`api`](./api/README.md) | Draft | Planned | The HTTP contract between the Bun server and the page: conventions, then one file per resource — projects, files, settings, mcp, plugins. |
+| [`foundation`](./foundation/README.md) | Stable | Planned | The stack, repository shape, the files cluide reads and writes, the write primitive, security, dev and build, testing. Everything both halves stand on. |
+| [`api`](./api/README.md) | Stable | Planned | The HTTP contract between the Bun server and the page: conventions, then one file per resource — projects, files, settings, mcp, plugins. |
 | [`ui`](./ui/README.md) | Draft | Planned | The page: routes, data flow, save experience. The screens section waits for the UI design. |
 
 ## Start here

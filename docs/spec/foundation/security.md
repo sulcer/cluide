@@ -1,6 +1,6 @@
 # Security
 
-Status: Draft · Planned · 2026-09-12 · What cluide defends against, how, and what it deliberately does not.
+Status: Stable · Planned · 2026-09-12 · What cluide defends against, how, and what it deliberately does not.
 
 ## At a glance
 
@@ -9,6 +9,8 @@ Hooks are shell commands. MCP servers are processes started with the command you
 Anyone who can make the cluide server write one of those files can run code as you. The server
 has no login, so the whole defence is making sure that only the cluide page in your own browser can
 talk to it, and that it can only reach the files it is meant to.
+
+Decided in: [`2026-09-12-cross-site-write-guard.md`](../../adr/2026-09-12-cross-site-write-guard.md).
 
 ## Threat model
 
