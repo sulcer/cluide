@@ -58,7 +58,6 @@ export const noContent = (): Response => new Response(null, { status: 204 });
 // Resource routes are added here task by task.
 function routes(handle: Handle) {
   return {
-    "/api/health": { GET: handle(() => ({ ok: true })) },
     "/api/projects": { GET: handle(() => listProjects()) },
     "/api/files": { GET: handle((req) => listFiles(query(req, "scope"), query(req, "kind"))) },
     "/api/file": {
