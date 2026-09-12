@@ -1,4 +1,5 @@
 import { startServer } from "./app";
+import { loadSchema } from "./schema";
 
 const args = Bun.argv.slice(2);
 const flag = (name: string): string | undefined => {
@@ -11,6 +12,9 @@ if (!Number.isInteger(port) || port <= 0) {
   console.error(`invalid --port: ${flag("--port")}`);
   process.exit(1);
 }
+
+const hasSchema = await loadSchema();
+if (!hasSchema) console.warn("settings schema unavailable: validation is off until it can be fetched");
 
 const server = startServer(port);
 console.log(`cluide listening on ${server.url}`);
