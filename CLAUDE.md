@@ -39,8 +39,9 @@ Full detail, repository layout and the reasoning: [`docs/spec/foundation/`](docs
 
 - **Docs before code.** A spec is written and approved, flipped to `Stable`, and a plan exists
   in `docs/plans/` before implementation starts.
-- **Backend before frontend.** The `api` spec is the contract both halves meet at. The `ui`
-  spec's screens and the frontend plan wait for the UI design, which the user provides.
+- **Backend before frontend.** The `api` spec is the contract both halves meet at; the backend is
+  built. The `ui` spec is the source of truth for the frontend and carries every measurement the
+  page needs.
 - **Git conventions** are the user's global ones: Conventional Commits without scope,
   `<type>/<slug>` branches, ask before every commit. Nothing repo-specific.
 
