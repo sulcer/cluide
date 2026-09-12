@@ -1,6 +1,12 @@
 import { existsSync } from "node:fs";
 import { join, normalize, sep } from "node:path";
 import { ApiError } from "./errors";
+import { createFile, deleteFile, listFiles, readFile, writeFile } from "./resources/files";
+import { deleteMcp, listMcp, putMcp, setMcpApproval } from "./resources/mcp";
+import { listPlugins, setPluginEnabled } from "./resources/plugins";
+import { listProjects } from "./resources/projects";
+import { readSettings, writeSettings } from "./resources/settings";
+import { schemaJson } from "./schema";
 import { assertTrusted } from "./security";
 
 type Handler = (req: Request) => unknown;
@@ -53,6 +59,41 @@ export const noContent = (): Response => new Response(null, { status: 204 });
 function routes(handle: Handle) {
   return {
     "/api/health": { GET: handle(() => ({ ok: true })) },
+    "/api/projects": { GET: handle(() => listProjects()) },
+    "/api/files": { GET: handle((req) => listFiles(query(req, "scope"), query(req, "kind"))) },
+    "/api/file": {
+      GET: handle((req) => readFile(query(req, "path"))),
+      PUT: handle(async (req) => writeFile(await req.json())),
+      POST: handle(async (req) => createFile(await req.json()), 201),
+      DELETE: handle((req) => {
+        deleteFile(query(req, "path"), optional(req, "etag"));
+        return noContent();
+      }),
+    },
+    "/api/settings": {
+      GET: handle((req) => readSettings(query(req, "scope"), query(req, "file"))),
+      PUT: handle(async (req) => writeSettings(await req.json())),
+    },
+    "/api/settings/schema": {
+      GET: handle(() => {
+        const json = schemaJson();
+        if (json === null) throw new ApiError(404, "not_found", "settings schema unavailable");
+        return json;
+      }),
+    },
+    "/api/plugins": {
+      GET: handle(() => listPlugins()),
+      PUT: handle(async (req) => setPluginEnabled(await req.json())),
+    },
+    "/api/mcp": {
+      GET: handle((req) => listMcp(query(req, "scope"))),
+      PUT: handle(async (req) => putMcp(await req.json())),
+      DELETE: handle((req) => {
+        deleteMcp(query(req, "scope"), query(req, "target"), query(req, "name"), optional(req, "etag"));
+        return noContent();
+      }),
+    },
+    "/api/mcp/approval": { POST: handle(async (req) => setMcpApproval(await req.json())) },
   };
 }
 
