@@ -1,6 +1,6 @@
 # Plugins resource
 
-Status: Stable · Planned · 2026-09-12 · Installed plugins, where they come from, and their enabled state.
+Status: Stable · Built · 2026-09-12 · Installed plugins, where they come from, and their enabled state.
 
 ## At a glance
 

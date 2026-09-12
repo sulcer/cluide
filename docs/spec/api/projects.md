@@ -1,6 +1,6 @@
 # Projects resource
 
-Status: Stable · Planned · 2026-09-12 · The list of projects the scope switcher offers.
+Status: Stable · Built · 2026-09-12 · The list of projects the scope switcher offers.
 
 ## At a glance
 

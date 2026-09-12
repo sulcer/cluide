@@ -1,6 +1,6 @@
 # API
 
-Status: Stable · Planned · 2026-09-12 · The HTTP contract between the Bun server and the page, and the conventions every resource follows.
+Status: Stable · Built · 2026-09-12 · The HTTP contract between the Bun server and the page, and the conventions every resource follows.
 
 ## At a glance
 

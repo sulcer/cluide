@@ -1,6 +1,6 @@
 # Write safety
 
-Status: Stable · Planned · 2026-09-12 · The single function every write goes through, and what it guarantees.
+Status: Stable · Built · 2026-09-12 · The single function every write goes through, and what it guarantees.
 
 ## At a glance
 

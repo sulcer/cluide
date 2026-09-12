@@ -1,6 +1,7 @@
 # Foundation
 
-Status: Stable · Planned · 2026-09-12 · The stack, repository shape and safety rules every part of cluide builds on.
+Status: Stable · Partial · 2026-09-12 · The stack, repository shape and safety rules every part of cluide builds on.
+Not built: the Vite frontend, the dev proxy, the Playwright smoke test.
 
 ## At a glance
 

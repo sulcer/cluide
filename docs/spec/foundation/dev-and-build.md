@@ -1,6 +1,7 @@
 # Dev and build
 
-Status: Stable · Planned · 2026-09-12 · How to run cluide while developing it and how it runs when built.
+Status: Stable · Partial · 2026-09-12 · How to run cluide while developing it and how it runs when built.
+Not built: the Vite frontend, the dev proxy, the Playwright smoke test.
 
 ## At a glance
 
