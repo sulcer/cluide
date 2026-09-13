@@ -1,6 +1,26 @@
+import { Navigate } from "react-router";
+import { screenDef, screenUrl } from "@/lib/routes";
 import { useRoute } from "@/lib/useRoute";
+import { FilesScreen } from "./FilesScreen";
 
 export function Screen() {
-  const route = useRoute();
-  return <pre className="p-4 font-mono text-xs">{JSON.stringify(route, null, 2)}</pre>;
+  const { scope, screen, file } = useRoute();
+  const def = screenDef(screen);
+  if (def === undefined || (def.globalOnly && scope !== "global")) {
+    return <Navigate to={screenUrl(scope, "settings")} replace />;
+  }
+  const key = `${scope}/${def.id}`;
+  switch (def.id) {
+    case "hooks":
+      return file === undefined ? <Soon key={key} name="Hooks" /> : <FilesScreen key={`${key}/${file}`} scope={scope} kind="hooks" file={file} />;
+    case "settings":
+    case "mcp":
+    case "plugins":
+      return <Soon key={key} name={def.label} />;
+    default:
+      return <FilesScreen key={key} scope={scope} kind={def.kind!} />;
+  }
 }
+
+// Replaced screen by screen in Tasks 6 to 9.
+const Soon = ({ name }: { name: string }) => <div className="p-4 text-xs text-muted-foreground">{name}</div>;

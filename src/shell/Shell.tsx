@@ -1,4 +1,4 @@
-import type { Project } from "@shared/api";
+import type { FileEntry, Project } from "@shared/api";
 import { useCallback, useRef, useState } from "react";
 import { Outlet } from "react-router";
 import { useResource } from "@/api/useResource";
@@ -13,9 +13,13 @@ import { OfflineBanner } from "./OfflineBanner";
 import { Sidebar } from "./Sidebar";
 import { useShortcuts } from "./useShortcuts";
 
+export interface ShellContext { claudeDir: string | null }
+
 export function Shell() {
   const { scope, screen, file } = useRoute();
   const projects = useResource<Project[]>("/api/projects");
+  const memory = useResource<FileEntry[]>("/api/files?scope=global&kind=memory");
+  const claudeDir = memory.data?.[0] ? memory.data[0].path.slice(0, -"/CLAUDE.md".length) : null;
   const [rail, setRail] = useState(() => readStorage<"full" | "rail">("cluide.sidebar", "full") === "rail");
   const [menuOpen, setMenuOpen] = useState(false);
   const [offline, setOffline] = useState(false);
@@ -42,7 +46,7 @@ export function Shell() {
           {offline && <OfflineBanner />}
           <Header scope={scope} screen={screen} file={file} onToggleSidebar={toggleRail} />
           <main className="flex min-h-0 flex-1 flex-col">
-            <Outlet />
+            <Outlet context={{ claudeDir } satisfies ShellContext} />
           </main>
         </div>
         <CommandMenu open={menuOpen} onOpenChange={setMenuOpen} scope={scope} projects={projects.data ?? []} />
