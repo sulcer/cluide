@@ -91,3 +91,14 @@ trigger to revisit, reference. Add an item when deferring. Remove it when it lan
   source is a shape change to `McpEntry` and a screen change, for a file state that is rare.
 - **Trigger:** The first time a broken plugin file hides a user's own servers.
 - **Reference:** [`api/mcp.md`](spec/api/mcp.md), `readJsonOrEmpty` in the write-safety spec.
+
+---
+
+## Plugin MCP servers declared in `plugin.json`
+
+- **What:** Read MCP servers a plugin declares inside its `plugin.json` manifest, not only in a
+  top-level `.mcp.json`, so the merged list and `hasMcp` cover both forms.
+- **Why deferred:** No installed plugin on the reference machine uses the manifest form, so there
+  is nothing to test against.
+- **Trigger:** A plugin whose servers Claude Code loads but cluide does not list.
+- **Reference:** [`api/mcp.md`](spec/api/mcp.md) sources table, [`api/plugins.md`](spec/api/plugins.md).

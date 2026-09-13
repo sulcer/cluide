@@ -1,6 +1,6 @@
 # Files resource
 
-Status: Stable · Planned · 2026-09-12 · One generic resource for every text file cluide edits at a known location.
+Status: Stable · Built · 2026-09-12 · One generic resource for every text file cluide edits at a known location.
 
 ## At a glance
 

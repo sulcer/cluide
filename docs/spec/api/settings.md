@@ -1,6 +1,6 @@
 # Settings resource
 
-Status: Stable · Planned · 2026-09-12 · Reading and writing `settings.json` and `settings.local.json` per scope, with schema validation.
+Status: Stable · Built · 2026-09-12 · Reading and writing `settings.json` and `settings.local.json` per scope, with schema validation.
 
 ## At a glance
 

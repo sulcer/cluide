@@ -1,6 +1,6 @@
 # Security
 
-Status: Stable · Planned · 2026-09-12 · What cluide defends against, how, and what it deliberately does not.
+Status: Stable · Built · 2026-09-12 · What cluide defends against, how, and what it deliberately does not.
 
 ## At a glance
 
