@@ -44,6 +44,7 @@ files on its own schedule, which is why conflict detection exists.
 | Validation | ajv | `settings.json` has a published JSON schema on SchemaStore (142 properties). |
 | Diff | `git diff --no-index` via `Bun.spawn` | Always present on a dev box; no diff library. |
 | Tests | `bun test` for server modules and pure frontend helpers | Playwright covers the rest of the frontend: a smoke test plus a render spec for visual review. |
+| Formatter and linter | Biome | One dependency and one config for formatting, import order and lint across TypeScript, JSX, JSON and CSS; ESLint plus Prettier would be six. Changes: [`2026-09-13-adopt-biome-for-formatting-and-linting.md`](../../adr/2026-09-13-adopt-biome-for-formatting-and-linting.md) |
 
 Vite over Bun's own bundler is decided in [`2026-09-12-vite-builds-the-page.md`](../../adr/2026-09-12-vite-builds-the-page.md).
 
@@ -59,6 +60,7 @@ cluide/
   index.html              # Vite's entry point; loads src/main.tsx
   tsconfig.json           # server, shared, scripts, e2e; paths: @/* -> src/*, @shared/* -> shared/*
   components.json         # shadcn
+  biome.json              # formatter, linter and import order; bun run lint, bun run format
   CLAUDE.md, .claude/rules/
   docs/                   # adr/, spec/, plans/, nice-to-have.md
   scripts/

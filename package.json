@@ -9,6 +9,8 @@
     "start": "bun server/index.ts --open",
     "test": "bun test server shared src",
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p src/tsconfig.json",
+    "lint": "biome check --error-on-warnings .",
+    "format": "biome check --write .",
     "e2e": "bunx playwright test -c e2e/playwright.config.ts",
     "render": "bunx playwright test -c e2e/playwright.config.ts render.spec.ts"
   },
@@ -26,6 +28,7 @@
     "react-router": "8.3.1"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.5.13",
     "@playwright/test": "1.63.0",
     "@tailwindcss/vite": "4.3.3",
     "@types/bun": "1.4.2",
