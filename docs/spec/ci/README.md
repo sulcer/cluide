@@ -22,7 +22,7 @@ the repository is public, a variable keeps the npm step off and releases exist o
 | File | Trigger | Jobs |
 |---|---|---|
 | `.github/workflows/ci.yml` | `pull_request` to `main`, `push` to `main` | `check`, `e2e`, `docs`, in parallel; a newer push cancels the older run of the same ref |
-| `.github/workflows/release.yml` | `push` to `main`; `workflow_dispatch` with a `tag` input | `release` (release-please), then `publish` when a release was created, or for the given tag |
+| `.github/workflows/release.yml` | `push` to `main`; `workflow_dispatch` with a `tag` input | `release` (release-please), then `publish` when a release was created, or for the given tag; runs queue behind each other and are never cancelled |
 | `.github/workflows/audit.yml` | every Monday 06:00 UTC; `workflow_dispatch` | `bun audit` |
 
 Every job runs on `ubuntu-latest`, installs Bun from the `packageManager` field of `package.json`
@@ -51,7 +51,7 @@ The tool is release-please, in manifest mode: `.release-please-config.json` and
 | Setting | Value | Why |
 |---|---|---|
 | release type | `node` | bumps `package.json` and writes `CHANGELOG.md` |
-| version | from the commit types since the last release: `feat` → minor, `fix` → patch, `!` or `BREAKING CHANGE` → major; while the major is 0, a breaking change bumps the minor | one source of truth: the commits the hook already checks |
+| version | from the commit types since the last release: `feat` → minor, `fix` → patch, `!` or `BREAKING CHANGE` → major; while the major is 0, a breaking change bumps the minor; any other type bumps the patch | one source of truth: the commits the hook already checks |
 | notes | GitHub's generated notes from pull request titles, categorised by `.github/release.yml` | pull requests merge with a merge commit, so per-task commits stay in history without doubling the changelog; release-please writes the same notes into `CHANGELOG.md` and the release body, so the two never differ |
 | release pull request title | `chore: release X.Y.Z` | Conventional Commits, no scope |
 | tag | `vX.Y.Z` | manifest mode would otherwise tag `cluide-vX.Y.Z`, so the config sets `include-component-in-tag` to `false` |
@@ -60,7 +60,9 @@ The tool is release-please, in manifest mode: `.release-please-config.json` and
 The release pull request only ever changes `package.json`, `CHANGELOG.md` and the manifest.
 `bun.lock` does not record the root package's version, so the lockfile stays untouched. The bot's
 pull request gets no CI run of its own, because GitHub does not start workflows for events the
-Actions token creates; the publish job is the gate for the tagged commit.
+Actions token creates; the publish job is the gate for the tagged commit. A release pull request
+opened by a documentation or dependency change stays open and keeps updating until it is merged,
+so releasing is still the maintainer's decision.
 
 `.github/release.yml` puts pull requests into Features (`enhancement`), Fixes (`bug`),
 Documentation (`documentation`) and Other changes, and excludes the bot's own pull requests
@@ -78,8 +80,8 @@ first release after going public, or a retry).
 2. `bun run typecheck`, `bun run test`, `bun run e2e` on the tagged commit.
 3. `bun run build`, then `bun pm pack` → `cluide-X.Y.Z.tgz`.
 4. `npm publish cluide-X.Y.Z.tgz --provenance --access public` with the job's OIDC token
-   (`id-token: write`). The runner's npm is older than the 11.5.1 that trusted publishing needs, so
-   the job installs npm 11 first. No secret is involved.
+   (`id-token: write`). The job installs npm 11 first so the 11.5.1 minimum that trusted publishing
+   needs holds whatever the runner image ships. No secret is involved.
 5. `gh release upload vX.Y.Z cluide-X.Y.Z.tgz` with the job's token (`contents: write`).
 
 A prerelease version (`0.2.0-alpha.1`) publishes under the `alpha` dist-tag; any other prerelease
@@ -90,7 +92,7 @@ under `next`; a plain version under `latest`.
 | Field | Value |
 |---|---|
 | `name` | `cluide` |
-| `bin` | `cluide` → `bin/cluide.ts`, which prints `cluide runs on Bun: https://bun.sh` and exits 1 when `Bun` is undefined, and otherwise starts `server/index.ts` |
+| `bin` | `cluide` → `bin/cluide.ts`, which prints `cluide runs on Bun: https://bun.sh` and `Try: bunx cluide` and exits 1 when `Bun` is undefined, and otherwise starts `server/index.ts` |
 | `files` | `bin`, `server` without `*.test.ts` and `testing.ts`, `shared`, `dist`, `README.md`, `CHANGELOG.md`, `LICENSE` |
 | `dependencies` | `ajv` only; React, react-router, the shadcn packages, lucide, the fonts, Vite and Tailwind are `devDependencies`, since `dist/` ships built |
 | `engines` | `bun >= 1.3.0` |
@@ -105,21 +107,24 @@ the version from `package.json`, the same value the page shows in its footer, in
 
 | Name | Kind | Unset means |
 |---|---|---|
-| `NPM_PUBLISH` | repository variable, `true` to publish | the publish job logs that publishing is off and exits green |
+| `NPM_PUBLISH` | repository variable, `true` to publish | the publish job is skipped; the release job logs a notice naming the tag |
 | `FORBIDDEN_NAMES` | repository variable, comma-separated | the docs job skips the names check with a notice |
 | Allow GitHub Actions to create and approve pull requests | repository setting, Settings → Actions → General → Workflow permissions | the `release` job fails with "GitHub Actions is not permitted to create or approve pull requests"; the release pull request never opens |
 
 There are no secrets. Publishing authenticates with OIDC, artifacts upload with the job token. The
 setting is off on a new repository; it has to be on before the first push to `main` after this
-lands, or the first release pull request is not opened.
+lands, or the first release pull request is not opened. `FORBIDDEN_NAMES` keeps the names out of
+the tree, not secret: anyone who can run the workflow can read it, and a matched name is printed in
+the job log.
 
 ## Go public
 
 In this order, once the repository is public:
 
 1. Publish the first version: run `release.yml` by hand with the tag of the latest release. If npm
-   refuses a first publish over OIDC, run `npm publish --provenance --access public` once from a
-   checkout of that tag; that creates the package.
+   refuses the first publish over OIDC, run `npm publish --provenance=false --access public` once
+   from a checkout of that tag after `npm login`; that creates the package, and the provenance
+   attestation arrives with the first workflow publish.
 2. On npmjs.com, add `sulcer/cluide` with workflow `release.yml` as the package's trusted
    publisher.
 3. Set the repository variable `NPM_PUBLISH` to `true`.
@@ -130,7 +135,8 @@ In this order, once the repository is public:
 ## Dependencies and updates
 
 `.github/dependabot.yml` opens weekly pull requests for GitHub Actions and for Bun packages, minor
-and patch updates grouped into one, keeping exact versions. `audit.yml` fails when an installed
+and patch updates grouped into one, keeping exact versions. Dependabot's pull requests carry the
+`patch` label, like every pull request in this repository. `audit.yml` fails when an installed
 package carries a known advisory, so it shows up without anyone running `bun audit` locally.
 
 ## When something goes wrong
@@ -140,6 +146,7 @@ package carries a known advisory, so it shows up without anyone running `bun aud
 | The publish job failed after the release was created | fix the cause, then run `release.yml` by hand with the tag |
 | A published version is broken | `npm deprecate cluide@X.Y.Z "<reason>"`, then fix forward with a `fix:` and the next release; npm allows unpublishing within 72 hours when nothing depends on the version |
 | The release pull request proposes the wrong version | a commit type was wrong; fix it with an empty commit of the right type (`git commit --allow-empty -m "fix: ..."`) and the bot recomputes |
+| A `workflow_dispatch` for a tag that has no GitHub Release | `npm publish` succeeds and the upload step fails; create the release for the tag with `gh release create vX.Y.Z --generate-notes` and run the workflow again |
 
 ## Open questions
 

@@ -134,3 +134,14 @@ Found reconciling the built frontend against its specs; each too small for its o
   is nothing to test against.
 - **Trigger:** A plugin whose servers Claude Code loads but cluide does not list.
 - **Reference:** [`api/mcp.md`](spec/api/mcp.md) sources table, [`api/plugins.md`](spec/api/plugins.md).
+
+---
+
+## Required checks and the release pull request
+
+Once `main` requires the `check`, `e2e` and `docs` checks, the release pull request that
+release-please opens with the Actions token has none, because GitHub does not start workflows for
+events that token creates; merge it with the administrator override, or move release-please to a
+GitHub App or fine-grained token that starts workflows.
+
+- **Reference:** [`ci`](spec/ci/README.md), Go public.

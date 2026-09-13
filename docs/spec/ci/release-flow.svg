@@ -93,6 +93,6 @@
     <text x="574" y="140">a Release PR is open</text>
     <text x="663" y="180">merged</text>
   </g>
-  <text x="20" y="410" fill="#555" font-size="11">The version comes from the commit types since the last release (feat → minor, fix → patch, ! → major). The notes come from PR titles. Until NPM_PUBLISH is set, the publish job exits green without publishing; releases still exist on GitHub.</text>
+  <text x="20" y="410" fill="#555" font-size="11">The version comes from the commit types since the last release (feat → minor, fix → patch, ! → major). The notes come from PR titles. Until NPM_PUBLISH is set, the publish job is skipped and the release job logs a notice; releases still exist on GitHub.</text>
   <text x="20" y="426" fill="#555" font-size="11">A published tag can be re-published by hand: release.yml has a workflow_dispatch input with the tag name.</text>
 </svg>
