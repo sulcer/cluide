@@ -1,4 +1,4 @@
-import { copyFileSync, existsSync, mkdirSync, mkdtempSync, utimesSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, utimesSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 
@@ -132,14 +132,21 @@ export function seedHome(): string {
   write("cluide/.claude/settings.json", json({}));
   write("cluide/.claude/settings.local.json", '{\n  "permissions": {\n    "allow": [\n  }\n}\n');
 
-  // Warnings are deterministic when the schema cache is present: copy the real one when there is one.
-  const realCache = join(process.env.HOME ?? "", ".cluide", "schema-cache.json");
-  if (existsSync(realCache)) {
-    const target = join(home, ".cluide", "schema-cache.json");
-    mkdirSync(dirname(target), { recursive: true });
-    copyFileSync(realCache, target);
-    utimesSync(target, new Date(), new Date());
-  }
+  // A small deterministic draft-07 schema, so the settings warnings are the same on every machine
+  // regardless of what SchemaStore's real schema currently says.
+  write(".cluide/schema-cache.json", json({
+    $schema: "http://json-schema.org/draft-07/schema#",
+    type: "object",
+    properties: {
+      $schema: { type: "string" },
+      model: { type: "string" },
+      permissions: { type: "object" },
+      enabledPlugins: { type: "object" },
+      managedMcpServers: { type: "object" },
+      hooks: { type: "object", additionalProperties: { type: "array", items: { type: "object", properties: { matcher: { type: "string" } } } } },
+    },
+  }));
+  utimesSync(join(home, ".cluide", "schema-cache.json"), new Date(), new Date());
   return home;
 }
 

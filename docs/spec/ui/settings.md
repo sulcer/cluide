@@ -53,7 +53,7 @@ The warnings shown are the `errors` from the last read or the last successful sa
 | State | What shows |
 |---|---|
 | Missing file (`exists: false`) | The editor column centred: `<file> does not exist in this scope` in 500, the path in mono 12px muted, a primary `Create <file>`. Create opens the editor dirty with `{`, an empty indented line and `}`; the first save `PUT`s it. |
-| Three warnings | Count badge amber `3`, rows `/modelSettings · not in the published schema`, `/mcpServers · not in the published schema`, `/hooks/PreToolUse/0/matcher · must be string`. Save stays enabled. |
+| Three warnings | Count badge amber `3`, rows `/hooks/PreToolUse/0/matcher · must be string`, `/modelSettings · not a documented setting`, `/mcpServers · not a documented setting`. Save stays enabled. |
 | Schema unavailable | The dashed badge next to the count; rows may be empty. |
 | Unparsable | The red banner over the raw text; the panel shows zero warnings because validation needs a parse. |
 

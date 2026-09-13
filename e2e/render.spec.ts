@@ -22,6 +22,8 @@ test.describe("render", () => {
     // Rail mode drops the <nav> landmark (the group labels move into it); the rail's own
     // icon-only links carry the same accessible name, so scope to <nav> to detect collapse.
     await expect(page.locator("nav").getByRole("link", { name: "Settings" })).toHaveCount(0);
+    // The rail still shows the item, now as an icon-only link labelled by its accessible name.
+    await expect(page.getByRole("link", { name: "Settings" })).toBeVisible();
     await shot(page, "shell-collapsed");
     await page.reload();
     await expect(page.locator("nav").getByRole("link", { name: "Settings" })).toHaveCount(0); // persisted
@@ -184,21 +186,20 @@ test.describe("render", () => {
 
   test("editor-diff", async ({ page }) => {
     await page.goto("/global/rules");
+    // security.md, not the default first file: no other case edits it, so the diff below is
+    // exactly +1 regardless of what else in the suite has run.
+    await page.getByRole("button", { name: "security.md" }).click();
     const ta = page.locator("textarea");
-    await ta.click();
-    await ta.press("End");
-    await ta.pressSequentially("\nAdded by the render spec.");
+    const before = await ta.inputValue();
+    const after = before.endsWith("\n") ? `${before}Added by the render spec.\n` : `${before}\nAdded by the render spec.\n`;
+    await ta.fill(after);
     await page.keyboard.press("ControlOrMeta+s");
     await page.getByRole("button", { name: "View diff" }).click();
     // The sheet sits over the still-mounted textarea, which shares the same edited text; scope to
     // the sheet (a Radix Dialog, role="dialog") so the match is unambiguous.
     const sheet = page.getByRole("dialog");
     await expect(sheet.getByText("Added by the render spec.")).toBeVisible();
-    // The click lands after the file's trailing newline, so the appended text starts its own new
-    // line: always 2 added lines, not 1. In the full suite (not run in isolation), "editor-saving"
-    // above already strips git-workflow.md's trailing newline, so this also rewrites that
-    // no-newline last line, making it +2 -1 rather than +2 -0 — either way, +2.
-    await expect(sheet.getByText("+2", { exact: true })).toBeVisible();
+    await expect(sheet.getByText("+1", { exact: true })).toBeVisible();
     await shot(page, "editor-diff");
     await page.keyboard.press("Escape");
     await expect(page.getByText("Diff ·")).toHaveCount(0);
@@ -218,6 +219,43 @@ test.describe("render", () => {
     await page.keyboard.press("Enter");
     await expect(ta).toHaveValue("# Changed outside\n");
     await expect(page.getByText("Reloaded CLAUDE.md from disk")).toBeVisible();
+  });
+
+  test("conflict dialog: Escape leaves the on-disk rewrite untouched", async ({ page }) => {
+    await page.goto("/global/memory");
+    const ta = page.locator("textarea");
+    // fill(), not click+End+type: whatever the previous test in the suite left CLAUDE.md as, this
+    // always ends with a trailing newline, so a later diff elsewhere in the suite stays a clean
+    // pure addition instead of a "no newline at end of file" line change (see editor-diff's note).
+    const before = await ta.inputValue();
+    await ta.fill(before.endsWith("\n") ? `${before}mine\n` : `${before}\nmine\n`);
+    const claudeMd = join(homeDir(), ".claude", "CLAUDE.md");
+    writeFileSync(claudeMd, "# Escape leaves this alone\n");
+    await page.keyboard.press("ControlOrMeta+s");
+    await expect(page.getByText("changed on disk")).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(page.getByText("changed on disk")).toHaveCount(0);
+    await expect(page.getByText("Unsaved changes")).toBeVisible();
+    expect(readFileSync(claudeMd, "utf8")).toBe("# Escape leaves this alone\n");
+  });
+
+  test("conflict dialog: Overwrite replaces the on-disk rewrite", async ({ page }) => {
+    await page.goto("/global/memory");
+    const ta = page.locator("textarea");
+    const before = await ta.inputValue();
+    const edited = before.endsWith("\n") ? `${before}mine\n` : `${before}\nmine\n`;
+    await ta.fill(edited);
+    const claudeMd = join(homeDir(), ".claude", "CLAUDE.md");
+    writeFileSync(claudeMd, "# Overwrite replaces this\n");
+    await page.keyboard.press("ControlOrMeta+s");
+    await expect(page.getByText("changed on disk")).toBeVisible();
+    await page.getByRole("button", { name: "Overwrite" }).click();
+    // The conflict dialog is a Radix modal, which marks the rest of the page (the Toaster
+    // included) aria-hidden while its exit animation plays, so getByRole("status") and
+    // getByText("Saved") (the save bar reads "Saved" too) are both ambiguous or hidden here.
+    // Match the toast's DOM attribute directly, as the mcp-sheet flow does for the same reason.
+    await expect(page.locator('[role="status"]')).toContainText("Saved");
+    expect(readFileSync(claudeMd, "utf8")).toBe(edited);
   });
 
   test("a conflict with no version on disk recovers as a create", async ({ page }) => {
@@ -244,13 +282,19 @@ test.describe("render", () => {
 
   test("editor-delete", async ({ page }) => {
     await page.goto("/global/rules");
-    await page.getByRole("button", { name: "style.md" }).click();
-    await page.getByRole("button", { name: "Delete" }).click();
-    await expect(page.getByText("Delete style.md?")).toBeVisible();
+    // Its own file, not style.md from "editor-new creates a file": nothing else may depend on
+    // which files editor-new or editor-delete each create.
+    await page.request.post("/api/file", { headers: { "X-Cluide": "1" }, data: { path: `${homeDir()}/.claude/rules/to-delete.md`, content: "" } });
+    await page.reload();
+    await page.getByRole("button", { name: "to-delete.md" }).click();
+    // exact: true, unlike every other case here — "to-delete.md" itself contains "delete", so a
+    // substring match on the header's trash button would also match the just-clicked list item.
+    await page.getByRole("button", { name: "Delete", exact: true }).click();
+    await expect(page.getByText("Delete to-delete.md?")).toBeVisible();
     await shot(page, "editor-delete");
     await page.getByRole("button", { name: "Delete", exact: true }).last().click();
-    await expect(page.getByText("Deleted style.md")).toBeVisible();
-    await expect(page.getByRole("button", { name: "style.md" })).toHaveCount(0);
+    await expect(page.getByText("Deleted to-delete.md")).toBeVisible();
+    await expect(page.getByRole("button", { name: "to-delete.md" })).toHaveCount(0);
   });
 
   test("a failed delete keeps the dialog open", async ({ page }) => {
@@ -294,13 +338,17 @@ test.describe("render", () => {
   test("settings-warnings", async ({ page }) => {
     await page.goto("/global/settings");
     await expect(page.locator("textarea")).toHaveValue(/"enabledPlugins"/);
-    await expect(page.getByText("Warnings")).toBeVisible();
+    const warnings = page.getByRole("complementary", { name: "Warnings" });
+    await expect(warnings.getByText("3", { exact: true })).toBeVisible();
+    await expect(warnings.getByText("/hooks/PreToolUse/0/matcher")).toBeVisible();
+    await expect(warnings.getByText("must be string")).toBeVisible();
+    await expect(warnings.getByText("/modelSettings")).toBeVisible();
+    await expect(warnings.getByText("/mcpServers")).toBeVisible();
+    await expect(warnings.getByText("not a documented setting")).toHaveCount(2);
     await shot(page, "settings-warnings");
-    const rows = page.getByRole("complementary", { name: "Warnings" }).getByRole("button");
-    if ((await rows.count()) > 0) {
-      await rows.first().click();
-      await expect(page.locator("textarea")).toBeFocused();
-    }
+    const rows = warnings.getByRole("button");
+    await rows.first().click();
+    await expect(page.locator("textarea")).toBeFocused();
   });
 
   test("settings-local-missing", async ({ page }) => {
