@@ -161,6 +161,7 @@ test.describe("render", () => {
     await page.keyboard.press("Enter");
     await expect(page.getByRole("button", { name: "security.md" })).toHaveClass(/selected/);
     await expect(page.locator("textarea")).toHaveValue(/Never paste raw logs into chat/);
+    await expect(page.locator("textarea")).toBeFocused();
   });
 
   test("a failed read clears once retried", async ({ page }) => {

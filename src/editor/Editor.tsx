@@ -1,5 +1,5 @@
 import { CircleAlert } from "lucide-react";
-import { type Ref, useEffect, useRef } from "react";
+import { type Ref, useCallback, useEffect, useRef } from "react";
 import { cn } from "cn";
 import type { DraftError } from "./useDraft";
 
@@ -15,18 +15,23 @@ interface Props {
 export function Editor({ value, onChange, error, disabled, autoFocus = true, ref }: Props) {
   const local = useRef<HTMLTextAreaElement>(null);
   useEffect(() => {
-    // A dialog already open (the command menu, a conflict) keeps focus; a late-loading
-    // editor (its data arrived after the dialog opened) must not steal it.
-    if (autoFocus && !document.querySelector('[role="dialog"]')) local.current?.focus();
+    // An open dialog (the command menu, a conflict) keeps focus; a late-loading editor (its
+    // data arrived after the dialog opened) must not steal it. A closing dialog stays mounted
+    // with data-state="closed" for its exit animation, so only an open one counts.
+    if (autoFocus && !document.querySelector('[role="dialog"]:not([data-state="closed"])')) local.current?.focus();
   }, []);
+  const setRef = useCallback(
+    (node: HTMLTextAreaElement | null) => {
+      local.current = node;
+      if (typeof ref === "function") ref(node);
+      else if (ref) ref.current = node;
+    },
+    [ref],
+  );
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <textarea
-        ref={(node) => {
-          local.current = node;
-          if (typeof ref === "function") ref(node);
-          else if (ref) ref.current = node;
-        }}
+        ref={setRef}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         disabled={disabled}
