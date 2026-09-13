@@ -437,3 +437,39 @@ test.describe("render", () => {
     await expect(page.getByText("9 plugins · 6 enabled")).toBeVisible();
   });
 });
+
+test.describe("light", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => localStorage.setItem("cluide.theme", JSON.stringify("light")));
+  });
+
+  test("light-shell and light-settings-warnings", async ({ page }) => {
+    await page.goto("/global/settings");
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+    await shot(page, "light-settings-warnings");
+    await shot(page, "light-shell");
+  });
+
+  test("light-editor-diff", async ({ page }) => {
+    await page.goto("/global/rules");
+    const ta = page.locator("textarea");
+    await ta.click();
+    await ta.press("End");
+    await ta.pressSequentially("\nLight render line.");
+    await page.keyboard.press("ControlOrMeta+s");
+    await page.getByRole("button", { name: "View diff" }).click();
+    // The sheet sits over the still-mounted textarea, which shares the same edited text (see the
+    // "editor-diff" test above); scope to the sheet so the match is unambiguous.
+    await expect(page.getByRole("dialog").getByText("Light render line.")).toBeVisible();
+    await shot(page, "light-editor-diff");
+  });
+
+  test("light-mcp-project and light-plugins", async ({ page }) => {
+    await page.goto(`${projectUrl("fetcher")}/mcp`);
+    await expect(page.getByText("Shadowed by local")).toBeVisible();
+    await shot(page, "light-mcp-project");
+    await page.goto("/global/plugins");
+    await expect(page.getByText(/plugins ·/)).toBeVisible();
+    await shot(page, "light-plugins");
+  });
+});

@@ -5,7 +5,7 @@ import { cn } from "cn";
 const base = "inline-flex h-[18px] shrink-0 items-center rounded-sm px-1.5 text-[11px] font-medium leading-none";
 
 const scopeClass: Record<McpScope, string> = {
-  local: "bg-background text-foreground",
+  local: "bg-foreground text-background",
   project: "border border-foreground",
   user: "border bg-secondary",
   plugin: "border border-dashed border-muted-foreground text-muted-foreground",
