@@ -4,6 +4,7 @@ import { type ApiError, api } from "@/api/client";
 import { useResource } from "@/api/useResource";
 import { ProvidesBadge } from "@/components/Badge";
 import { SearchInput } from "@/components/Input";
+import { LoadFailed } from "@/components/LoadFailed";
 import { SkeletonRows } from "@/components/Skeleton";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "@/lib/toast";
@@ -15,6 +16,11 @@ export function PluginsScreen() {
   const plugins = list.data;
   const shown = plugins?.filter((p) => `${p.name} ${p.marketplace}`.toLowerCase().includes(filter.toLowerCase())) ?? [];
   const enabledCount = plugins?.filter((p) => p.enabled).length ?? 0;
+
+  // A network failure is the shell's offline banner, not this screen's own retry state.
+  if (list.error !== undefined && list.error.code !== "offline" && plugins === undefined) {
+    return <LoadFailed what="Plugins" error={list.error} onRetry={list.reload} />;
+  }
 
   const toggle = async (plugin: Plugin, enabled: boolean) => {
     try {

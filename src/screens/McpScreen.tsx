@@ -5,6 +5,7 @@ import { useLocation } from "react-router";
 import { type ApiError, api, q } from "@/api/client";
 import { useResource } from "@/api/useResource";
 import { ScopeBadge } from "@/components/Badge";
+import { LoadFailed } from "@/components/LoadFailed";
 import { SkeletonRows } from "@/components/Skeleton";
 import { Switch } from "@/components/ui/switch";
 import { useWindowEvent } from "@/lib/events";
@@ -25,6 +26,11 @@ export function McpScreen({ scope }: { scope: Scope }) {
   const entries = list.data;
   const open = entries?.find((e) => keyOf(e) === openKey);
   const effective = entries?.filter((e) => e.effective).length ?? 0;
+
+  // A network failure is the shell's offline banner, not this screen's own retry state.
+  if (list.error !== undefined && list.error.code !== "offline" && entries === undefined) {
+    return <LoadFailed what="MCP servers" error={list.error} onRetry={list.reload} />;
+  }
 
   const approve = async (entry: McpEntry, enabled: boolean) => {
     try {

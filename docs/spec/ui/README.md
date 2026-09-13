@@ -64,6 +64,9 @@ without hunting for a focusable element.
 - Theme, sidebar collapse and the command menu's recent files are per-viewer conveniences kept in
   `localStorage`, read inside `try`, and default sanely when missing.
 - The app version shown in the sidebar footer is `package.json`'s `version`, inlined at build time.
+- A read that fails with a status shows `<screen> could not be loaded`, the status and message, and
+  a `Retry` button that reloads; a network failure shows the offline banner instead.
+  *Changes: [2026-09-13-frontend-build-reconciliations.md](../../adr/2026-09-13-frontend-build-reconciliations.md)*
 
 ## Topic files
 

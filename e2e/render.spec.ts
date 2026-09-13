@@ -459,6 +459,24 @@ test.describe("render", () => {
     await expect(page.getByRole("row")).toHaveCount(2); // header + acme-mcp
     await expect(page.getByText("9 plugins · 6 enabled")).toBeVisible();
   });
+
+  test("a failed plugin list read shows Retry", async ({ page }) => {
+    // A boolean gate, not a one-shot counter — see "a failed read clears once retried" above.
+    let failing = true;
+    await page.route("**/api/plugins", async (route) => {
+      if (failing) {
+        await route.fulfill({ status: 422, contentType: "application/json", body: JSON.stringify({ error: { code: "unprocessable", message: "installed_plugins.json is not valid JSON" } }) });
+      } else {
+        await route.continue();
+      }
+    });
+    await page.goto("/global/plugins");
+    await expect(page.getByText("Plugins could not be loaded")).toBeVisible();
+    await expect(page.getByText("422 · installed_plugins.json is not valid JSON")).toBeVisible();
+    failing = false;
+    await page.getByRole("button", { name: "Retry" }).click();
+    await expect(page.getByText("acme-mcp")).toBeVisible();
+  });
 });
 
 test.describe("light", () => {

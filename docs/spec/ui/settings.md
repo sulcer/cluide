@@ -32,8 +32,9 @@ the name in 11px muted Inter. The save bar sits at the right of the same row.
 
 ## Warnings panel
 
-320px, 1px left border, flex column. Below 1200px of frame width it moves under the editor, full
-width, 180px tall, 1px top border.
+320px, 1px left border, flex column. Below a 1200px viewport it moves under the editor, full width,
+180px tall, 1px top border.
+*Changes: [2026-09-13-frontend-build-reconciliations.md](../../adr/2026-09-13-frontend-build-reconciliations.md)*
 
 - Header 32px, padding 0 12px, 12px 500: `Warnings`, the count badge (`--warning` with dark text
   above zero, `--muted` at zero), then when the read carried `schema: "unavailable"` a dashed badge

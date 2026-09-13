@@ -4,6 +4,7 @@ import { Link } from "react-router";
 import { q } from "@/api/client";
 import { useResource } from "@/api/useResource";
 import { Centered } from "@/components/Centered";
+import { LoadFailed } from "@/components/LoadFailed";
 import { SkeletonRows } from "@/components/Skeleton";
 import { flattenHooks, language, scriptFor } from "@/lib/hooks";
 import { screenUrl, scopeUrl } from "@/lib/routes";
@@ -12,6 +13,10 @@ export function HooksScreen({ scope }: { scope: Scope }) {
   const settings = useResource<SettingsDoc>(`/api/settings${q({ scope, file: "settings" })}`);
   const local = useResource<SettingsDoc>(`/api/settings${q({ scope, file: "local" })}`);
   const scripts = useResource<FileEntry[]>(`/api/files${q({ scope, kind: "hooks" })}`);
+  // Whichever resource failed first drives the retry state; a network failure is the shell's
+  // offline banner instead.
+  const failed = [settings, local, scripts].find((r) => r.error !== undefined && r.error.code !== "offline" && r.data === undefined);
+  if (failed) return <LoadFailed what="Hooks" error={failed.error!} onRetry={failed.reload} />;
   if (settings.data === undefined || local.data === undefined || scripts.data === undefined) return <SkeletonRows />;
 
   const docs = [settings.data, local.data];

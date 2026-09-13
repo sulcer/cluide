@@ -7,6 +7,7 @@ import { useResource } from "@/api/useResource";
 import { Button } from "@/components/Button";
 import { Centered } from "@/components/Centered";
 import { IconButton } from "@/components/IconButton";
+import { LoadFailed } from "@/components/LoadFailed";
 import { ConflictDialog } from "@/editor/ConflictDialog";
 import { DeleteDialog } from "@/editor/DeleteDialog";
 import { DiffSheet } from "@/editor/DiffSheet";
@@ -96,6 +97,11 @@ export function FilesScreen({ scope, kind, file }: Props) {
     else setSelectedPath(next?.path);
     list.reload();
   };
+
+  // A network failure is the shell's offline banner, not this screen's own retry state.
+  if (list.error !== undefined && list.error.code !== "offline" && entries === undefined) {
+    return <LoadFailed what={screenDef(kind)?.label ?? kind} error={list.error} onRetry={list.reload} />;
+  }
 
   return (
     <div className="flex min-h-0 flex-1">

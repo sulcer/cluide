@@ -5,6 +5,7 @@ import { ApiError, api, q } from "@/api/client";
 import { useResource } from "@/api/useResource";
 import { Button } from "@/components/Button";
 import { Centered } from "@/components/Centered";
+import { LoadFailed } from "@/components/LoadFailed";
 import { ConflictDialog } from "@/editor/ConflictDialog";
 import { DiffSheet } from "@/editor/DiffSheet";
 import { Editor } from "@/editor/Editor";
@@ -33,6 +34,8 @@ export function SettingsScreen({ scope }: { scope: Scope }) {
       file={file}
       onFile={setFile}
       doc={docs[file].data}
+      error={docs[file].error}
+      onRetry={docs[file].reload}
       missing={{ settings: settings.data?.exists === false, local: local.data?.exists === false }}
       onWritten={reloadBoth}
     />
@@ -44,11 +47,13 @@ interface EditorProps {
   file: SettingsFile;
   onFile: (file: SettingsFile) => void;
   doc: SettingsDoc | undefined;
+  error: ApiError | undefined;
+  onRetry: () => void;
   missing: Record<SettingsFile, boolean>;
   onWritten: () => void;
 }
 
-function SettingsEditor({ scope, file, onFile, doc, missing, onWritten }: EditorProps) {
+function SettingsEditor({ scope, file, onFile, doc, error, onRetry, missing, onWritten }: EditorProps) {
   const [errors, setErrors] = useState<SchemaError[]>();
   const [created, setCreated] = useState<Loaded>();
   const textarea = useRef<HTMLTextAreaElement>(null);
@@ -113,7 +118,18 @@ function SettingsEditor({ scope, file, onFile, doc, missing, onWritten }: Editor
     </div>
   );
 
-  if (doc === undefined) return tabs;
+  if (doc === undefined) {
+    // A network failure is the shell's offline banner, not this screen's own retry state.
+    if (error !== undefined && error.code !== "offline") {
+      return (
+        <>
+          {tabs}
+          <LoadFailed what="Settings" error={error} onRetry={onRetry} />
+        </>
+      );
+    }
+    return tabs;
+  }
   if (!doc.exists && created === undefined) {
     return (
       <>
