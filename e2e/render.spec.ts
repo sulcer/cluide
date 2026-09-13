@@ -422,4 +422,18 @@ test.describe("render", () => {
     await expect(page).toHaveURL(/\/global\/mcp$/);
     await expect(page.getByPlaceholder("my-server")).toBeVisible();
   });
+
+  test("plugins", async ({ page }) => {
+    await page.goto("/global/plugins");
+    await expect(page.getByText("9 plugins · 6 enabled")).toBeVisible();
+    await shot(page, "plugins");
+    await page.getByRole("switch", { name: "Enable code-review" }).click();
+    await expect(page.getByText("Enabled code-review")).toBeVisible();
+    await expect(page.getByText("9 plugins · 7 enabled")).toBeVisible();
+    await page.getByRole("switch", { name: "Enable code-review" }).click();
+    await expect(page.getByText("Disabled code-review")).toBeVisible();
+    await page.getByPlaceholder("Filter plugins").fill("acme");
+    await expect(page.getByRole("row")).toHaveCount(2); // header + acme-mcp
+    await expect(page.getByText("9 plugins · 6 enabled")).toBeVisible();
+  });
 });

@@ -4,6 +4,7 @@ import { useRoute } from "@/lib/useRoute";
 import { FilesScreen } from "./FilesScreen";
 import { HooksScreen } from "./HooksScreen";
 import { McpScreen } from "./McpScreen";
+import { PluginsScreen } from "./PluginsScreen";
 import { SettingsScreen } from "./SettingsScreen";
 
 export function Screen() {
@@ -21,11 +22,8 @@ export function Screen() {
     case "mcp":
       return <McpScreen key={key} scope={scope} />;
     case "plugins":
-      return <Soon key={key} name={def.label} />;
+      return <PluginsScreen key={key} />;
     default:
       return <FilesScreen key={key} scope={scope} kind={def.kind!} />;
   }
 }
-
-// Replaced screen by screen in Tasks 6 to 9.
-const Soon = ({ name }: { name: string }) => <div className="p-4 text-xs text-muted-foreground">{name}</div>;
