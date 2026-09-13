@@ -10,6 +10,10 @@ on:
         required: true
         type: string
 
+concurrency:
+  group: release
+  cancel-in-progress: false
+
 permissions:
   contents: read
 
@@ -21,6 +25,7 @@ jobs:
     timeout-minutes: 5
     permissions:
       contents: write
+      issues: write
       pull-requests: write
     outputs:
       created: ${{ steps.rp.outputs.release_created }}
@@ -37,7 +42,7 @@ jobs:
   publish:
     name: Publish
     needs: [release]
-    if: always() && (github.event_name == 'workflow_dispatch' || (needs.release.outputs.created == 'true' && vars.NPM_PUBLISH == 'true'))
+    if: "!cancelled() && (github.event_name == 'workflow_dispatch' || (needs.release.outputs.created == 'true' && vars.NPM_PUBLISH == 'true'))"
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
