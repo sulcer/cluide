@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { join } from "node:path";
-import { loadSchema, schemaAvailable, validateSettings } from "./schema";
-import { tempHome, type TempHome } from "./testing";
+import { loadSchema, schemaAvailable, validateSettings } from "../schema";
+import { tempHome, type TempHome } from "./temp-home";
 
 const TINY_SCHEMA = JSON.stringify({
   $schema: "http://json-schema.org/draft-07/schema#",

@@ -2,11 +2,11 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { ErrorCode } from "@shared/api";
-import { ApiError } from "../errors";
-import { etagOf } from "../fs";
-import { loadSchema } from "../schema";
-import { tempHome, type TempHome } from "../testing";
-import { readSettings, writeSettings } from "./settings";
+import { ApiError } from "../../errors";
+import { etagOf } from "../../fs";
+import { loadSchema } from "../../schema";
+import { tempHome, type TempHome } from "../temp-home";
+import { readSettings, writeSettings } from "../../resources/settings";
 
 const TINY_SCHEMA = JSON.stringify({ type: "object", properties: { model: { type: "string" } } });
 

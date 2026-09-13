@@ -2,10 +2,10 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import type { ErrorCode } from "@shared/api";
-import { ApiError } from "../errors";
-import { etagOf } from "../fs";
-import { tempHome, type TempHome } from "../testing";
-import { createFile, deleteFile, listFiles, readFile, writeFile } from "./files";
+import { ApiError } from "../../errors";
+import { etagOf } from "../../fs";
+import { tempHome, type TempHome } from "../temp-home";
+import { createFile, deleteFile, listFiles, readFile, writeFile } from "../../resources/files";
 
 let t: TempHome;
 beforeEach(() => { t = tempHome(); });

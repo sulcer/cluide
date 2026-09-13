@@ -2,10 +2,10 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { ErrorCode, McpEntry } from "@shared/api";
-import { ApiError } from "../errors";
-import { sliceEtag } from "../fs";
-import { tempHome, type TempHome } from "../testing";
-import { deleteMcp, listMcp, putMcp, setMcpApproval } from "./mcp";
+import { ApiError } from "../../errors";
+import { sliceEtag } from "../../fs";
+import { tempHome, type TempHome } from "../temp-home";
+import { deleteMcp, listMcp, putMcp, setMcpApproval } from "../../resources/mcp";
 
 let t: TempHome;
 const userServers = { shared: { command: "user-shared" }, github: { type: "http", url: "https://api" } };

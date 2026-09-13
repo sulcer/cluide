@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, expect, test } from "bun:test";
 import { join } from "node:path";
-import { tempHome, type TempHome } from "../testing";
-import { listProjects } from "./projects";
+import { tempHome, type TempHome } from "../temp-home";
+import { listProjects } from "../../resources/projects";
 
 let t: TempHome;
 beforeEach(() => { t = tempHome(); });

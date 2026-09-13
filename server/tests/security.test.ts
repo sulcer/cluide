@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { ApiError } from "./errors";
-import { assertTrusted } from "./security";
+import { ApiError } from "../errors";
+import { assertTrusted } from "../security";
 
 const PORT = 8787;
 const request = (method: string, headers: Record<string, string>) =>

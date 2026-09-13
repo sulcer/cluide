@@ -2,10 +2,10 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { ErrorCode } from "@shared/api";
-import { ApiError } from "../errors";
-import { sliceEtag } from "../fs";
-import { tempHome, type TempHome } from "../testing";
-import { listPlugins, setPluginEnabled } from "./plugins";
+import { ApiError } from "../../errors";
+import { sliceEtag } from "../../fs";
+import { tempHome, type TempHome } from "../temp-home";
+import { listPlugins, setPluginEnabled } from "../../resources/plugins";
 
 let t: TempHome;
 let installA: string;

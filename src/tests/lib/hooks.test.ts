@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { flattenHooks, language, scriptFor } from "./hooks";
+import { flattenHooks, language, scriptFor } from "@/lib/hooks";
 
 describe("hooks", () => {
   test("flattens events, matchers and hooks in file order", () => {

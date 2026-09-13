@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { parseFrontmatter } from "./frontmatter";
+import { parseFrontmatter } from "@/lib/frontmatter";
 
 describe("parseFrontmatter", () => {
   test("reads name and description", () => {

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { decodeProject, kindDir, scopeName, scopeUrl, screenUrl, visibleScreens } from "./routes";
+import { decodeProject, kindDir, scopeName, scopeUrl, screenUrl, visibleScreens } from "@/lib/routes";
 
 describe("routes", () => {
   test("a project path round-trips through the url", () => {

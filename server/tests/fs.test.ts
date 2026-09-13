@@ -2,9 +2,9 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { ErrorCode } from "@shared/api";
-import { ApiError } from "./errors";
-import { deleteText, etagOf, patchJson, readJsonDoc, readText, sliceEtag, writeText } from "./fs";
-import { tempHome, type TempHome } from "./testing";
+import { ApiError } from "../errors";
+import { deleteText, etagOf, patchJson, readJsonDoc, readText, sliceEtag, writeText } from "../fs";
+import { tempHome, type TempHome } from "./temp-home";
 
 let t: TempHome;
 beforeEach(() => { t = tempHome(); });

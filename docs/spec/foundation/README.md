@@ -79,28 +79,28 @@ cluide/
     paths.ts              # roots, scope -> file paths, allowlist check
     fs.ts                 # readText, writeText, JSON helpers (backup, atomic, etag, diff)
     schema.ts             # settings schema fetch, disk cache, ajv validate
-    testing.ts            # temp HOME helper for tests; tests sit next to modules as *.test.ts
     resources/
       projects.ts, files.ts, settings.ts, mcp.ts, plugins.ts
+    tests/                # bun test, mirroring server/; temp-home.ts is the temp HOME helper
   src/
     tsconfig.json         # the app's own tsconfig: DOM + JSX types, paths relative to src/
     vite-env.d.ts         # Vite's ambient client types
     main.tsx, router.tsx, globals.css
     api/                  # client.ts, useResource.ts
-    lib/                  # pure, unit tested next to source: routes, diff, frontmatter, hooks, mcp.
-                           # React or browser helpers: useRoute, icons, keys, json, events, storage,
-                           # theme, toast, recent.
+    lib/                  # pure: routes, diff, frontmatter, hooks, mcp. React or browser helpers:
+                           # useRoute, icons, keys, json, events, storage, theme, toast, recent.
     components/           # Button, Input, Badge, Kbd, IconButton, Skeleton, Centered, Toaster
     components/ui/        # shadcn (generated)
     shell/                # Shell, Sidebar, ScopeSwitcher, Header, OfflineBanner, CommandMenu
     editor/                # useDraft (the save-state machine), SaveBar, Editor, DiffSheet,
                            # ConflictDialog, DeleteDialog — shared by every editing screen
     screens/               # Screen (picks a screen from the route) plus one file per screen
+    tests/                 # bun test, mirroring src/: tests/lib/*.test.ts
 ```
 
 Rules for growth: one file per screen under `screens/`, sharing `editor/` for editing and `shell/`
 for layout; one module per resource under `server/resources/`; both sides import types only from
-`shared/api.ts`.
+`shared/api.ts`. Tests live in `<package>/tests/`, mirroring the package.
 
 ## Topic files
 

@@ -2,9 +2,9 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdirSync, symlinkSync } from "node:fs";
 import { join } from "node:path";
 import type { ErrorCode } from "@shared/api";
-import { ApiError } from "./errors";
-import { assertAllowed, assertScope, projectPaths } from "./paths";
-import { tempHome, type TempHome } from "./testing";
+import { ApiError } from "../errors";
+import { assertAllowed, assertScope, projectPaths } from "../paths";
+import { tempHome, type TempHome } from "./temp-home";
 
 let t: TempHome;
 beforeEach(() => { t = tempHome(); });

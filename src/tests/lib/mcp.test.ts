@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { buildConfig, commandText, readOnly, transportOf } from "./mcp";
+import { buildConfig, commandText, readOnly, transportOf } from "@/lib/mcp";
 
 describe("mcp", () => {
   test("transport, command text and read-only", () => {
