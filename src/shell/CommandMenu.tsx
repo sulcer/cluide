@@ -42,6 +42,7 @@ export function CommandMenu({ open, onOpenChange, scope, projects }: Props) {
     <Dialog open={open} onOpenChange={(o) => { setQuery(""); onOpenChange(o); }}>
       <DialogContent
         showCloseButton={false}
+        overlayClassName="bg-black/40"
         className="top-24 w-[560px] sm:max-w-[560px] max-w-[calc(100%-32px)] translate-y-0 gap-0 rounded-lg border p-0 shadow-float ring-0"
       >
         <DialogTitle className="sr-only">Command menu</DialogTitle>

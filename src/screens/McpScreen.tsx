@@ -7,7 +7,7 @@ import { useResource } from "@/api/useResource";
 import { ScopeBadge } from "@/components/Badge";
 import { LoadFailed } from "@/components/LoadFailed";
 import { SkeletonRows } from "@/components/Skeleton";
-import { Switch } from "@/components/ui/switch";
+import { Switch } from "@/components/Switch";
 import { useWindowEvent } from "@/lib/events";
 import { commandText, readOnly, transportOf } from "@/lib/mcp";
 import { toast } from "@/lib/toast";
@@ -86,7 +86,7 @@ export function McpScreen({ scope }: { scope: Scope }) {
                   <td className="truncate px-3 font-mono text-xs text-muted-foreground" title={commandText(e.config)}>{commandText(e.config)}</td>
                   <td onClick={(ev) => ev.stopPropagation()}>
                     {e.scope === "project" && (
-                      <Switch checked={e.enabled === true} onCheckedChange={(v) => void approve(e, v)} aria-label={`Approve ${e.name}`} className="h-[18px] w-8 [&_[data-slot=switch-thumb]]:size-3.5" />
+                      <Switch checked={e.enabled === true} onCheckedChange={(v) => void approve(e, v)} aria-label={`Approve ${e.name}`} />
                     )}
                   </td>
                   <td className={cn("pr-4 pl-3", !e.effective && "text-muted-foreground")}>{e.effective ? "Effective" : `Shadowed by ${e.shadowedBy}`}</td>

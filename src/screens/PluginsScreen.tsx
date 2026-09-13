@@ -6,7 +6,7 @@ import { ProvidesBadge } from "@/components/Badge";
 import { SearchInput } from "@/components/Input";
 import { LoadFailed } from "@/components/LoadFailed";
 import { SkeletonRows } from "@/components/Skeleton";
-import { Switch } from "@/components/ui/switch";
+import { Switch } from "@/components/Switch";
 import { toast } from "@/lib/toast";
 import { cn } from "cn";
 
@@ -73,7 +73,7 @@ export function PluginsScreen() {
                   </span>
                 </td>
                 <td className="pr-4 pl-3">
-                  <Switch checked={p.enabled} onCheckedChange={(v) => void toggle(p, v)} aria-label={`Enable ${p.name}`} className="h-[18px] w-8 [&_[data-slot=switch-thumb]]:size-3.5" />
+                  <Switch checked={p.enabled} onCheckedChange={(v) => void toggle(p, v)} aria-label={`Enable ${p.name}`} />
                 </td>
               </tr>
             ))}
