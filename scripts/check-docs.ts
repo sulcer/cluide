@@ -2,7 +2,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
 
 const STATUS = /^Status: (Draft|Stable) · (Built|Partial|Planned) · \d{4}-\d{2}-\d{2} · .+$/;
-const LINK = /\]\((\.{1,2}\/[^)#\s]+)/g;
+const LINK = /\]\((?!https?:\/\/|#|mailto:|\/)([^)#\s]+)/g;
 const TEXT = /\.(md|ts|tsx|json|css|yml|yaml|html|svg|txt)$/;
 const SKIP = ["node_modules", "dist", ".git", "e2e/renders", "docs/spec/ui/design", ".agents", ".claude/skills", ".superpowers"];
 

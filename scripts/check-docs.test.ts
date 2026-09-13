@@ -31,6 +31,17 @@ describe("checkDocs", () => {
     }
   });
 
+  test("reports a bare relative broken link", () => {
+    const root = tree({
+      "docs/spec/a/README.md": "# A\n\nStatus: Stable · Built · 2026-09-13 · Fine.\n\nSee [x](missing/other.md).\n",
+    });
+    try {
+      expect(checkDocs(root, [])).toEqual(["docs/spec/a/README.md:5 broken link: missing/other.md"]);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
   test("a clean tree has no violations", () => {
     const root = tree({ "docs/spec/a/README.md": "# A\n\nStatus: Draft · Planned · 2026-09-13 · Fine.\n" });
     try {

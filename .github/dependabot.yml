@@ -7,6 +7,9 @@ updates:
     commit-message:
       prefix: build
     labels: [patch]
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
   - package-ecosystem: bun
     directory: /
     schedule:
