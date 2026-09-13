@@ -22,9 +22,9 @@ defined what happens when the server is unreachable (the offline banner) but not
 screen shows when its one resource read comes back with a 4xx or 5xx status — an unknown scope, an
 unparsable `.mcp.json`, a broken `installed_plugins.json` — which left every list and the settings
 document stuck on permanent loading skeletons. Second, `settings.md` said the warnings panel moves
-under the editor "below 1200px of frame width", but the built panel uses a CSS viewport media query,
-and at the design's 1440px viewport (a 1200px content frame once the 240px sidebar is subtracted)
-only the viewport reading reproduces the design's render.
+under the editor "below 1200px of frame width", but the built panel uses a CSS viewport media query.
+At the design's 1440px viewport (a 1200px frame), only the viewport reading reproduces the design's
+own render; a literal frame-width (container) query does not.
 
 ## Options considered
 
@@ -38,9 +38,8 @@ only the viewport reading reproduces the design's render.
 **Warnings panel breakpoint**
 
 - *Frame width*, matching the spec's original wording literally (a container query on the editor
-  column's own width). Rejected: the design's frame width and the browser's viewport width diverge
-  once real sidebar and scrollbar chrome are accounted for, so a literal frame-width query doesn't
-  reproduce the design's render at its own stated viewport.
+  column's own width). Rejected: it doesn't reproduce the design's own render at the design's
+  stated viewport — only the viewport reading does.
 - *Viewport width* (**chosen**), matching what was actually built.
 
 ## Decision

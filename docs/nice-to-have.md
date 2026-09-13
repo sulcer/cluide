@@ -108,7 +108,7 @@ Found reconciling the built frontend against its specs; each too small for its o
 - `bun` in `src/tsconfig.json`'s `types` lets a stray `Bun.*` call typecheck in browser code.
 - The MCP sheet's width comes from an explicit `max-width` over the generated `w-3/4` — a comment
   in `sheet.tsx`, not a cleaner fix.
-- `0 plugins · 0 enabled` (and the MCP equivalent) show for one frame while loading.
+- `0 plugins · 0 enabled` shows for one frame while `PluginsScreen` is loading.
 - The plugin toggle e2e case proves only the toggled row's own etag updates.
 - The hooks screen's "Read from" separator is untested with exactly two source files.
 - `flattenHooks` has no test for a plain-string (non-array) `matcher`.
