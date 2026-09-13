@@ -13,6 +13,7 @@ markers: a lifecycle `Status` (`Draft` or `Stable`) and a **build state** (`Buil
 | [`foundation`](./foundation/README.md) | Stable | Built | The stack, repository shape, the files cluide reads and writes, the write primitive, security, dev and build, testing. Everything both halves stand on. |
 | [`api`](./api/README.md) | Stable | Built | The HTTP contract between the Bun server and the page: conventions, then one file per resource — projects, files, settings, mcp, plugins. |
 | [`ui`](./ui/README.md) | Stable | Built | The page: tokens, shell, the shared editor and save states, and the settings, hooks, MCP and plugins screens, with measurements. |
+| [`ci`](./ci/README.md) | Stable | Planned | What runs on every pull request, how a release is cut from a release pull request, how the npm package is published, and the go-public checklist. |
 
 ## Start here
 
@@ -24,3 +25,5 @@ resource file you are implementing, then [`write-safety.md`](./foundation/write-
 [`security.md`](./foundation/security.md), which every write goes through.
 
 **Building the frontend:** [`ui`](./ui/README.md), then the `api` resource files it calls.
+
+**Cutting a release:** [`ci`](./ci/README.md), the Release and Go public sections.

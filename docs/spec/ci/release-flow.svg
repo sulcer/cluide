@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="440" viewBox="0 0 1100 440" font-family="-apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#333"/>
+    </marker>
+  </defs>
+  <rect width="1100" height="440" fill="#ffffff"/>
+  <text x="20" y="28" font-size="15" font-weight="600" fill="#222">From a merged pull request to a published package</text>
+
+  <!-- lanes -->
+  <g fill="#666" font-size="11" font-weight="600">
+    <text x="20" y="80">you</text>
+    <text x="20" y="200">GitHub Actions</text>
+    <text x="20" y="330">outside</text>
+  </g>
+  <g stroke="#e5e5e5" stroke-dasharray="4 4">
+    <line x1="20" y1="130" x2="1080" y2="130"/>
+    <line x1="20" y1="280" x2="1080" y2="280"/>
+  </g>
+
+  <!-- you -->
+  <g stroke="#333" stroke-width="1.2">
+    <rect x="90"  y="55" width="150" height="50" rx="8" fill="#eef4ff"/>
+    <rect x="470" y="55" width="190" height="50" rx="8" fill="#eef4ff"/>
+  </g>
+  <g fill="#222" text-anchor="middle" font-weight="600">
+    <text x="165" y="76">merge a PR</text>
+    <text x="565" y="76">merge the Release PR</text>
+  </g>
+  <g fill="#555" text-anchor="middle" font-size="11">
+    <text x="165" y="94">Conventional Commits inside</text>
+    <text x="565" y="94">chore: release X.Y.Z</text>
+  </g>
+
+  <!-- actions -->
+  <g stroke="#333" stroke-width="1.2">
+    <rect x="90"  y="160" width="150" height="60" rx="8" fill="#f3f8f1"/>
+    <rect x="280" y="160" width="160" height="60" rx="8" fill="#fff8e6"/>
+    <rect x="470" y="160" width="190" height="60" rx="8" fill="#fff8e6"/>
+    <rect x="700" y="160" width="190" height="60" rx="8" fill="#f3f8f1"/>
+    <rect x="930" y="160" width="150" height="60" rx="8" fill="#f3f8f1"/>
+  </g>
+  <g fill="#222" text-anchor="middle" font-weight="600">
+    <text x="165" y="182">ci.yml</text>
+    <text x="360" y="182">release.yml</text>
+    <text x="565" y="182">release.yml</text>
+    <text x="795" y="182">publish job</text>
+    <text x="1005" y="182">publish job</text>
+  </g>
+  <g fill="#555" text-anchor="middle" font-size="11">
+    <text x="165" y="198">check · e2e · docs</text>
+    <text x="165" y="212">renders as an artifact</text>
+    <text x="360" y="198">release-please updates</text>
+    <text x="360" y="212">the one open Release PR</text>
+    <text x="565" y="198">tags vX.Y.Z, creates the</text>
+    <text x="565" y="212">GitHub Release with PR notes</text>
+    <text x="795" y="198">gate: NPM_PUBLISH = true</text>
+    <text x="795" y="212">rerun typecheck · unit · e2e</text>
+    <text x="1005" y="198">bun run build</text>
+    <text x="1005" y="212">bun pm pack</text>
+  </g>
+
+  <!-- outside -->
+  <g stroke="#333" stroke-width="1.2">
+    <rect x="700" y="310" width="150" height="60" rx="8" fill="#f3f8f1"/>
+    <rect x="890" y="310" width="190" height="60" rx="8" fill="#f3f8f1"/>
+  </g>
+  <g fill="#222" text-anchor="middle" font-weight="600">
+    <text x="775" y="332">npm: cluide@X.Y.Z</text>
+    <text x="985" y="332">GitHub Release asset</text>
+  </g>
+  <g fill="#555" text-anchor="middle" font-size="11">
+    <text x="775" y="348">npm publish --provenance</text>
+    <text x="775" y="362">OIDC, no token</text>
+    <text x="985" y="348">cluide-X.Y.Z.tgz</text>
+    <text x="985" y="362">gh release upload</text>
+  </g>
+
+  <!-- arrows -->
+  <g stroke="#333" stroke-width="1.3" fill="none" marker-end="url(#arrow)">
+    <line x1="165" y1="105" x2="165" y2="158"/>
+    <path d="M 240 80 C 300 80, 300 140, 340 158"/>
+    <line x1="440" y1="190" x2="468" y2="190"/>
+    <line x1="565" y1="158" x2="565" y2="107"/>
+    <line x1="660" y1="190" x2="698" y2="190"/>
+    <line x1="890" y1="190" x2="928" y2="190"/>
+    <path d="M 1005 220 C 1005 260, 800 260, 775 308"/>
+    <path d="M 1040 220 C 1040 260, 985 260, 985 308"/>
+  </g>
+  <g fill="#444" font-size="11">
+    <text x="172" y="135">push to main</text>
+    <text x="300" y="120">push to main</text>
+    <text x="574" y="140">a Release PR is open</text>
+    <text x="663" y="180">merged</text>
+  </g>
+  <text x="20" y="410" fill="#555" font-size="11">The version comes from the commit types since the last release (feat → minor, fix → patch, ! → major). The notes come from PR titles. Until NPM_PUBLISH is set, the publish job exits green without publishing; releases still exist on GitHub.</text>
+  <text x="20" y="426" fill="#555" font-size="11">A published tag can be re-published by hand: release.yml has a workflow_dispatch input with the tag name.</text>
+</svg>

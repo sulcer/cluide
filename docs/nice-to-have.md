@@ -64,9 +64,11 @@ trigger to revisit, reference. Add an item when deferring. Remove it when it lan
 
 - **What:** `bun build --compile` producing one executable that serves `dist/` and the API, for
   people who do not want to clone the repo.
-- **Why deferred:** The only user is the author until v1 works.
-- **Trigger:** Sharing the tool with someone else.
-- **Reference:** [`dev-and-build.md`](spec/foundation/dev-and-build.md).
+- **Why deferred:** `bunx cluide` covers everyone who has Bun; a binary needs `dist/` embedded at
+  compile time and carries the Bun runtime, about 90 MB per platform.
+- **Trigger:** A user without Bun, or a Homebrew request. Attaches to the publish job in
+  [`ci`](spec/ci/README.md), one asset per platform on the same release.
+- **Reference:** [`dev-and-build.md`](spec/foundation/dev-and-build.md), [`ci`](spec/ci/README.md).
 
 ---
 

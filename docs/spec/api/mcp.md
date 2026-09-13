@@ -29,7 +29,7 @@ highest definition is used, fields are never merged across scopes.
 | 5 | `managed` | `~/.claude/settings.json` → `managedMcpServers` | no | yes |
 
 Plugin servers are listed as `plugin_<plugin>_<server>`, the prefix Claude Code puts on their tools
-(`mcp__plugin_databox-mcp_es__search` is tool `search` of server `es` from plugin `databox-mcp`).
+(`mcp__plugin_acme-mcp_es__search` is tool `search` of server `es` from plugin `acme-mcp`).
 A plugin's servers appear only when the plugin is enabled; see [`plugins.md`](./plugins.md).
 
 ## Approval of project servers
