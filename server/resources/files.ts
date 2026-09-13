@@ -18,9 +18,10 @@ const root = (scope: Scope): string => (scope === "global" ? claudeDir() : join(
 export function listFiles(scopeArg: string, kind: string): FileEntry[] {
   const scope = assertScope(scopeArg);
   if (kind === "memory") {
-    const paths = scope === "global"
-      ? [join(claudeDir(), "CLAUDE.md")]
-      : [join(scope, "CLAUDE.md"), join(scope, "CLAUDE.local.md")];
+    const paths =
+      scope === "global"
+        ? [join(claudeDir(), "CLAUDE.md")]
+        : [join(scope, "CLAUDE.md"), join(scope, "CLAUDE.local.md")];
     return paths.map(fixed);
   }
   if (kind === "keybindings") {
@@ -46,10 +47,18 @@ export function listFiles(scopeArg: string, kind: string): FileEntry[] {
 const fixed = (path: string): FileEntry => ({ name: basename(path), path, exists: existsSync(path) });
 
 const files = (dir: string): string[] =>
-  existsSync(dir) ? readdirSync(dir).filter((f) => statSync(join(dir, f)).isFile()).sort() : [];
+  existsSync(dir)
+    ? readdirSync(dir)
+        .filter((f) => statSync(join(dir, f)).isFile())
+        .sort()
+    : [];
 
 const subdirs = (dir: string): string[] =>
-  existsSync(dir) ? readdirSync(dir).filter((f) => statSync(join(dir, f)).isDirectory()).sort() : [];
+  existsSync(dir)
+    ? readdirSync(dir)
+        .filter((f) => statSync(join(dir, f)).isDirectory())
+        .sort()
+    : [];
 
 export function readFile(path: string): FileDoc {
   const doc = readText(path);

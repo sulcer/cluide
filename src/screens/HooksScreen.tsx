@@ -2,20 +2,20 @@ import type { FileEntry, Scope, SettingsDoc } from "@shared/api";
 import { ArrowRight, FileCode } from "lucide-react";
 import { Link } from "react-router";
 import { q } from "@/api/client";
-import { useResource } from "@/api/useResource";
 import { Centered } from "@/components/Centered";
 import { LoadFailed } from "@/components/LoadFailed";
 import { SkeletonRows } from "@/components/Skeleton";
+import { useResource } from "@/hooks/useResource";
 import { flattenHooks, language, scriptFor } from "@/lib/hooks";
-import { screenUrl, scopeUrl } from "@/lib/routes";
+import { scopeUrl, screenUrl } from "@/lib/routes";
 
 export function HooksScreen({ scope }: { scope: Scope }) {
   const settings = useResource<SettingsDoc>(`/api/settings${q({ scope, file: "settings" })}`);
   const local = useResource<SettingsDoc>(`/api/settings${q({ scope, file: "local" })}`);
   const scripts = useResource<FileEntry[]>(`/api/files${q({ scope, kind: "hooks" })}`);
-  // Whichever resource failed first drives the retry state; a network failure is the shell's
-  // offline banner instead.
-  const failed = [settings, local, scripts].find((r) => r.error !== undefined && r.error.code !== "offline" && r.data === undefined);
+  const failed = [settings, local, scripts].find(
+    (r) => r.error !== undefined && r.error.code !== "offline" && r.data === undefined,
+  );
   if (failed) return <LoadFailed what="Hooks" error={failed.error!} onRetry={failed.reload} />;
   if (settings.data === undefined || local.data === undefined || scripts.data === undefined) return <SkeletonRows />;
 
@@ -24,7 +24,9 @@ export function HooksScreen({ scope }: { scope: Scope }) {
   const sources = docs.filter((d) => d.json !== null && d.json.hooks !== undefined).map((d) => d.path);
   const scriptUrl = (name: string) => `${scopeUrl(scope)}/hooks/${encodeURIComponent(name)}`;
   const settingsLink = (text: string) => (
-    <Link to={screenUrl(scope, "settings")} className="text-link underline underline-offset-2">{text}</Link>
+    <Link to={screenUrl(scope, "settings")} className="text-link underline underline-offset-2">
+      {text}
+    </Link>
   );
 
   return (
@@ -55,12 +57,18 @@ export function HooksScreen({ scope }: { scope: Scope }) {
                     <td className="px-4 font-mono text-xs">{r.matcher}</td>
                     <td className="px-4 font-mono text-xs">
                       {script ? (
-                        <Link to={scriptUrl(script.name)} title={r.command} className="inline-flex max-w-[520px] items-center gap-1 text-link">
+                        <Link
+                          to={scriptUrl(script.name)}
+                          title={r.command}
+                          className="inline-flex max-w-[520px] items-center gap-1 text-link"
+                        >
                           <span className="min-w-0 truncate">{r.command}</span>
                           <ArrowRight className="size-3.5 shrink-0" />
                         </Link>
                       ) : (
-                        <span title={r.command} className="block max-w-[520px] truncate">{r.command}</span>
+                        <span title={r.command} className="block max-w-[520px] truncate">
+                          {r.command}
+                        </span>
                       )}
                     </td>
                     <td className="px-4 font-mono text-xs text-muted-foreground">{r.type}</td>
@@ -72,7 +80,10 @@ export function HooksScreen({ scope }: { scope: Scope }) {
           <div className="flex h-7 items-center gap-1 px-4 text-xs text-muted-foreground">
             Read from{" "}
             {sources.map((p, i) => (
-              <span key={p} className="font-mono">{i > 0 && ", "}{p}</span>
+              <span key={p} className="font-mono">
+                {i > 0 && ", "}
+                {p}
+              </span>
             ))}{" "}
             · edit the mapping in {settingsLink("Settings")}
           </div>
@@ -82,7 +93,11 @@ export function HooksScreen({ scope }: { scope: Scope }) {
         <div className="max-w-[480px] px-4 pt-5 pb-4">
           <div className="flex h-6 items-center text-xs font-medium text-muted-foreground">Scripts in hooks/</div>
           {scripts.data.map((s) => (
-            <Link key={s.path} to={scriptUrl(s.name)} className="flex h-7 items-center gap-2 rounded-sm px-1 hover:bg-accent">
+            <Link
+              key={s.path}
+              to={scriptUrl(s.name)}
+              className="flex h-7 items-center gap-2 rounded-sm px-1 hover:bg-accent"
+            >
               <FileCode className="size-4 text-muted-foreground" />
               <span className="flex-1 font-mono text-xs">{s.name}</span>
               <span className="text-[11px] text-muted-foreground">{language(s.name)}</span>

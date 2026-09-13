@@ -3,7 +3,12 @@ import { Button } from "@/components/Button";
 import { Kbd } from "@/components/Kbd";
 import { MOD } from "@/lib/keys";
 
-interface Props { dirty: boolean; saving: boolean; onSave: () => void; onDiscard: () => void }
+interface Props {
+  dirty: boolean;
+  saving: boolean;
+  onSave: () => void;
+  onDiscard: () => void;
+}
 
 export function SaveBar({ dirty, saving, onSave, onDiscard }: Props) {
   if (!dirty && !saving) {

@@ -1,7 +1,12 @@
 import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
-interface Props { icon?: LucideIcon; title: string; path?: string; children?: ReactNode }
+interface Props {
+  icon?: LucideIcon;
+  title: string;
+  path?: string;
+  children?: ReactNode;
+}
 
 export function Centered({ icon: Icon, title, path, children }: Props) {
   return (

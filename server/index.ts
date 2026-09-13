@@ -7,6 +7,12 @@ const flag = (name: string): string | undefined => {
   return i === -1 ? undefined : args[i + 1];
 };
 
+if (args.includes("--version")) {
+  const pkg = await Bun.file(new URL("../package.json", import.meta.url)).json();
+  console.log(pkg.version);
+  process.exit(0);
+}
+
 const port = Number(flag("--port") ?? 8787);
 if (!Number.isInteger(port) || port <= 0) {
   console.error(`invalid --port: ${flag("--port")}`);

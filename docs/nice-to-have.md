@@ -64,9 +64,11 @@ trigger to revisit, reference. Add an item when deferring. Remove it when it lan
 
 - **What:** `bun build --compile` producing one executable that serves `dist/` and the API, for
   people who do not want to clone the repo.
-- **Why deferred:** The only user is the author until v1 works.
-- **Trigger:** Sharing the tool with someone else.
-- **Reference:** [`dev-and-build.md`](spec/foundation/dev-and-build.md).
+- **Why deferred:** `bunx cluide` covers everyone who has Bun; a binary needs `dist/` embedded at
+  compile time and carries the Bun runtime, about 90 MB per platform.
+- **Trigger:** A user without Bun, or a Homebrew request. Attaches to the publish job in
+  [`ci`](spec/ci/README.md), one asset per platform on the same release.
+- **Reference:** [`dev-and-build.md`](spec/foundation/dev-and-build.md), [`ci`](spec/ci/README.md).
 
 ---
 
@@ -132,3 +134,14 @@ Found reconciling the built frontend against its specs; each too small for its o
   is nothing to test against.
 - **Trigger:** A plugin whose servers Claude Code loads but cluide does not list.
 - **Reference:** [`api/mcp.md`](spec/api/mcp.md) sources table, [`api/plugins.md`](spec/api/plugins.md).
+
+---
+
+## Required checks and the release pull request
+
+Once `main` requires the `check`, `e2e` and `docs` checks, the release pull request that
+release-please opens with the Actions token has none, because GitHub does not start workflows for
+events that token creates; merge it with the administrator override, or move release-please to a
+GitHub App or fine-grained token that starts workflows.
+
+- **Reference:** [`ci`](spec/ci/README.md), Go public.

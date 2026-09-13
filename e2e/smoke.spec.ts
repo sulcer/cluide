@@ -8,9 +8,7 @@ test("edit the global memory file, save, see the diff", async ({ page }) => {
   await page.getByRole("link", { name: "Memory" }).click();
   const ta = page.locator("textarea");
   await expect(ta).toHaveValue(/# /);
-  // A click + End + typed "\n..." lands after the file's trailing newline (every seeded memory
-  // file ends in one), so it always adds an *empty* line plus the typed one — see editor-diff's
-  // own comment on this. Append via fill instead, so exactly one line is added and +1 stays true.
+  // fill(), not typing after End: the seeded file ends in a newline, so exactly one line is added.
   const before = await ta.inputValue();
   const after = before.endsWith("\n") ? `${before}- Smoke test line\n` : `${before}\n- Smoke test line\n`;
   await ta.fill(after);

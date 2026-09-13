@@ -1,15 +1,8 @@
-// The HTTP contract between server/ and src/. docs/spec/api is the authority;
-// when this file and the spec disagree, the spec wins and this file is fixed.
+// Mirrors docs/spec/api; when the two disagree, the spec wins.
 
 export type Scope = "global" | string;
 
-export type ErrorCode =
-  | "bad_request"
-  | "forbidden"
-  | "not_found"
-  | "conflict"
-  | "unprocessable"
-  | "internal";
+export type ErrorCode = "bad_request" | "forbidden" | "not_found" | "conflict" | "unprocessable" | "internal";
 
 export interface ApiErrorBody {
   error: { code: ErrorCode; message: string; current?: unknown };
@@ -20,22 +13,13 @@ export interface WriteResult {
   diff: string;
 }
 
-// projects
 export interface Project {
   path: string;
   name: string;
   exists: boolean;
 }
 
-// files
-export type FileKind =
-  | "memory"
-  | "rules"
-  | "agents"
-  | "skills"
-  | "commands"
-  | "hooks"
-  | "keybindings";
+export type FileKind = "memory" | "rules" | "agents" | "skills" | "commands" | "hooks" | "keybindings";
 
 export interface FileEntry {
   name: string;
@@ -60,7 +44,6 @@ export interface PostFileBody {
   content: string;
 }
 
-// settings
 export type SettingsFile = "settings" | "local";
 
 export interface SchemaError {
@@ -89,7 +72,6 @@ export interface PutSettingsResult extends WriteResult {
   errors: SchemaError[];
 }
 
-// mcp
 export type McpScope = "local" | "project" | "user" | "plugin" | "managed";
 export type McpTarget = "local" | "project" | "user";
 
@@ -122,7 +104,6 @@ export interface McpApprovalBody {
   enabled: boolean;
 }
 
-// plugins
 export interface Plugin {
   id: string;
   name: string;

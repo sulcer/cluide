@@ -46,11 +46,14 @@ and the `Host` the server sees is its own.
 
 ## Dependencies
 
-Few, pinned to exact versions, installed from the lockfile. The runtime set is React, react-router,
-the shadcn primitives (`radix-ui`, `cmdk`), ajv, lucide, `cn` and `class-variance-authority` (the
-shadcn class helpers), and the two fontsource font packages. Anything new must earn its place
-against "a few lines of code do it". `bun install` runs with the lockfile committed; a diff in the
-lockfile is reviewed like code.
+Few, pinned to exact versions, installed from the lockfile. The published package depends on
+`ajv` alone: the page ships built in `dist/`, so React, react-router, the shadcn primitives
+(`radix-ui`, `cmdk`), lucide, `cn`, `class-variance-authority`, the fontsource fonts, Vite,
+Tailwind and biome are dev dependencies. Anything new must earn its place against "a few lines of code do
+it". `bun install` runs with the lockfile committed and, in CI, frozen; a diff in the lockfile is
+reviewed like code. Actions are pinned to commit SHAs, Dependabot proposes updates weekly, and a
+weekly `bun audit` fails on known advisories. Publishing uses npm trusted publishing over OIDC, so
+the repository holds no token. Details in [`ci`](../ci/README.md).
 
 ## Open questions
 

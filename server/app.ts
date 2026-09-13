@@ -17,18 +17,19 @@ const DIST = join(import.meta.dir, "..", "dist");
 export function startServer(port: number, dist: string = DIST) {
   let actualPort = port;
 
-  // Wraps a resource call: guard, run, JSON, and never a raw exception.
-  const handle: Handle = (fn, status = 200) => async (req) => {
-    try {
-      assertTrusted(req, actualPort);
-      const data = await fn(req);
-      return data instanceof Response ? data : Response.json(data, { status });
-    } catch (e) {
-      if (e instanceof ApiError) return e.toResponse();
-      console.error(e);
-      return new ApiError(500, "internal", (e as Error).message).toResponse();
-    }
-  };
+  const handle: Handle =
+    (fn, status = 200) =>
+    async (req) => {
+      try {
+        assertTrusted(req, actualPort);
+        const data = await fn(req);
+        return data instanceof Response ? data : Response.json(data, { status });
+      } catch (e) {
+        if (e instanceof ApiError) return e.toResponse();
+        console.error(e);
+        return new ApiError(500, "internal", (e as Error).message).toResponse();
+      }
+    };
 
   const server = Bun.serve({
     hostname: "127.0.0.1",
@@ -55,7 +56,6 @@ export const optional = (req: Request, name: string): string | undefined =>
 
 export const noContent = (): Response => new Response(null, { status: 204 });
 
-// Resource routes are added here task by task.
 function routes(handle: Handle) {
   return {
     "/api/projects": { GET: handle(() => listProjects()) },

@@ -1,7 +1,7 @@
-import Ajv, { type ValidateFunction } from "ajv";
 import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import type { SchemaError } from "@shared/api";
+import Ajv, { type ValidateFunction } from "ajv";
 import { cluideDir } from "./paths";
 
 const SCHEMA_URL = "https://www.schemastore.org/claude-code-settings.json";
@@ -13,7 +13,6 @@ let knownKeys = new Set<string>();
 
 const cachePath = (): string => join(cluideDir(), "schema-cache.json");
 
-// Fetch once a week, keep a disk cache, never block on the network when a cache exists.
 export async function loadSchema(): Promise<boolean> {
   const cache = cachePath();
   let text: string | null = null;

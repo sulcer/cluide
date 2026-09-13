@@ -31,7 +31,9 @@ Deferred work goes to [`docs/nice-to-have.md`](docs/nice-to-have.md).
 | Routing | react-router |
 | Validation | ajv against the SchemaStore schema for `settings.json` |
 | Diff | `git diff --no-index` via `Bun.spawn` |
-| Tests | `bun test` |
+| Tests | `bun test`, Playwright for the page |
+| Formatter and linter | Biome; `bun run lint` checks, `bun run format` fixes |
+| CI and releases | GitHub Actions; a release pull request cut from Conventional Commits; npm with trusted publishing |
 
 Full detail, repository layout and the reasoning: [`docs/spec/foundation/`](docs/spec/foundation/README.md).
 

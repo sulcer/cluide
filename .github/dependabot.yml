@@ -1,0 +1,23 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: build
+    labels: [patch]
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+  - package-ecosystem: bun
+    directory: /
+    schedule:
+      interval: weekly
+    versioning-strategy: increase
+    commit-message:
+      prefix: build
+    labels: [patch]
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]

@@ -1,6 +1,6 @@
 import type { McpScope } from "@shared/api";
-import type { ReactNode } from "react";
 import { cn } from "cn";
+import type { ReactNode } from "react";
 
 const base = "inline-flex h-[18px] shrink-0 items-center rounded-sm px-1.5 text-[11px] font-medium leading-none";
 
@@ -32,7 +32,10 @@ export const CountBadge = ({ count }: { count: number }) => (
 );
 
 export const DashedBadge = ({ children, title }: { children: ReactNode; title?: string }) => (
-  <span title={title} className={cn(base, "gap-1 border border-dashed font-normal text-muted-foreground [&_svg]:size-3")}>
+  <span
+    title={title}
+    className={cn(base, "gap-1 border border-dashed font-normal text-muted-foreground [&_svg]:size-3")}
+  >
     {children}
   </span>
 );
