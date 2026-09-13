@@ -1,7 +1,15 @@
-import type { ReactNode } from "react";
 import { cn } from "cn";
+import type { ReactNode } from "react";
 
-export function Kbd({ children, onPrimary, className }: { children: ReactNode; onPrimary?: boolean; className?: string }) {
+export function Kbd({
+  children,
+  onPrimary,
+  className,
+}: {
+  children: ReactNode;
+  onPrimary?: boolean;
+  className?: string;
+}) {
   return (
     <kbd
       className={cn(

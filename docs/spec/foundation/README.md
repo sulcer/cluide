@@ -44,6 +44,7 @@ files on its own schedule, which is why conflict detection exists.
 | Validation | ajv | `settings.json` has a published JSON schema on SchemaStore (142 properties). |
 | Diff | `git diff --no-index` via `Bun.spawn` | Always present on a dev box; no diff library. |
 | Tests | `bun test` for server modules and pure frontend helpers | Playwright covers the rest of the frontend: a smoke test plus a render spec for visual review. |
+| Formatter and linter | Biome | One dependency and one config for formatting, import order and lint across TypeScript, JSX, JSON and CSS; ESLint plus Prettier would be six. Changes: [`2026-09-13-adopt-biome-for-formatting-and-linting.md`](../../adr/2026-09-13-adopt-biome-for-formatting-and-linting.md) |
 
 Vite over Bun's own bundler is decided in [`2026-09-12-vite-builds-the-page.md`](../../adr/2026-09-12-vite-builds-the-page.md).
 
@@ -59,6 +60,7 @@ cluide/
   index.html              # Vite's entry point; loads src/main.tsx
   tsconfig.json           # server, shared, scripts, e2e; paths: @/* -> src/*, @shared/* -> shared/*
   components.json         # shadcn
+  biome.json              # formatter, linter and import order; bun run lint, bun run format
   CLAUDE.md, .claude/rules/
   docs/                   # adr/, spec/, plans/, nice-to-have.md
   scripts/
@@ -79,28 +81,31 @@ cluide/
     paths.ts              # roots, scope -> file paths, allowlist check
     fs.ts                 # readText, writeText, JSON helpers (backup, atomic, etag, diff)
     schema.ts             # settings schema fetch, disk cache, ajv validate
-    testing.ts            # temp HOME helper for tests; tests sit next to modules as *.test.ts
     resources/
       projects.ts, files.ts, settings.ts, mcp.ts, plugins.ts
+    tests/                # bun test, mirroring server/; temp-home.ts is the temp HOME helper
   src/
     tsconfig.json         # the app's own tsconfig: DOM + JSX types, paths relative to src/
     vite-env.d.ts         # Vite's ambient client types
     main.tsx, router.tsx, globals.css
-    api/                  # client.ts, useResource.ts
-    lib/                  # pure, unit tested next to source: routes, diff, frontmatter, hooks, mcp.
-                           # React or browser helpers: useRoute, icons, keys, json, events, storage,
-                           # theme, toast, recent.
+    api/                  # client.ts
+    hooks/                # every React hook: useResource, useDraft (the save-state machine),
+                           # useRoute, useShortcuts, useWindowEvent, useToast, useTheme
+    lib/                  # pure: routes, diff, frontmatter, hooks, mcp. Browser helpers: icons,
+                           # keys, json, events, storage, theme, toast, recent.
     components/           # Button, Input, Badge, Kbd, IconButton, Skeleton, Centered, Toaster
     components/ui/        # shadcn (generated)
     shell/                # Shell, Sidebar, ScopeSwitcher, Header, OfflineBanner, CommandMenu
-    editor/                # useDraft (the save-state machine), SaveBar, Editor, DiffSheet,
-                           # ConflictDialog, DeleteDialog — shared by every editing screen
+    editor/                # SaveBar, Editor, DiffSheet, ConflictDialog, DeleteDialog — shared by
+                           # every editing screen
     screens/               # Screen (picks a screen from the route) plus one file per screen
+    tests/                 # bun test, mirroring src/: tests/lib/*.test.ts
 ```
 
 Rules for growth: one file per screen under `screens/`, sharing `editor/` for editing and `shell/`
 for layout; one module per resource under `server/resources/`; both sides import types only from
-`shared/api.ts`.
+`shared/api.ts`. Tests live in `<package>/tests/`, mirroring the package; React hooks live in
+`src/hooks/`.
 
 ## Topic files
 

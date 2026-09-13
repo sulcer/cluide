@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { parseUnifiedDiff } from "./diff";
+import { parseUnifiedDiff } from "@/lib/diff";
 
 const DIFF = [
   "diff --git a/CLAUDE.md b/CLAUDE.md",

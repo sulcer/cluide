@@ -1,12 +1,18 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { join } from "node:path";
-import { startServer } from "./app";
-import { tempHome, type TempHome } from "./testing";
+import { startServer } from "../app";
+import { type TempHome, tempHome } from "./temp-home";
 
 let t: TempHome;
 let server: ReturnType<typeof startServer>;
-beforeEach(() => { t = tempHome(); server = startServer(0); });
-afterEach(() => { server.stop(true); t.cleanup(); });
+beforeEach(() => {
+  t = tempHome();
+  server = startServer(0);
+});
+afterEach(() => {
+  server.stop(true);
+  t.cleanup();
+});
 
 const url = (path: string) => `http://127.0.0.1:${server.port}${path}`;
 

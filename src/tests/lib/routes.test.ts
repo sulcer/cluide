@@ -1,20 +1,35 @@
 import { describe, expect, test } from "bun:test";
-import { decodeProject, kindDir, scopeName, scopeUrl, screenUrl, visibleScreens } from "./routes";
+import { decodeProject, kindDir, scopeName, scopeUrl, screenUrl, visibleScreens } from "@/lib/routes";
 
 describe("routes", () => {
   test("a project path round-trips through the url", () => {
     expect(scopeUrl("/Users/me/my repo")).toBe("/p/%2FUsers%2Fme%2Fmy%20repo");
-    // react-router's useParams() decodes every escape, %2F included, before cluide sees it
     expect(decodeProject("/Users/me/my repo")).toBe("/Users/me/my repo");
     expect(decodeProject("/Users/me/repo")).toBe("/Users/me/repo");
   });
 
   test("global-only screens hide in a project", () => {
     expect(visibleScreens("global").map((s) => s.id)).toEqual([
-      "settings", "memory", "rules", "keybindings", "agents", "skills", "commands", "hooks", "plugins", "mcp",
+      "settings",
+      "memory",
+      "rules",
+      "keybindings",
+      "agents",
+      "skills",
+      "commands",
+      "hooks",
+      "plugins",
+      "mcp",
     ]);
     expect(visibleScreens("/Users/me/repo").map((s) => s.id)).toEqual([
-      "settings", "memory", "rules", "agents", "skills", "commands", "hooks", "mcp",
+      "settings",
+      "memory",
+      "rules",
+      "agents",
+      "skills",
+      "commands",
+      "hooks",
+      "mcp",
     ]);
   });
 

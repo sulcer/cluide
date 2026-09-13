@@ -12,8 +12,9 @@ and a render spec that screenshots every screen state for visual review.
 
 ## Server tests
 
-Every test creates a temp directory, points `HOME` at it, and seeds the files it needs. Assertions
-compare whole payloads, not single fields.
+Tests live in `server/tests/`, mirroring the module tree; `temp-home.ts` there is the temp `HOME`
+helper. Every test creates a temp directory, points `HOME` at it, and seeds the files it needs.
+Assertions compare whole payloads, not single fields.
 
 | Module | Must prove |
 |---|---|
@@ -26,10 +27,10 @@ compare whole payloads, not single fields.
 
 ## Frontend
 
-Pure helpers under `src/lib` (routes, diff, frontmatter, hooks, mcp) have `bun test` tests next to
-them. Components have no unit tests. `e2e/smoke.spec.ts` is the one browser test: load, edit the
-global memory file, save, see the diff. `e2e/render.spec.ts` screenshots every screen state for
-visual review. Both run against `bun run build` served by the real server on a seeded temporary
+Pure helpers under `src/lib` (routes, diff, frontmatter, hooks, mcp) have `bun test` tests under
+`src/tests/lib`. Components have no unit tests. `e2e/smoke.spec.ts` is the one browser test: load,
+edit the global memory file, save, see the diff. `e2e/render.spec.ts` screenshots every screen state
+for visual review. Both run against `bun run build` served by the real server on a seeded temporary
 home from `scripts/seed-home.ts`; the real `~/.claude` is never touched.
 
 ## Open questions

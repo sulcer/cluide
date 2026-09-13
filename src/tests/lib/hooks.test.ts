@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { flattenHooks, language, scriptFor } from "./hooks";
+import { flattenHooks, language, scriptFor } from "@/lib/hooks";
 
 describe("hooks", () => {
   test("flattens events, matchers and hooks in file order", () => {
@@ -10,9 +10,27 @@ describe("hooks", () => {
       },
     };
     expect(flattenHooks(json, "/h/.claude/settings.json")).toEqual([
-      { event: "PreToolUse", matcher: "Bash, Edit", command: "a.sh", type: "command", file: "/h/.claude/settings.json" },
-      { event: "PreToolUse", matcher: "Bash, Edit", command: "b.sh", type: "command", file: "/h/.claude/settings.json" },
-      { event: "SessionStart", matcher: "*", command: "~/.claude/hooks/c.sh", type: "command", file: "/h/.claude/settings.json" },
+      {
+        event: "PreToolUse",
+        matcher: "Bash, Edit",
+        command: "a.sh",
+        type: "command",
+        file: "/h/.claude/settings.json",
+      },
+      {
+        event: "PreToolUse",
+        matcher: "Bash, Edit",
+        command: "b.sh",
+        type: "command",
+        file: "/h/.claude/settings.json",
+      },
+      {
+        event: "SessionStart",
+        matcher: "*",
+        command: "~/.claude/hooks/c.sh",
+        type: "command",
+        file: "/h/.claude/settings.json",
+      },
     ]);
     expect(flattenHooks(null, "x")).toEqual([]);
     expect(flattenHooks({ hooks: "nope" }, "x")).toEqual([]);
@@ -27,6 +45,11 @@ describe("hooks", () => {
   });
 
   test("language from the extension", () => {
-    expect([language("a.py"), language("b.sh"), language("c.rb"), language("Makefile")]).toEqual(["python", "bash", "rb", "Makefile"]);
+    expect([language("a.py"), language("b.sh"), language("c.rb"), language("Makefile")]).toEqual([
+      "python",
+      "bash",
+      "rb",
+      "Makefile",
+    ]);
   });
 });

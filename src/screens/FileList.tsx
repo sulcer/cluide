@@ -1,9 +1,9 @@
 import type { FileEntry, FileKind } from "@shared/api";
+import { cn } from "cn";
 import { FileCode, FileText, Folder } from "lucide-react";
 import { useEffect, useState } from "react";
 import { SearchInput } from "@/components/Input";
 import { SkeletonRows } from "@/components/Skeleton";
-import { cn } from "cn";
 import { NewFileInput } from "./NewFileInput";
 
 interface Props {
@@ -23,14 +23,12 @@ export function FileList({ kind, entries, selected, onSelect, creating, onCreate
   const shown = (entries ?? []).filter((e) => e.name.toLowerCase().includes(filter.toLowerCase()));
   const Icon = kind === "skills" ? Folder : kind === "hooks" ? FileCode : FileText;
 
-  // j/k move the selection while no field has focus.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.key !== "j" && e.key !== "k") || e.metaKey || e.ctrlKey || e.altKey) return;
       const tag = document.activeElement?.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA") return;
-      // An open dialog (the delete confirmation) must keep j/k from moving the selection under it,
-      // which would remount the editor behind the dialog.
+      // An open dialog must keep j/k from moving the selection and remounting the editor beneath it.
       if (document.querySelector('[role="dialog"]:not([data-state="closed"])')) return;
       const i = shown.findIndex((x) => x.path === selected?.path);
       const next = shown[i + (e.key === "j" ? 1 : -1)];
@@ -60,7 +58,10 @@ export function FileList({ kind, entries, selected, onSelect, creating, onCreate
               key={e.path}
               type="button"
               onClick={() => onSelect(e)}
-              className={cn("flex h-8 w-full min-w-0 items-center gap-2 rounded-sm px-2 text-left hover:bg-accent", e.path === selected?.path && "selected bg-accent")}
+              className={cn(
+                "flex h-8 w-full min-w-0 items-center gap-2 rounded-sm px-2 text-left hover:bg-accent",
+                e.path === selected?.path && "selected bg-accent",
+              )}
             >
               <Icon className="size-4 shrink-0 text-muted-foreground" />
               <span className="truncate">

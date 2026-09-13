@@ -6,17 +6,25 @@ export const transportOf = (config: McpConfig): Transport =>
   config.type === "http" || config.type === "sse" ? config.type : "stdio";
 
 export const commandText = (config: McpConfig): string =>
-  // TS can't narrow the positive branch of "in" away from the other variant's index
-  // signature, so config.args reads as unknown there; cast to spread it safely.
+  // TS can't narrow "in" against the other variant's index signature; cast to spread args.
   "command" in config ? [config.command, ...((config.args as string[] | undefined) ?? [])].join(" ") : config.url;
 
 export const readOnly = (e: McpEntry): boolean => e.scope === "plugin" || e.scope === "managed";
 
-export interface AddForm { transport: Transport; command: string; args: string; url: string; headers: string }
+export interface AddForm {
+  transport: Transport;
+  command: string;
+  args: string;
+  url: string;
+  headers: string;
+}
 
-const lines = (s: string): string[] => s.split("\n").map((l) => l.trim()).filter((l) => l !== "");
+const lines = (s: string): string[] =>
+  s
+    .split("\n")
+    .map((l) => l.trim())
+    .filter((l) => l !== "");
 
-// The config the add dialog writes; empty parts are omitted.
 export function buildConfig(form: AddForm): McpConfig {
   if (form.transport === "stdio") {
     const args = lines(form.args);

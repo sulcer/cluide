@@ -1,12 +1,10 @@
+import type { Scope } from "@shared/api";
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
-import type { Scope } from "@shared/api";
 import { emit } from "@/lib/events";
 import { isMod } from "@/lib/keys";
 import { screenUrl, visibleScreens } from "@/lib/routes";
 
-// ⌘K, ⌘S, ⌘1-9 and Esc. No ⌘⇧ chord: Chrome acts on those before the page sees them. Radix layers take Esc first (document, capture) and
-// preventDefault when they dismiss, so an Esc that reaches here with nothing open discards edits.
 export function useShortcuts(scope: Scope, toggleMenu: () => void): void {
   const navigate = useNavigate();
   useEffect(() => {
@@ -25,6 +23,7 @@ export function useShortcuts(scope: Scope, toggleMenu: () => void): void {
           navigate(screenUrl(scope, item.id));
         }
       } else if (e.key === "Escape" && !e.defaultPrevented) {
+        // Radix layers preventDefault the Esc that closes them, so only a stray Esc discards edits.
         emit("cluide:escape");
       }
     };

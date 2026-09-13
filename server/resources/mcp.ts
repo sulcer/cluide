@@ -37,7 +37,12 @@ export function listMcp(scopeArg: string): McpEntry[] {
     sources.push({ scope: "plugin", file, servers: prefixed, etag: null });
   }
   const settingsPath = join(claudeDir(), "settings.json");
-  sources.push({ scope: "managed", file: settingsPath, servers: readJsonOrEmpty(settingsPath).managedMcpServers ?? {}, etag: null });
+  sources.push({
+    scope: "managed",
+    file: settingsPath,
+    servers: readJsonOrEmpty(settingsPath).managedMcpServers ?? {},
+    etag: null,
+  });
 
   const approved = scope === "global" ? (_name: string) => null : approvalOf(scope);
   const entries: McpEntry[] = [];
@@ -66,7 +71,6 @@ export function listMcp(scopeArg: string): McpEntry[] {
   return entries.sort((a, b) => a.name.localeCompare(b.name) || rank(a) - rank(b));
 }
 
-// Approval of .mcp.json servers, read from every settings file that may hold the keys.
 function approvalOf(project: string): (name: string) => boolean {
   const files = [
     join(claudeDir(), "settings.json"),
@@ -101,7 +105,12 @@ function targetOf(scope: Scope, target: string): Target {
     return {
       path: claudeJsonPath(),
       slice: (j) => j.projects?.[scope]?.mcpServers,
-      servers: (j) => (((j.projects ??= {})[scope] ??= {}).mcpServers ??= {}),
+      servers: (j) => {
+        j.projects ??= {};
+        j.projects[scope] ??= {};
+        j.projects[scope].mcpServers ??= {};
+        return j.projects[scope].mcpServers;
+      },
     };
   }
   if (target === "project") {
@@ -119,7 +128,14 @@ export function putMcp(body: unknown): WriteResult {
   if (c === null || typeof c !== "object" || (typeof c.command !== "string" && typeof c.url !== "string")) {
     throw new ApiError(400, "bad_request", "config needs a command or a url");
   }
-  return patchJson(target.path, target.slice, (json) => { target.servers(json)[name] = c as McpConfig; }, etag);
+  return patchJson(
+    target.path,
+    target.slice,
+    (json) => {
+      target.servers(json)[name] = c as McpConfig;
+    },
+    etag,
+  );
 }
 
 export function deleteMcp(scopeArg: string, targetArg: string, name: string, etag?: string): void {

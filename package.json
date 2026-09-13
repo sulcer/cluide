@@ -40,6 +40,8 @@
     "start": "bun server/index.ts --open",
     "test": "bun test server shared src scripts",
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p src/tsconfig.json",
+    "lint": "biome check --error-on-warnings .",
+    "format": "biome check --write .",
     "e2e": "bunx playwright test -c e2e/playwright.config.ts",
     "render": "bunx playwright test -c e2e/playwright.config.ts render.spec.ts",
     "check-docs": "bun scripts/check-docs.ts",
@@ -49,6 +51,7 @@
     "ajv": "8.20.0"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.5.13",
     "@fontsource-variable/inter": "5.3.0",
     "@fontsource-variable/jetbrains-mono": "5.3.0",
     "@playwright/test": "1.63.0",

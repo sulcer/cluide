@@ -3,9 +3,14 @@ import { PanelLeft, Plus } from "lucide-react";
 import { Button } from "@/components/Button";
 import { IconButton } from "@/components/IconButton";
 import { emit } from "@/lib/events";
-import { HOOK_SCRIPT_PRIMARY, type ScreenId, screenDef, scopeName } from "@/lib/routes";
+import { HOOK_SCRIPT_PRIMARY, type ScreenId, scopeName, screenDef } from "@/lib/routes";
 
-interface Props { scope: Scope; screen: ScreenId | undefined; file: string | undefined; onToggleSidebar: () => void }
+interface Props {
+  scope: Scope;
+  screen: ScreenId | undefined;
+  file: string | undefined;
+  onToggleSidebar: () => void;
+}
 
 export function Header({ scope, screen, file, onToggleSidebar }: Props) {
   const def = screenDef(screen);

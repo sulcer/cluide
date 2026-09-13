@@ -6,14 +6,20 @@ import { useNavigate } from "react-router";
 import { Kbd } from "@/components/Kbd";
 import { Command, CommandEmpty, CommandList } from "@/components/ui/command";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { useTheme } from "@/hooks/useTheme";
 import { ScreenIcon } from "@/lib/icons";
 import { MOD } from "@/lib/keys";
 import { readRecent } from "@/lib/recent";
-import { screenUrl, scopeName, visibleScreens } from "@/lib/routes";
-import { toggleTheme, useTheme } from "@/lib/theme";
+import { scopeName, screenUrl, visibleScreens } from "@/lib/routes";
+import { toggleTheme } from "@/lib/theme";
 import { contains } from "./ScopeSwitcher";
 
-interface Props { open: boolean; onOpenChange: (open: boolean) => void; scope: Scope; projects: Project[] }
+interface Props {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  scope: Scope;
+  projects: Project[];
+}
 
 export function CommandMenu({ open, onOpenChange, scope, projects }: Props) {
   const navigate = useNavigate();
@@ -30,8 +36,8 @@ export function CommandMenu({ open, onOpenChange, scope, projects }: Props) {
   const shown = query === "" ? projects.slice(0, 5) : projects;
   const recent = readRecent();
 
-  // Matching is case-insensitive on label and hint; a group with no matches disappears.
-  const matches = (label: string, hint?: string) => query === "" || contains(label, query, hint ? [hint] : undefined) > 0;
+  const matches = (label: string, hint?: string) =>
+    query === "" || contains(label, query, hint ? [hint] : undefined) > 0;
   const screens = visibleScreens(scope);
   const screenCount = screens.filter((def) => matches(def.label, screenUrl(scope, def.id))).length;
   const projectCount = shown.filter((p) => matches(p.name, p.path)).length;
@@ -39,7 +45,13 @@ export function CommandMenu({ open, onOpenChange, scope, projects }: Props) {
   const actionCount = [matches("Toggle theme"), matches("Add server")].filter(Boolean).length;
 
   return (
-    <Dialog open={open} onOpenChange={(o) => { setQuery(""); onOpenChange(o); }}>
+    <Dialog
+      open={open}
+      onOpenChange={(o) => {
+        setQuery("");
+        onOpenChange(o);
+      }}
+    >
       <DialogContent
         showCloseButton={false}
         overlayClassName="bg-black/40"
@@ -59,38 +71,74 @@ export function CommandMenu({ open, onOpenChange, scope, projects }: Props) {
             <Kbd>Esc</Kbd>
           </div>
           <CommandList className="max-h-[380px] p-1">
-            <CommandEmpty className="py-6 text-center text-xs text-muted-foreground">No results for “{query}”</CommandEmpty>
+            <CommandEmpty className="py-6 text-center text-xs text-muted-foreground">
+              No results for “{query}”
+            </CommandEmpty>
             {screenCount > 0 && (
               <Group heading="Go to">
                 {screens.map((def, i) => (
-                  <Item key={def.id} icon={<ScreenIcon id={def.id} className="size-4" />} label={def.label} hint={screenUrl(scope, def.id)} kbd={i < 9 ? `${MOD}${i + 1}` : undefined} onSelect={() => go(screenUrl(scope, def.id))} />
+                  <Item
+                    key={def.id}
+                    icon={<ScreenIcon id={def.id} className="size-4" />}
+                    label={def.label}
+                    hint={screenUrl(scope, def.id)}
+                    kbd={i < 9 ? `${MOD}${i + 1}` : undefined}
+                    onSelect={() => go(screenUrl(scope, def.id))}
+                  />
                 ))}
               </Group>
             )}
             {projectCount > 0 && (
               <Group heading="Switch scope">
                 {shown.map((p) => (
-                  <Item key={p.path} icon={p.exists ? <Folder className="size-4" /> : <FolderX className="size-4" />} label={p.name} hint={p.path} onSelect={() => go(screenUrl(p.path, "settings"))} />
+                  <Item
+                    key={p.path}
+                    icon={p.exists ? <Folder className="size-4" /> : <FolderX className="size-4" />}
+                    label={p.name}
+                    hint={p.path}
+                    onSelect={() => go(screenUrl(p.path, "settings"))}
+                  />
                 ))}
               </Group>
             )}
             {recentCount > 0 && (
               <Group heading="Open file">
                 {recent.map((r) => (
-                  <Item key={r.path} icon={<History className="size-4" />} label={r.label} hint={r.path} onSelect={() => go(r.url, { path: r.path })} />
+                  <Item
+                    key={r.path}
+                    icon={<History className="size-4" />}
+                    label={r.label}
+                    hint={r.path}
+                    onSelect={() => go(r.url, { path: r.path })}
+                  />
                 ))}
               </Group>
             )}
             {actionCount > 0 && (
               <Group heading="Actions">
-                <Item icon={theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />} label="Toggle theme" onSelect={() => { close(); toggleTheme(); }} />
-                <Item icon={<Plus className="size-4" />} label="Add server" onSelect={() => go(screenUrl(scope, "mcp"), { primary: true })} />
+                <Item
+                  icon={theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
+                  label="Toggle theme"
+                  onSelect={() => {
+                    close();
+                    toggleTheme();
+                  }}
+                />
+                <Item
+                  icon={<Plus className="size-4" />}
+                  label="Add server"
+                  onSelect={() => go(screenUrl(scope, "mcp"), { primary: true })}
+                />
               </Group>
             )}
           </CommandList>
           <div className="flex h-8 items-center gap-3 border-t px-3 text-[11px] text-muted-foreground">
-            <span className="flex items-center gap-1"><Kbd>↑↓</Kbd> move</span>
-            <span className="flex items-center gap-1"><Kbd>↵</Kbd> open</span>
+            <span className="flex items-center gap-1">
+              <Kbd>↑↓</Kbd> move
+            </span>
+            <span className="flex items-center gap-1">
+              <Kbd>↵</Kbd> open
+            </span>
             <span className="ml-auto">{scopeName(scope)} scope</span>
           </div>
         </Command>

@@ -4,7 +4,11 @@ import { useState } from "react";
 
 const SUFFIX: Partial<Record<FileKind, string>> = { skills: "/SKILL.md", hooks: ".sh" };
 
-interface Props { kind: FileKind; onCreate: (name: string) => Promise<void>; onCancel: () => void }
+interface Props {
+  kind: FileKind;
+  onCreate: (name: string) => Promise<void>;
+  onCancel: () => void;
+}
 
 export function NewFileInput({ kind, onCreate, onCancel }: Props) {
   const [name, setName] = useState("");
@@ -30,6 +34,7 @@ export function NewFileInput({ kind, onCreate, onCancel }: Props) {
       <div className="flex h-8 items-center gap-2 rounded-sm border border-ring bg-background px-2">
         <FileText className="size-4 shrink-0 text-muted-foreground" />
         <input
+          // biome-ignore lint/a11y/noAutofocus: the input appears on the user's own New action
           autoFocus
           value={name}
           onChange={(e) => setName(e.target.value)}

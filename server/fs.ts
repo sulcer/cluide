@@ -68,7 +68,7 @@ export function readJsonDoc(path: string): JsonDoc {
   }
 }
 
-// For files cluide itself locates. A file that exists but does not parse is an error the user must fix.
+// An existing file that does not parse is the user's error to fix, not an empty document.
 export function readJsonOrEmpty(path: string): Record<string, any> {
   const doc = readJsonDoc(path);
   if (doc.exists && doc.json === null) {
@@ -77,7 +77,6 @@ export function readJsonOrEmpty(path: string): Record<string, any> {
   return doc.json ?? {};
 }
 
-// Re-read, check the managed slice's etag, mutate, write the whole file.
 export function patchJson(
   path: string,
   slice: (json: any) => unknown,
@@ -87,7 +86,10 @@ export function patchJson(
   const json = readJsonOrEmpty(path);
   const before = sliceEtag(slice(json));
   if (expectedEtag !== undefined && before !== expectedEtag) {
-    throw new ApiError(409, "conflict", `${basename(path)} changed on disk`, { content: slice(json) ?? null, etag: before });
+    throw new ApiError(409, "conflict", `${basename(path)} changed on disk`, {
+      content: slice(json) ?? null,
+      etag: before,
+    });
   }
   mutate(json);
   const { diff } = writeText(path, jsonText(json));

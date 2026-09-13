@@ -1,19 +1,21 @@
 import type { FileEntry, Project } from "@shared/api";
 import { useCallback, useRef, useState } from "react";
 import { Outlet } from "react-router";
-import { useResource } from "@/api/useResource";
 import { Toaster } from "@/components/Toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { useWindowEvent } from "@/lib/events";
+import { useResource } from "@/hooks/useResource";
+import { useRoute } from "@/hooks/useRoute";
+import { useShortcuts } from "@/hooks/useShortcuts";
+import { useWindowEvent } from "@/hooks/useWindowEvent";
 import { readStorage, writeStorage } from "@/lib/storage";
-import { useRoute } from "@/lib/useRoute";
 import { CommandMenu } from "./CommandMenu";
 import { Header } from "./Header";
 import { OfflineBanner } from "./OfflineBanner";
 import { Sidebar } from "./Sidebar";
-import { useShortcuts } from "./useShortcuts";
 
-export interface ShellContext { claudeDir: string | null }
+export interface ShellContext {
+  claudeDir: string | null;
+}
 
 export function Shell() {
   const { scope, screen, file } = useRoute();

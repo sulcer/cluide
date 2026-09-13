@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
-import { useWindowEvent } from "@/lib/events";
-import { api, type ApiError } from "./client";
+import { type ApiError, api } from "@/api/client";
+import { useWindowEvent } from "@/hooks/useWindowEvent";
 
-// One resource per screen, loaded on mount, reloaded on demand or on the offline banner's Retry.
 export function useResource<T>(url: string | null) {
   const [data, setData] = useState<T | undefined>(undefined);
   const [error, setError] = useState<ApiError | undefined>(undefined);
@@ -18,10 +17,19 @@ export function useResource<T>(url: string | null) {
     if (url === null) return;
     let live = true;
     api.get<T>(url).then(
-      (d) => { if (live) { setData(d); setError(undefined); } },
-      (e) => { if (live) setError(e as ApiError); },
+      (d) => {
+        if (live) {
+          setData(d);
+          setError(undefined);
+        }
+      },
+      (e) => {
+        if (live) setError(e as ApiError);
+      },
     );
-    return () => { live = false; };
+    return () => {
+      live = false;
+    };
   }, [url, tick]);
 
   const reload = useCallback(() => setTick((t) => t + 1), []);

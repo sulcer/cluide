@@ -1,20 +1,27 @@
 import type { WriteResult } from "@shared/api";
 import { useEffect, useState } from "react";
 import type { ApiError } from "@/api/client";
-import { useWindowEvent } from "@/lib/events";
+import { useWindowEvent } from "@/hooks/useWindowEvent";
 import { toast } from "@/lib/toast";
 
-export interface Loaded { content: string; etag: string | null; draft?: string }
-// etag is null when the 409 body carries no version at all (the file was deleted on disk); the
-// next save then goes through as a create.
-export interface Conflict { content: string; etag: string | null }
-export interface DraftError { status: number; message: string }
+export interface Loaded {
+  content: string;
+  etag: string | null;
+  draft?: string;
+}
+// etag null: the file was deleted on disk, so the next save is a create.
+export interface Conflict {
+  content: string;
+  etag: string | null;
+}
+export interface DraftError {
+  status: number;
+  message: string;
+}
 export type SaveFn = (content: string, etag: string | undefined) => Promise<WriteResult | { etag: string }>;
 
 interface Options {
-  // Maps a 409 body's `current` to what Reload should load. Default: the body already is { content, etag }.
   conflictOf?: (current: unknown) => Conflict;
-  // Description of the "Saved" toast, e.g. the server name in the MCP sheet.
   savedDescription?: string;
 }
 
@@ -32,12 +39,10 @@ export function useDraft(loaded: Loaded | undefined, save: SaveFn, name: string,
   const [diff, setDiff] = useState("");
   const [diffOpen, setDiffOpen] = useState(false);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: loaded is the trigger; base is read from the current render on purpose
   useEffect(() => {
     if (loaded === undefined) return;
-    // A re-fetch that returns the version already loaded (identified by its etag, not by content:
-    // formatting can differ) must not touch the draft — it would erase keystrokes typed since, or
-    // reformat text the user already saved. `base` is read from the render this effect runs in,
-    // not from a stale closure: the effect only re-runs when `loaded` itself changes.
+    // The same etag is the same version: leave the draft alone, or it would erase keystrokes typed since.
     if (loaded.etag !== null && loaded.etag === base?.etag) return;
     setBase({ content: loaded.content, etag: loaded.etag });
     setContent(loaded.draft ?? loaded.content);
@@ -56,18 +61,26 @@ export function useDraft(loaded: Loaded | undefined, save: SaveFn, name: string,
       setBase({ content: snapshot, etag: result.etag });
       if ("diff" in result) {
         setDiff(result.diff);
-        toast({ title: "Saved", description: options.savedDescription, action: { label: "View diff", run: () => setDiffOpen(true) } });
+        toast({
+          title: "Saved",
+          description: options.savedDescription,
+          action: { label: "View diff", run: () => setDiffOpen(true) },
+        });
       }
     } catch (e) {
       const err = e as ApiError;
-      // A 409 without `current` (or a mapped conflict missing its etag) carries nothing Reload
-      // could load, so it isn't a usable conflict: fall through to the generic failure toast.
-      const mapped = err.status === 409 && err.current !== undefined ? (options.conflictOf ?? asConflict)(err.current) : undefined;
+      // A 409 without a loadable `current` is not a usable conflict; fall through to the failure toast.
+      const mapped =
+        err.status === 409 && err.current !== undefined ? (options.conflictOf ?? asConflict)(err.current) : undefined;
       if (mapped?.etag !== undefined) {
         setConflict(mapped);
       } else {
         if (err.status === 400 || err.status === 422) setError({ status: err.status, message: err.message });
-        toast({ title: "Save failed", description: err.status ? `${err.status} · ${err.message}` : err.message, error: true });
+        toast({
+          title: "Save failed",
+          description: err.status ? `${err.status} · ${err.message}` : err.message,
+          error: true,
+        });
       }
     } finally {
       setSaving(false);
@@ -106,10 +119,21 @@ export function useDraft(loaded: Loaded | undefined, save: SaveFn, name: string,
   }, [dirty]);
 
   return {
-    content, setContent, dirty, saving, error, conflict, diff, diffOpen, setDiffOpen,
+    content,
+    setContent,
+    dirty,
+    saving,
+    error,
+    conflict,
+    diff,
+    diffOpen,
+    setDiffOpen,
     etag: base?.etag ?? null,
     ready: base !== undefined,
-    save: doSave, discard, reload, overwrite,
+    save: doSave,
+    discard,
+    reload,
+    overwrite,
     dismissConflict: () => setConflict(undefined),
   };
 }

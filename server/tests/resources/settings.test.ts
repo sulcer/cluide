@@ -2,11 +2,11 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { ErrorCode } from "@shared/api";
-import { ApiError } from "../errors";
-import { etagOf } from "../fs";
-import { loadSchema } from "../schema";
-import { tempHome, type TempHome } from "../testing";
-import { readSettings, writeSettings } from "./settings";
+import { ApiError } from "../../errors";
+import { etagOf } from "../../fs";
+import { readSettings, writeSettings } from "../../resources/settings";
+import { loadSchema } from "../../schema";
+import { type TempHome, tempHome } from "../temp-home";
 
 const TINY_SCHEMA = JSON.stringify({ type: "object", properties: { model: { type: "string" } } });
 
@@ -19,7 +19,9 @@ beforeEach(async () => {
 afterEach(() => t.cleanup());
 
 const rejects = (fn: () => unknown, status: number, code: ErrorCode) => {
-  try { fn(); } catch (e) {
+  try {
+    fn();
+  } catch (e) {
     expect(e).toBeInstanceOf(ApiError);
     expect({ status: (e as ApiError).status, code: (e as ApiError).code }).toEqual({ status, code });
     return;
@@ -31,19 +33,31 @@ describe("readSettings", () => {
   test("returns the parsed file with schema warnings", () => {
     const path = t.write(".claude/settings.json", '{"model":1}');
     expect(readSettings("global", "settings")).toEqual({
-      path, exists: true, json: { model: 1 }, etag: etagOf('{"model":1}'),
+      path,
+      exists: true,
+      json: { model: 1 },
+      etag: etagOf('{"model":1}'),
       errors: [{ path: "/model", message: "must be string" }],
     });
   });
   test("a missing local file is not an error", () => {
     expect(readSettings(t.project, "local")).toEqual({
-      path: join(t.project, ".claude", "settings.local.json"), exists: false, json: null, etag: null, errors: [],
+      path: join(t.project, ".claude", "settings.local.json"),
+      exists: false,
+      json: null,
+      etag: null,
+      errors: [],
     });
   });
   test("keeps raw text when the file does not parse", () => {
     const path = t.write(".claude/settings.json", "{nope");
     expect(readSettings("global", "settings")).toEqual({
-      path, exists: true, json: null, raw: "{nope", etag: etagOf("{nope"), errors: [],
+      path,
+      exists: true,
+      json: null,
+      raw: "{nope",
+      etag: etagOf("{nope"),
+      errors: [],
     });
   });
   test("rejects an unknown file name", () => {
