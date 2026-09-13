@@ -105,7 +105,12 @@ function targetOf(scope: Scope, target: string): Target {
     return {
       path: claudeJsonPath(),
       slice: (j) => j.projects?.[scope]?.mcpServers,
-      servers: (j) => (((j.projects ??= {})[scope] ??= {}).mcpServers ??= {}),
+      servers: (j) => {
+        j.projects ??= {};
+        j.projects[scope] ??= {};
+        j.projects[scope].mcpServers ??= {};
+        return j.projects[scope].mcpServers;
+      },
     };
   }
   if (target === "project") {

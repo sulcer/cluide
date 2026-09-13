@@ -39,6 +39,7 @@ export function useDraft(loaded: Loaded | undefined, save: SaveFn, name: string,
   const [diff, setDiff] = useState("");
   const [diffOpen, setDiffOpen] = useState(false);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: loaded is the trigger; base is read from the current render on purpose
   useEffect(() => {
     if (loaded === undefined) return;
     // The same etag is the same version: leave the draft alone, or it would erase keystrokes typed since.

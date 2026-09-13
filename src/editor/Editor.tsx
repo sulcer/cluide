@@ -14,6 +14,7 @@ interface Props {
 
 export function Editor({ value, onChange, error, disabled, autoFocus = true, ref }: Props) {
   const local = useRef<HTMLTextAreaElement>(null);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: focus once on mount; a later autoFocus flip must not refocus
   useEffect(() => {
     // A closing dialog holds stale DOM focus through its exit animation, so only an open dialog counts.
     const active = document.activeElement as HTMLElement | null;

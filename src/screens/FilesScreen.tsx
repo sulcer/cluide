@@ -38,7 +38,7 @@ export function FilesScreen({ scope, kind, file }: Props) {
   const [selectedPath, setSelectedPath] = useState<string | undefined>(
     (location.state as { path?: string } | null)?.path,
   );
-  // Recent files of one kind share a route pattern, so re-apply location.state on every navigation.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: location.key is the trigger, so state is re-applied on every navigation
   useEffect(() => {
     const p = (location.state as { path?: string } | null)?.path;
     if (p !== undefined) setSelectedPath(p);
@@ -64,6 +64,7 @@ export function FilesScreen({ scope, kind, file }: Props) {
     [kind, scope, navigate],
   );
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: the path is the identity; the entry object and urlOf change identity without meaning
   useEffect(() => {
     if (selected) pushRecent({ label: selected.name, path: selected.path, url: urlOf(selected) });
   }, [selected?.path]);

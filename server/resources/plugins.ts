@@ -52,7 +52,8 @@ export function setPluginEnabled(body: unknown): WriteResult {
     settingsPath(),
     (json) => json.enabledPlugins,
     (json) => {
-      (json.enabledPlugins ??= {})[id] = enabled;
+      json.enabledPlugins ??= {};
+      json.enabledPlugins[id] = enabled;
     },
     etag,
   );

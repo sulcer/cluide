@@ -97,6 +97,7 @@ export function McpScreen({ scope }: { scope: Scope }) {
                   <td className="truncate px-3 font-mono text-xs text-muted-foreground" title={commandText(e.config)}>
                     {commandText(e.config)}
                   </td>
+                  {/* biome-ignore lint/a11y/useKeyWithClickEvents: the handler only keeps the switch's click from opening the row */}
                   <td onClick={(ev) => ev.stopPropagation()}>
                     {e.scope === "project" && (
                       <Switch
