@@ -329,4 +329,77 @@ test.describe("render", () => {
     await expect(page.getByText("No hooks in this scope")).toBeVisible();
     await shot(page, "hooks-empty");
   });
+
+  test("mcp-global", async ({ page }) => {
+    await page.goto("/global/mcp");
+    await expect(page.getByText("corp-proxy")).toBeVisible();
+    await expect(page.getByText(/precedence local/)).toBeVisible();
+    await shot(page, "mcp-global");
+  });
+
+  test("mcp-project with approval, shadowing and the sheet", async ({ page }) => {
+    await page.goto(`${projectUrl("fetcher")}/mcp`);
+    await expect(page.getByText("Shadowed by local")).toBeVisible();
+    await expect(page.getByRole("switch", { name: "Approve fetcher-postgres-local" })).toBeChecked();
+    await shot(page, "mcp-project");
+    await page.getByRole("switch", { name: "Approve fetcher-postgres-local" }).click();
+    await expect(page.getByText("Approval removed for fetcher-postgres-local")).toBeVisible();
+    await page.getByRole("switch", { name: "Approve fetcher-postgres-local" }).click();
+    await expect(page.getByText("Approved fetcher-postgres-local")).toBeVisible();
+
+    await page.getByRole("row", { name: /^asana/ }).click();
+    await expect(page.getByRole("dialog")).toContainText("Config");
+    await shot(page, "mcp-sheet");
+    const ta = page.getByRole("dialog").locator("textarea");
+    await ta.fill("not json");
+    await page.keyboard.press("ControlOrMeta+s");
+    await expect(page.getByRole("dialog").getByText("config must be valid JSON")).toBeVisible();
+    await ta.fill('{\n  "type": "http",\n  "url": "https://mcp.asana.com/mcp",\n  "headers": {}\n}\n');
+    await page.keyboard.press("ControlOrMeta+s");
+    // The sheet is a Radix dialog, which marks the rest of the page (the Toaster included)
+    // aria-hidden, so getByRole("status") finds nothing even though the toast is visible. A
+    // plain "Saved" text match is ambiguous here too: the sheet's own now-clean SaveBar reads
+    // "Saved" as well. Match the toast's DOM attribute directly instead, which — unlike
+    // getByRole — isn't filtered by aria-hidden.
+    await expect(page.locator('[role="status"]')).toContainText("Saved");
+    await page.keyboard.press("Escape");
+
+    await page.getByRole("row", { name: /^corp-proxy/ }).click();
+    await expect(page.getByText("Managed by your organisation")).toBeVisible();
+    await shot(page, "mcp-sheet-readonly");
+    await page.keyboard.press("Escape");
+  });
+
+  test("mcp-add", async ({ page }) => {
+    await page.goto(`${projectUrl("fetcher")}/mcp`);
+    await page.getByRole("button", { name: "Add server" }).click();
+    await expect(page.getByPlaceholder("my-server")).toBeFocused();
+    await shot(page, "mcp-add");
+    await page.getByPlaceholder("my-server").fill("echo");
+    await page.getByPlaceholder("npx").fill("echo");
+    await page.getByRole("button", { name: /^Add server/ }).last().click();
+    await expect(page.getByText("Added echo")).toBeVisible();
+    await expect(page.getByRole("row", { name: /^echo/ })).toBeVisible();
+    await page.getByRole("row", { name: /^echo/ }).click();
+    await page.getByRole("button", { name: "Delete" }).click();
+    await page.getByRole("button", { name: "Delete", exact: true }).last().click();
+    await expect(page.getByText("Deleted echo")).toBeVisible();
+  });
+
+  test("mcp-project-1024", async ({ page }) => {
+    await page.setViewportSize({ width: 1024, height: 768 });
+    await page.goto(`${projectUrl("fetcher")}/mcp`);
+    await expect(page.getByText("Shadowed by local")).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+    await shot(page, "mcp-project-1024");
+  });
+
+  test("command menu's Add server opens the dialog", async ({ page }) => {
+    await page.goto("/global/settings");
+    await page.keyboard.press("ControlOrMeta+k");
+    await page.keyboard.type("Add server");
+    await page.keyboard.press("Enter");
+    await expect(page).toHaveURL(/\/global\/mcp$/);
+    await expect(page.getByPlaceholder("my-server")).toBeVisible();
+  });
 });

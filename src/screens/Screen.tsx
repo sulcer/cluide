@@ -3,6 +3,7 @@ import { screenDef, screenUrl } from "@/lib/routes";
 import { useRoute } from "@/lib/useRoute";
 import { FilesScreen } from "./FilesScreen";
 import { HooksScreen } from "./HooksScreen";
+import { McpScreen } from "./McpScreen";
 import { SettingsScreen } from "./SettingsScreen";
 
 export function Screen() {
@@ -18,6 +19,7 @@ export function Screen() {
     case "settings":
       return <SettingsScreen key={key} scope={scope} />;
     case "mcp":
+      return <McpScreen key={key} scope={scope} />;
     case "plugins":
       return <Soon key={key} name={def.label} />;
     default:
