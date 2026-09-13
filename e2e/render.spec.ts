@@ -1,7 +1,7 @@
 import { writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, test } from "@playwright/test";
-import { homeDir, main, projectUrl, shot } from "./helpers";
+import { homeDir, main, projectUrl, shot, toast } from "./helpers";
 
 test.describe("render", () => {
   test("shell: fonts load and / redirects", async ({ page }) => {
@@ -266,5 +266,48 @@ test.describe("render", () => {
     await expect(page.getByText("Unsaved changes")).toBeVisible();
     await page.keyboard.press("Escape");
     await expect(main(page).getByText("Saved")).toBeVisible();
+  });
+
+  test("settings-warnings", async ({ page }) => {
+    await page.goto("/global/settings");
+    await expect(page.locator("textarea")).toHaveValue(/"enabledPlugins"/);
+    await expect(page.getByText("Warnings")).toBeVisible();
+    await shot(page, "settings-warnings");
+    const rows = page.getByRole("complementary", { name: "Warnings" }).getByRole("button");
+    if ((await rows.count()) > 0) {
+      await rows.first().click();
+      await expect(page.locator("textarea")).toBeFocused();
+    }
+  });
+
+  test("settings-local-missing", async ({ page }) => {
+    await page.goto("/global/settings");
+    await page.getByRole("button", { name: /settings\.local\.json/ }).click();
+    await expect(page.getByText("settings.local.json does not exist in this scope")).toBeVisible();
+    await shot(page, "settings-local-missing");
+    await page.getByRole("button", { name: "Create settings.local.json" }).click();
+    await expect(page.getByText("Unsaved changes")).toBeVisible();
+    await page.keyboard.press("Escape");
+  });
+
+  test("settings-unparsable", async ({ page }) => {
+    await page.goto(`${projectUrl("cluide")}/settings`);
+    await page.getByRole("button", { name: /settings\.local\.json/ }).click();
+    await expect(page.getByText("does not parse. Fix it and save.")).toBeVisible();
+    await shot(page, "settings-unparsable");
+    await page.locator("textarea").fill('{\n  "permissions": {\n    "allow": []\n  }\n}\n');
+    await page.keyboard.press("ControlOrMeta+s");
+    await expect(toast(page)).toContainText("Saved");
+    await expect(page.getByText("does not parse. Fix it and save.")).toHaveCount(0);
+  });
+
+  test("settings: an invalid document shows the inline error", async ({ page }) => {
+    await page.goto("/global/settings");
+    const ta = page.locator("textarea");
+    await ta.fill("[1]");
+    await page.keyboard.press("ControlOrMeta+s");
+    await expect(main(page).getByText("json must be an object")).toBeVisible();
+    await expect(toast(page)).toContainText("Save failed");
+    await page.keyboard.press("Escape");
   });
 });

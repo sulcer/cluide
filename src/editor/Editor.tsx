@@ -1,5 +1,5 @@
 import { CircleAlert } from "lucide-react";
-import type { Ref } from "react";
+import { type Ref, useEffect, useRef } from "react";
 import { cn } from "cn";
 import type { DraftError } from "./useDraft";
 
@@ -13,14 +13,23 @@ interface Props {
 }
 
 export function Editor({ value, onChange, error, disabled, autoFocus = true, ref }: Props) {
+  const local = useRef<HTMLTextAreaElement>(null);
+  useEffect(() => {
+    // A dialog already open (the command menu, a conflict) keeps focus; a late-loading
+    // editor (its data arrived after the dialog opened) must not steal it.
+    if (autoFocus && !document.querySelector('[role="dialog"]')) local.current?.focus();
+  }, []);
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <textarea
-        ref={ref}
+        ref={(node) => {
+          local.current = node;
+          if (typeof ref === "function") ref(node);
+          else if (ref) ref.current = node;
+        }}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         disabled={disabled}
-        autoFocus={autoFocus}
         spellCheck={false}
         className={cn("min-h-0 flex-1 resize-none bg-transparent px-4 py-3 font-mono text-[12.5px] leading-5 [tab-size:2]", disabled && "opacity-60")}
       />
