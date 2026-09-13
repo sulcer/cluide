@@ -10,7 +10,8 @@ interface Props {
   kind: FileKind;
   entries: FileEntry[] | undefined;
   selected: FileEntry | undefined;
-  onSelect: (entry: FileEntry) => void;
+  // focus defaults true (a click); j/k passes false so keyboard browsing never steals focus into the editor.
+  onSelect: (entry: FileEntry, focus?: boolean) => void;
   creating: boolean;
   onCreate: (name: string) => Promise<void>;
   onCancelCreate: () => void;
@@ -32,7 +33,7 @@ export function FileList({ kind, entries, selected, onSelect, creating, onCreate
       const next = shown[i + (e.key === "j" ? 1 : -1)];
       if (next) {
         e.preventDefault();
-        onSelect(next);
+        onSelect(next, false);
       }
     };
     window.addEventListener("keydown", onKey);

@@ -145,6 +145,7 @@ test.describe("render", () => {
     await page.locator("main").click({ position: { x: 120, y: 700 } }); // the list column, below its items
     await page.keyboard.press("j");
     await expect(page.getByRole("button", { name: "security.md" })).toHaveClass(/selected/);
+    await expect(page.locator("textarea")).not.toBeFocused();
     await page.keyboard.press("k");
     await expect(page.getByRole("button", { name: "git-workflow.md" })).toHaveClass(/selected/);
   });

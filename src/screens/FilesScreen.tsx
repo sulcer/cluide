@@ -29,6 +29,9 @@ export function FilesScreen({ scope, kind, file }: Props) {
   const list = useResource<FileEntry[]>(`/api/files${q({ scope, kind })}`);
   const [selectedPath, setSelectedPath] = useState<string | undefined>((location.state as { path?: string } | null)?.path);
   const [creating, setCreating] = useState(false);
+  // A click, a create, or opening a file directly all focus the editor; j/k browsing must not,
+  // or the next j/k types into the now-focused textarea instead of moving the selection.
+  const [focusEditor, setFocusEditor] = useState(true);
   const entries = list.data;
   const selected =
     entries?.find((e) => e.path === selectedPath) ??
@@ -40,7 +43,8 @@ export function FilesScreen({ scope, kind, file }: Props) {
     kind === "hooks" ? `${scopeUrl(scope)}/hooks/${encodeURIComponent(entry.name)}` : screenUrl(scope, kind);
 
   const select = useCallback(
-    (entry: FileEntry) => {
+    (entry: FileEntry, focus = true) => {
+      setFocusEditor(focus);
       if (kind === "hooks") navigate(`${scopeUrl(scope)}/hooks/${encodeURIComponent(entry.name)}`);
       else setSelectedPath(entry.path);
     },
@@ -61,6 +65,7 @@ export function FilesScreen({ scope, kind, file }: Props) {
     toast({ title: `Created ${name}`, description: path });
     setCreating(false);
     list.reload();
+    setFocusEditor(true);
     if (kind === "hooks") navigate(`${scopeUrl(scope)}/hooks/${encodeURIComponent(name)}`);
     else setSelectedPath(path);
   };
@@ -86,7 +91,7 @@ export function FilesScreen({ scope, kind, file }: Props) {
           )}
         </Centered>
       ) : selected ? (
-        <FileEditor key={selected.path} scope={scope} kind={kind} entry={selected} onCreated={list.reload} onDeleted={afterDelete} />
+        <FileEditor key={selected.path} scope={scope} kind={kind} entry={selected} autoFocus={focusEditor} onCreated={list.reload} onDeleted={afterDelete} />
       ) : (
         <div className="flex-1" />
       )}
@@ -94,9 +99,9 @@ export function FilesScreen({ scope, kind, file }: Props) {
   );
 }
 
-interface EditorProps { scope: Scope; kind: FileKind; entry: FileEntry; onCreated: () => void; onDeleted: () => void }
+interface EditorProps { scope: Scope; kind: FileKind; entry: FileEntry; autoFocus: boolean; onCreated: () => void; onDeleted: () => void }
 
-function FileEditor({ scope, kind, entry, onCreated, onDeleted }: EditorProps) {
+function FileEditor({ scope, kind, entry, autoFocus, onCreated, onDeleted }: EditorProps) {
   const doc = useResource<FileDoc>(entry.exists ? `/api/file${q({ path: entry.path })}` : null);
   const [created, setCreated] = useState<Loaded>();
   const isNew = useRef(!entry.exists);
@@ -157,7 +162,7 @@ function FileEditor({ scope, kind, entry, onCreated, onDeleted }: EditorProps) {
           <span className="rounded-sm border px-1.5 text-[11px] leading-4">frontmatter</span>
         </div>
       )}
-      <Editor value={draft.content} onChange={draft.setContent} error={draft.error} />
+      <Editor value={draft.content} onChange={draft.setContent} error={draft.error} autoFocus={autoFocus} />
       {/* Task 5 adds: <DiffSheet />, <ConflictDialog />, <DeleteDialog open={deleting} ... onConfirm={remove} /> */}
     </div>
   );
