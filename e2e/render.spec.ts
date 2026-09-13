@@ -230,6 +230,29 @@ test.describe("render", () => {
     await expect(page.getByRole("button", { name: "style.md" })).toHaveCount(0);
   });
 
+  test("a failed delete keeps the dialog open", async ({ page }) => {
+    await page.goto("/global/rules");
+    await page.getByRole("button", { name: "security.md" }).click();
+    await page.route("**/api/file?**", async (route) => {
+      if (route.request().method() === "DELETE") {
+        await route.fulfill({ status: 409, contentType: "application/json", body: JSON.stringify({ error: { code: "conflict", message: "security.md changed on disk" } }) });
+      } else {
+        await route.continue();
+      }
+    });
+    await page.getByRole("button", { name: "Delete" }).click();
+    await expect(page.getByText("Delete security.md?")).toBeVisible();
+    await page.getByRole("button", { name: "Delete", exact: true }).last().click();
+    // The delete dialog stays open (a Radix modal), which marks the rest of the page — including
+    // the Toaster, a sibling of <main> — aria-hidden; getByRole("status") would find nothing even
+    // though the toast is visible, so match its text directly, as every other toast check here does.
+    await expect(page.getByText("Delete failed")).toBeVisible();
+    await expect(page.getByText("409 · security.md changed on disk")).toBeVisible();
+    await expect(page.getByText("Delete security.md?")).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("button", { name: "security.md" })).toBeVisible();
+  });
+
   test("esc: an open layer takes Esc before the editor", async ({ page }) => {
     await page.goto("/global/memory");
     const ta = page.locator("textarea");

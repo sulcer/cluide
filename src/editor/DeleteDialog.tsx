@@ -1,6 +1,8 @@
 import { useState } from "react";
+import type { ApiError } from "@/api/client";
 import { Button } from "@/components/Button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import { toast } from "@/lib/toast";
 
 interface Props { open: boolean; onOpenChange: (open: boolean) => void; name: string; body: string; onConfirm: () => Promise<void> }
 
@@ -11,6 +13,9 @@ export function DeleteDialog({ open, onOpenChange, name, body, onConfirm }: Prop
     try {
       await onConfirm();
       onOpenChange(false);
+    } catch (e) {
+      const err = e as ApiError;
+      toast({ title: "Delete failed", description: err.status ? `${err.status} · ${err.message}` : err.message, error: true });
     } finally {
       setBusy(false);
     }

@@ -50,8 +50,11 @@ export function useDraft(loaded: Loaded | undefined, save: SaveFn, name: string,
       }
     } catch (e) {
       const err = e as ApiError;
-      if (err.status === 409) {
-        setConflict((options.conflictOf ?? asConflict)(err.current));
+      // A 409 without `current` (or a mapped conflict missing its etag) carries nothing Reload
+      // could load, so it isn't a usable conflict: fall through to the generic failure toast.
+      const mapped = err.status === 409 && err.current !== undefined ? (options.conflictOf ?? asConflict)(err.current) : undefined;
+      if (mapped?.etag !== undefined) {
+        setConflict(mapped);
       } else {
         if (err.status === 400 || err.status === 422) setError({ status: err.status, message: err.message });
         toast({ title: "Save failed", description: err.status ? `${err.status} · ${err.message}` : err.message, error: true });
