@@ -39,6 +39,7 @@ export function McpAddDialog({ open, onOpenChange, scope, onAdded }: Props) {
 
   const reset = () => {
     setName(""); setCommand(""); setArgs(""); setUrl(""); setHeaders(""); setTransport("stdio");
+    setTarget(scope === "global" ? "user" : "project");
   };
 
   const submit = async () => {
@@ -51,7 +52,8 @@ export function McpAddDialog({ open, onOpenChange, scope, onAdded }: Props) {
       reset();
       onAdded();
     } catch (e) {
-      toast({ title: "Save failed", description: (e as ApiError).message, error: true });
+      const err = e as ApiError;
+      toast({ title: "Save failed", description: err.status ? `${err.status} · ${err.message}` : err.message, error: true });
     } finally {
       setBusy(false);
     }
@@ -76,7 +78,7 @@ export function McpAddDialog({ open, onOpenChange, scope, onAdded }: Props) {
             <Input size="md" autoFocus className="font-mono" placeholder="my-server" value={name} onChange={(e) => setName(e.target.value)} />
           </Field>
           {scope !== "global" && (
-            <Field label="Target">
+            <Field label="Target" plain>
               <div className="grid grid-cols-3 gap-0.5 rounded-md bg-muted p-0.5">
                 {TARGETS.map((t) => (
                   <button
@@ -93,7 +95,7 @@ export function McpAddDialog({ open, onOpenChange, scope, onAdded }: Props) {
               <p className="text-[11px] text-muted-foreground">{HINTS[target]}</p>
             </Field>
           )}
-          <Field label="Transport">
+          <Field label="Transport" plain>
             <div className="grid w-60 grid-cols-3 gap-0.5 rounded-md bg-muted p-0.5">
               {TRANSPORTS.map((t) => (
                 <button
@@ -138,14 +140,18 @@ export function McpAddDialog({ open, onOpenChange, scope, onAdded }: Props) {
   );
 }
 
-function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
+// `plain` renders a <div>+<span> caption instead of a <label>: a <label> forwards a click
+// anywhere in it (including the caption text) to its first control, which for a segmented
+// button group would activate that button instead of just focusing it.
+function Field({ label, hint, children, plain }: { label: string; hint?: string; children: React.ReactNode; plain?: boolean }) {
+  const Caption = plain ? "div" : "label";
   return (
-    <label className="flex flex-col gap-1.5">
+    <Caption className="flex flex-col gap-1.5">
       <span className="text-xs font-medium">
         {label}
         {hint && <span className="ml-1.5 font-normal text-muted-foreground">{hint}</span>}
       </span>
       {children}
-    </label>
+    </Caption>
   );
 }

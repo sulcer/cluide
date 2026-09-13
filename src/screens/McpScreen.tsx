@@ -2,7 +2,7 @@ import type { McpEntry, Scope } from "@shared/api";
 import { CornerDownRight, Lock } from "lucide-react";
 import { useState } from "react";
 import { useLocation } from "react-router";
-import { api, q } from "@/api/client";
+import { type ApiError, api, q } from "@/api/client";
 import { useResource } from "@/api/useResource";
 import { ScopeBadge } from "@/components/Badge";
 import { SkeletonRows } from "@/components/Skeleton";
@@ -27,8 +27,16 @@ export function McpScreen({ scope }: { scope: Scope }) {
   const effective = entries?.filter((e) => e.effective).length ?? 0;
 
   const approve = async (entry: McpEntry, enabled: boolean) => {
-    await api.post("/api/mcp/approval", { scope, name: entry.name, enabled });
-    list.setData(entries!.map((e) => (e === entry ? { ...e, enabled } : e)));
+    try {
+      await api.post("/api/mcp/approval", { scope, name: entry.name, enabled });
+    } catch (e) {
+      const err = e as ApiError;
+      toast({ title: "Save failed", description: err.status ? `${err.status} · ${err.message}` : err.message, error: true });
+      return;
+    }
+    // Applied only after the POST resolves (not optimistically), and via an updater rather than
+    // the closed-over `entries` snapshot, so two quick toggles can't revert each other.
+    list.setData((prev) => prev?.map((e) => (e === entry ? { ...e, enabled } : e)));
     toast({ title: enabled ? `Approved ${entry.name}` : `Approval removed for ${entry.name}`, description: `${scope}/.claude/settings.local.json` });
   };
 

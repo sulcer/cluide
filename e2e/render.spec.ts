@@ -349,6 +349,7 @@ test.describe("render", () => {
 
     await page.getByRole("row", { name: /^asana/ }).click();
     await expect(page.getByRole("dialog")).toContainText("Config");
+    expect((await page.getByRole("dialog").boundingBox())?.width).toBe(520);
     await shot(page, "mcp-sheet");
     const ta = page.getByRole("dialog").locator("textarea");
     await ta.fill("not json");
@@ -370,11 +371,27 @@ test.describe("render", () => {
     await page.keyboard.press("Escape");
   });
 
+  test("mcp-approval failure keeps the switch checked and toasts", async ({ page }) => {
+    await page.goto(`${projectUrl("fetcher")}/mcp`);
+    await page.route("**/api/mcp/approval", (route) =>
+      route.fulfill({ status: 500, contentType: "application/json", body: JSON.stringify({ error: { code: "internal", message: "backup failed" } }) }),
+    );
+    const sw = page.getByRole("switch", { name: "Approve fetcher-postgres-local" });
+    await expect(sw).toBeChecked();
+    await sw.click();
+    await expect(toast(page)).toContainText("Save failed");
+    await expect(toast(page)).toContainText("500 · backup failed");
+    await expect(sw).toBeChecked();
+  });
+
   test("mcp-add", async ({ page }) => {
     await page.goto(`${projectUrl("fetcher")}/mcp`);
     await page.getByRole("button", { name: "Add server" }).click();
     await expect(page.getByPlaceholder("my-server")).toBeFocused();
     await shot(page, "mcp-add");
+    // Pick a non-default target before the first add, so reopening the dialog afterwards proves
+    // it reset to the scope's default rather than remembering the last choice.
+    await page.getByRole("button", { name: /^Local/ }).click();
     await page.getByPlaceholder("my-server").fill("echo");
     await page.getByPlaceholder("npx").fill("echo");
     await page.getByRole("button", { name: /^Add server/ }).last().click();
@@ -384,6 +401,9 @@ test.describe("render", () => {
     await page.getByRole("button", { name: "Delete" }).click();
     await page.getByRole("button", { name: "Delete", exact: true }).last().click();
     await expect(page.getByText("Deleted echo")).toBeVisible();
+
+    await page.getByRole("button", { name: "Add server" }).click();
+    await expect(page.getByRole("button", { name: /^Project/ })).toHaveClass(/bg-background/);
   });
 
   test("mcp-project-1024", async ({ page }) => {
