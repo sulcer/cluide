@@ -1,4 +1,5 @@
 import type { Project, Scope } from "@shared/api";
+import { cn } from "cn";
 import { Command, Moon, Sun } from "lucide-react";
 import { NavLink } from "react-router";
 import { Button } from "@/components/Button";
@@ -10,7 +11,6 @@ import { ScreenIcon } from "@/lib/icons";
 import { MOD } from "@/lib/keys";
 import { type ScreenDef, type ScreenId, screenUrl, visibleScreens } from "@/lib/routes";
 import { toggleTheme } from "@/lib/theme";
-import { cn } from "cn";
 import { ScopeSwitcher } from "./ScopeSwitcher";
 
 const GROUPS = ["Config", "Extensions", "MCP"] as const;
@@ -96,7 +96,9 @@ export function Sidebar({ rail, scope, screen, projects, onOpenMenu }: Props) {
                 >
                   <ScreenIcon id={def.id} className="size-4" />
                   <span className="flex-1 truncate">{def.label}</span>
-                  {hint(def) && <span className="font-mono text-[11px] text-muted-foreground opacity-70">{hint(def)}</span>}
+                  {hint(def) && (
+                    <span className="font-mono text-[11px] text-muted-foreground opacity-70">{hint(def)}</span>
+                  )}
                 </NavLink>
               ))}
           </div>

@@ -7,7 +7,9 @@ const request = (method: string, headers: Record<string, string>) =>
   new Request("http://127.0.0.1:8787/api/file", { method, headers });
 
 const forbidden = (req: Request) => {
-  try { assertTrusted(req, PORT); } catch (e) {
+  try {
+    assertTrusted(req, PORT);
+  } catch (e) {
     expect(e).toBeInstanceOf(ApiError);
     expect((e as ApiError).status).toBe(403);
     return;
@@ -23,7 +25,12 @@ describe("assertTrusted", () => {
     expect(() => assertTrusted(request("PUT", { host: "127.0.0.1:8787", "x-cluide": "1" }), PORT)).not.toThrow();
   });
   test("accepts localhost as host and the Vite dev origin", () => {
-    expect(() => assertTrusted(request("POST", { host: "localhost:8787", "x-cluide": "1", origin: "http://localhost:5173" }), PORT)).not.toThrow();
+    expect(() =>
+      assertTrusted(
+        request("POST", { host: "localhost:8787", "x-cluide": "1", origin: "http://localhost:5173" }),
+        PORT,
+      ),
+    ).not.toThrow();
   });
   test("rejects a PUT without the X-Cluide header", () => {
     forbidden(request("PUT", { host: "127.0.0.1:8787" }));

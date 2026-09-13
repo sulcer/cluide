@@ -1,4 +1,5 @@
 import type { Plugin, WriteResult } from "@shared/api";
+import { cn } from "cn";
 import { useState } from "react";
 import { type ApiError, api } from "@/api/client";
 import { ProvidesBadge } from "@/components/Badge";
@@ -8,7 +9,6 @@ import { SkeletonRows } from "@/components/Skeleton";
 import { Switch } from "@/components/Switch";
 import { useResource } from "@/hooks/useResource";
 import { toast } from "@/lib/toast";
-import { cn } from "cn";
 
 export function PluginsScreen() {
   const list = useResource<Plugin[]>("/api/plugins");
@@ -25,19 +25,33 @@ export function PluginsScreen() {
     try {
       const result = await api.put<WriteResult>("/api/plugins", { id: plugin.id, enabled, etag: plugin.etag });
       // Updater form, not the closed-over snapshot: two quick toggles must not revert each other.
-      list.setData((prev) => prev?.map((p) => ({ ...p, etag: result.etag, enabled: p.id === plugin.id ? enabled : p.enabled })));
-      toast({ title: `${enabled ? "Enabled" : "Disabled"} ${plugin.name}`, description: "~/.claude/settings.json → enabledPlugins" });
+      list.setData((prev) =>
+        prev?.map((p) => ({ ...p, etag: result.etag, enabled: p.id === plugin.id ? enabled : p.enabled })),
+      );
+      toast({
+        title: `${enabled ? "Enabled" : "Disabled"} ${plugin.name}`,
+        description: "~/.claude/settings.json → enabledPlugins",
+      });
     } catch (e) {
       const err = e as ApiError;
       if (err.status === 409) list.reload();
-      toast({ title: "Save failed", description: err.status ? `${err.status} · ${err.message}` : err.message, error: true });
+      toast({
+        title: "Save failed",
+        description: err.status ? `${err.status} · ${err.message}` : err.message,
+        error: true,
+      });
     }
   };
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
       <div className="flex h-11 shrink-0 items-center gap-3 border-b px-4">
-        <SearchInput className="w-[260px]" placeholder="Filter plugins" value={filter} onChange={(e) => setFilter(e.target.value)} />
+        <SearchInput
+          className="w-[260px]"
+          placeholder="Filter plugins"
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+        />
         <span className="text-xs text-muted-foreground">
           {plugins?.length ?? 0} plugins · {enabledCount} enabled
         </span>
@@ -71,7 +85,11 @@ export function PluginsScreen() {
                   </span>
                 </td>
                 <td className="pr-4 pl-3">
-                  <Switch checked={p.enabled} onCheckedChange={(v) => void toggle(p, v)} aria-label={`Enable ${p.name}`} />
+                  <Switch
+                    checked={p.enabled}
+                    onCheckedChange={(v) => void toggle(p, v)}
+                    aria-label={`Enable ${p.name}`}
+                  />
                 </td>
               </tr>
             ))}

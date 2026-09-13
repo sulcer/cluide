@@ -10,10 +10,26 @@ describe("routes", () => {
 
   test("global-only screens hide in a project", () => {
     expect(visibleScreens("global").map((s) => s.id)).toEqual([
-      "settings", "memory", "rules", "keybindings", "agents", "skills", "commands", "hooks", "plugins", "mcp",
+      "settings",
+      "memory",
+      "rules",
+      "keybindings",
+      "agents",
+      "skills",
+      "commands",
+      "hooks",
+      "plugins",
+      "mcp",
     ]);
     expect(visibleScreens("/Users/me/repo").map((s) => s.id)).toEqual([
-      "settings", "memory", "rules", "agents", "skills", "commands", "hooks", "mcp",
+      "settings",
+      "memory",
+      "rules",
+      "agents",
+      "skills",
+      "commands",
+      "hooks",
+      "mcp",
     ]);
   });
 

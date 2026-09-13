@@ -10,7 +10,9 @@ let current: Toast | null = null;
 let timer: ReturnType<typeof setTimeout> | undefined;
 let seq = 0;
 const listeners = new Set<() => void>();
-const notify = () => { for (const l of listeners) l(); };
+const notify = () => {
+  for (const l of listeners) l();
+};
 
 export function toast(t: Omit<Toast, "id">): void {
   clearTimeout(timer);

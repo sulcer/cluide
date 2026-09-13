@@ -1,6 +1,10 @@
 import { readStorage, writeStorage } from "./storage";
 
-export interface Recent { label: string; path: string; url: string }
+export interface Recent {
+  label: string;
+  path: string;
+  url: string;
+}
 
 export const readRecent = (): Recent[] => readStorage<Recent[]>("cluide.recent", []);
 

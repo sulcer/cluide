@@ -2,13 +2,7 @@
 
 export type Scope = "global" | string;
 
-export type ErrorCode =
-  | "bad_request"
-  | "forbidden"
-  | "not_found"
-  | "conflict"
-  | "unprocessable"
-  | "internal";
+export type ErrorCode = "bad_request" | "forbidden" | "not_found" | "conflict" | "unprocessable" | "internal";
 
 export interface ApiErrorBody {
   error: { code: ErrorCode; message: string; current?: unknown };
@@ -25,14 +19,7 @@ export interface Project {
   exists: boolean;
 }
 
-export type FileKind =
-  | "memory"
-  | "rules"
-  | "agents"
-  | "skills"
-  | "commands"
-  | "hooks"
-  | "keybindings";
+export type FileKind = "memory" | "rules" | "agents" | "skills" | "commands" | "hooks" | "keybindings";
 
 export interface FileEntry {
   name: string;

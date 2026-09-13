@@ -1,4 +1,5 @@
 import type { McpEntry, Scope } from "@shared/api";
+import { cn } from "cn";
 import { CornerDownRight, Lock } from "lucide-react";
 import { useState } from "react";
 import { useLocation } from "react-router";
@@ -11,7 +12,6 @@ import { useResource } from "@/hooks/useResource";
 import { useWindowEvent } from "@/hooks/useWindowEvent";
 import { commandText, readOnly, transportOf } from "@/lib/mcp";
 import { toast } from "@/lib/toast";
-import { cn } from "cn";
 import { McpAddDialog } from "./McpAddDialog";
 import { McpSheet } from "./McpSheet";
 
@@ -36,12 +36,19 @@ export function McpScreen({ scope }: { scope: Scope }) {
       await api.post("/api/mcp/approval", { scope, name: entry.name, enabled });
     } catch (e) {
       const err = e as ApiError;
-      toast({ title: "Save failed", description: err.status ? `${err.status} · ${err.message}` : err.message, error: true });
+      toast({
+        title: "Save failed",
+        description: err.status ? `${err.status} · ${err.message}` : err.message,
+        error: true,
+      });
       return;
     }
     // Updater form, not the closed-over snapshot: two quick toggles must not revert each other.
     list.setData((prev) => prev?.map((e) => (e === entry ? { ...e, enabled } : e)));
-    toast({ title: enabled ? `Approved ${entry.name}` : `Approval removed for ${entry.name}`, description: `${scope}/.claude/settings.local.json` });
+    toast({
+      title: enabled ? `Approved ${entry.name}` : `Approval removed for ${entry.name}`,
+      description: `${scope}/.claude/settings.local.json`,
+    });
   };
 
   return (
@@ -66,7 +73,11 @@ export function McpScreen({ scope }: { scope: Scope }) {
                 <tr
                   key={keyOf(e)}
                   onClick={() => setOpenKey(keyOf(e))}
-                  className={cn("h-9 cursor-pointer border-b hover:bg-accent", !e.effective && "opacity-50", keyOf(e) === openKey && "selected bg-accent")}
+                  className={cn(
+                    "h-9 cursor-pointer border-b hover:bg-accent",
+                    !e.effective && "opacity-50",
+                    keyOf(e) === openKey && "selected bg-accent",
+                  )}
                 >
                   <td className="truncate px-4">
                     <span className="inline-flex max-w-full items-center gap-1.5 align-middle">
@@ -79,25 +90,44 @@ export function McpScreen({ scope }: { scope: Scope }) {
                       )}
                     </span>
                   </td>
-                  <td><ScopeBadge scope={e.scope} /></td>
+                  <td>
+                    <ScopeBadge scope={e.scope} />
+                  </td>
                   <td className="font-mono text-xs">{transportOf(e.config)}</td>
-                  <td className="truncate px-3 font-mono text-xs text-muted-foreground" title={commandText(e.config)}>{commandText(e.config)}</td>
+                  <td className="truncate px-3 font-mono text-xs text-muted-foreground" title={commandText(e.config)}>
+                    {commandText(e.config)}
+                  </td>
                   <td onClick={(ev) => ev.stopPropagation()}>
                     {e.scope === "project" && (
-                      <Switch checked={e.enabled === true} onCheckedChange={(v) => void approve(e, v)} aria-label={`Approve ${e.name}`} />
+                      <Switch
+                        checked={e.enabled === true}
+                        onCheckedChange={(v) => void approve(e, v)}
+                        aria-label={`Approve ${e.name}`}
+                      />
                     )}
                   </td>
-                  <td className={cn("pr-4 pl-3", !e.effective && "text-muted-foreground")}>{e.effective ? "Effective" : `Shadowed by ${e.shadowedBy}`}</td>
+                  <td className={cn("pr-4 pl-3", !e.effective && "text-muted-foreground")}>
+                    {e.effective ? "Effective" : `Shadowed by ${e.shadowedBy}`}
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
           <div className="flex h-8 items-center px-4 text-[11px] text-muted-foreground">
-            {effective} effective · {entries.length - effective} shadowed · precedence local › project › user › plugin › managed
+            {effective} effective · {entries.length - effective} shadowed · precedence local › project › user › plugin ›
+            managed
           </div>
         </>
       )}
-      {open && <McpSheet key={keyOf(open)} scope={scope} entry={open} onClose={() => setOpenKey(undefined)} onChanged={list.reload} />}
+      {open && (
+        <McpSheet
+          key={keyOf(open)}
+          scope={scope}
+          entry={open}
+          onClose={() => setOpenKey(undefined)}
+          onChanged={list.reload}
+        />
+      )}
       <McpAddDialog open={adding} onOpenChange={setAdding} scope={scope} onAdded={list.reload} />
     </div>
   );

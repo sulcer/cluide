@@ -4,15 +4,19 @@ import { join } from "node:path";
 import type { ErrorCode } from "@shared/api";
 import { ApiError } from "../../errors";
 import { etagOf } from "../../fs";
-import { tempHome, type TempHome } from "../temp-home";
 import { createFile, deleteFile, listFiles, readFile, writeFile } from "../../resources/files";
+import { type TempHome, tempHome } from "../temp-home";
 
 let t: TempHome;
-beforeEach(() => { t = tempHome(); });
+beforeEach(() => {
+  t = tempHome();
+});
 afterEach(() => t.cleanup());
 
 const rejects = (fn: () => unknown, status: number, code: ErrorCode) => {
-  try { fn(); } catch (e) {
+  try {
+    fn();
+  } catch (e) {
     expect(e).toBeInstanceOf(ApiError);
     expect({ status: (e as ApiError).status, code: (e as ApiError).code }).toEqual({ status, code });
     return;

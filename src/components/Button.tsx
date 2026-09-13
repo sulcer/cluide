@@ -1,6 +1,6 @@
 import { cva, type VariantProps } from "class-variance-authority";
-import type { ComponentProps } from "react";
 import { cn } from "cn";
+import type { ComponentProps } from "react";
 
 const button = cva(
   "inline-flex shrink-0 items-center justify-center gap-1.5 rounded-md font-medium whitespace-nowrap select-none disabled:pointer-events-none disabled:opacity-60 [&_svg]:size-4 [&_svg]:shrink-0",

@@ -1,6 +1,6 @@
+import { cn } from "cn";
 import { CircleAlert } from "lucide-react";
 import { type Ref, useCallback, useEffect, useRef } from "react";
-import { cn } from "cn";
 import type { DraftError } from "@/hooks/useDraft";
 
 interface Props {
@@ -20,7 +20,11 @@ export function Editor({ value, onChange, error, disabled, autoFocus = true, ref
     const editorDialog = local.current?.closest('[role="dialog"]');
     const activeDialog = active?.closest('[role="dialog"]');
     const activeDialogClosing = activeDialog?.getAttribute("data-state") === "closed";
-    const typing = !activeDialogClosing && (active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement || active?.isContentEditable === true);
+    const typing =
+      !activeDialogClosing &&
+      (active instanceof HTMLInputElement ||
+        active instanceof HTMLTextAreaElement ||
+        active?.isContentEditable === true);
     const openDialog = document.querySelector('[role="dialog"]:not([data-state="closed"])');
     const foreignDialog = openDialog !== null && openDialog !== editorDialog;
     if (autoFocus && !typing && !foreignDialog) local.current?.focus();
@@ -41,7 +45,10 @@ export function Editor({ value, onChange, error, disabled, autoFocus = true, ref
         onChange={(e) => onChange(e.target.value)}
         disabled={disabled}
         spellCheck={false}
-        className={cn("min-h-0 flex-1 resize-none bg-transparent px-4 py-3 font-mono text-[12.5px] leading-5 outline-none [tab-size:2]", disabled && "opacity-60")}
+        className={cn(
+          "min-h-0 flex-1 resize-none bg-transparent px-4 py-3 font-mono text-[12.5px] leading-5 outline-none [tab-size:2]",
+          disabled && "opacity-60",
+        )}
       />
       {error && (
         <div className="flex items-center gap-1.5 border-t px-4 py-1.5 text-xs text-destructive">

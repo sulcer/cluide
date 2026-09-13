@@ -4,16 +4,20 @@ import { join } from "node:path";
 import type { ErrorCode } from "@shared/api";
 import { ApiError } from "../errors";
 import { deleteText, etagOf, patchJson, readJsonDoc, readText, sliceEtag, writeText } from "../fs";
-import { tempHome, type TempHome } from "./temp-home";
+import { type TempHome, tempHome } from "./temp-home";
 
 let t: TempHome;
-beforeEach(() => { t = tempHome(); });
+beforeEach(() => {
+  t = tempHome();
+});
 afterEach(() => t.cleanup());
 
 const backupDir = (path: string) => join(t.home, ".cluide", "backups", path.replaceAll("/", "-"));
 
 const rejects = (fn: () => unknown, status: number, code: ErrorCode): ApiError => {
-  try { fn(); } catch (e) {
+  try {
+    fn();
+  } catch (e) {
     expect(e).toBeInstanceOf(ApiError);
     expect({ status: (e as ApiError).status, code: (e as ApiError).code }).toEqual({ status, code });
     return e as ApiError;
@@ -81,7 +85,10 @@ describe("deleteText", () => {
   test("backs up then removes the file", () => {
     const path = t.write(".claude/rules/old.md", "bye\n");
     deleteText(path, etagOf("bye\n"));
-    expect({ exists: existsSync(path), backups: readdirSync(backupDir(path)).length }).toEqual({ exists: false, backups: 1 });
+    expect({ exists: existsSync(path), backups: readdirSync(backupDir(path)).length }).toEqual({
+      exists: false,
+      backups: 1,
+    });
   });
   test("returns 404 for a missing file", () => {
     rejects(() => deleteText(join(t.claude, "nope.md")), 404, "not_found");
@@ -109,9 +116,14 @@ describe("patchJson", () => {
 
   test("mutates only the slice and preserves other keys", () => {
     t.write(".claude.json", JSON.stringify({ other: { keep: true }, mcpServers: {} }));
-    const result = patchJson(path(), slice, (j) => { j.mcpServers.x = { command: "x" }; });
+    const result = patchJson(path(), slice, (j) => {
+      j.mcpServers.x = { command: "x" };
+    });
     expect(result).toEqual({ etag: sliceEtag({ x: { command: "x" } }), diff: expect.stringContaining('+    "x"') });
-    expect(JSON.parse(readFileSync(path(), "utf8"))).toEqual({ other: { keep: true }, mcpServers: { x: { command: "x" } } });
+    expect(JSON.parse(readFileSync(path(), "utf8"))).toEqual({
+      other: { keep: true },
+      mcpServers: { x: { command: "x" } },
+    });
   });
   test("returns 409 when the slice etag differs, even if the rest of the file changed too", () => {
     t.write(".claude.json", JSON.stringify({ mcpServers: { a: { command: "a" } }, cache: 1 }));
@@ -120,12 +132,25 @@ describe("patchJson", () => {
   });
   test("ignores unrelated changes when the slice etag matches", () => {
     t.write(".claude.json", JSON.stringify({ mcpServers: { a: { command: "a" } }, cache: 2 }));
-    const result = patchJson(path(), slice, (j) => { delete j.mcpServers.a; }, sliceEtag({ a: { command: "a" } }));
+    const result = patchJson(
+      path(),
+      slice,
+      (j) => {
+        delete j.mcpServers.a;
+      },
+      sliceEtag({ a: { command: "a" } }),
+    );
     expect(result.etag).toBe(sliceEtag({}));
   });
   test("creates the file when it does not exist", () => {
     const local = join(t.project, ".claude", "settings.local.json");
-    patchJson(local, (j) => j.enabledMcpjsonServers, (j) => { j.enabledMcpjsonServers = ["db"]; });
+    patchJson(
+      local,
+      (j) => j.enabledMcpjsonServers,
+      (j) => {
+        j.enabledMcpjsonServers = ["db"];
+      },
+    );
     expect(JSON.parse(readFileSync(local, "utf8"))).toEqual({ enabledMcpjsonServers: ["db"] });
   });
   test("returns 422 when the file does not parse", () => {

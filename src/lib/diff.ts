@@ -1,5 +1,15 @@
-export interface DiffLine { kind: "add" | "del" | "ctx" | "meta"; sign: string; old?: number; new?: number; text: string }
-export interface ParsedDiff { lines: DiffLine[]; added: number; removed: number }
+export interface DiffLine {
+  kind: "add" | "del" | "ctx" | "meta";
+  sign: string;
+  old?: number;
+  new?: number;
+  text: string;
+}
+export interface ParsedDiff {
+  lines: DiffLine[];
+  added: number;
+  removed: number;
+}
 
 export function parseUnifiedDiff(diff: string): ParsedDiff {
   const lines: DiffLine[] = [];

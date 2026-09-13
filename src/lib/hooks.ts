@@ -1,6 +1,12 @@
 import type { FileEntry } from "@shared/api";
 
-export interface HookRow { event: string; matcher: string; command: string; type: string; file: string }
+export interface HookRow {
+  event: string;
+  matcher: string;
+  command: string;
+  type: string;
+  file: string;
+}
 
 export function flattenHooks(json: Record<string, unknown> | null, file: string): HookRow[] {
   const hooks = json?.hooks;
@@ -9,7 +15,12 @@ export function flattenHooks(json: Record<string, unknown> | null, file: string)
   for (const [event, entries] of Object.entries(hooks as Record<string, unknown>)) {
     if (!Array.isArray(entries)) continue;
     for (const entry of entries as Array<Record<string, unknown>>) {
-      const matcher = entry.matcher === undefined ? "*" : Array.isArray(entry.matcher) ? entry.matcher.join(", ") : String(entry.matcher);
+      const matcher =
+        entry.matcher === undefined
+          ? "*"
+          : Array.isArray(entry.matcher)
+            ? entry.matcher.join(", ")
+            : String(entry.matcher);
       const inner = Array.isArray(entry.hooks) ? (entry.hooks as Array<Record<string, unknown>>) : [];
       for (const hook of inner) {
         rows.push({ event, matcher, command: String(hook.command ?? ""), type: String(hook.type ?? "command"), file });

@@ -33,7 +33,12 @@ async function request<T>(method: string, url: string, body?: unknown): Promise<
   } catch {
     // a non-JSON error body; the status is still the truth
   }
-  throw new ApiError(res.status, parsed?.error.code ?? "internal", parsed?.error.message ?? res.statusText, parsed?.error.current);
+  throw new ApiError(
+    res.status,
+    parsed?.error.code ?? "internal",
+    parsed?.error.message ?? res.statusText,
+    parsed?.error.current,
+  );
 }
 
 export const api = {

@@ -1,9 +1,9 @@
 import type { FileEntry, FileKind } from "@shared/api";
+import { cn } from "cn";
 import { FileCode, FileText, Folder } from "lucide-react";
 import { useEffect, useState } from "react";
 import { SearchInput } from "@/components/Input";
 import { SkeletonRows } from "@/components/Skeleton";
-import { cn } from "cn";
 import { NewFileInput } from "./NewFileInput";
 
 interface Props {
@@ -58,7 +58,10 @@ export function FileList({ kind, entries, selected, onSelect, creating, onCreate
               key={e.path}
               type="button"
               onClick={() => onSelect(e)}
-              className={cn("flex h-8 w-full min-w-0 items-center gap-2 rounded-sm px-2 text-left hover:bg-accent", e.path === selected?.path && "selected bg-accent")}
+              className={cn(
+                "flex h-8 w-full min-w-0 items-center gap-2 rounded-sm px-2 text-left hover:bg-accent",
+                e.path === selected?.path && "selected bg-accent",
+              )}
             >
               <Icon className="size-4 shrink-0 text-muted-foreground" />
               <span className="truncate">

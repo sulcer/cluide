@@ -1,4 +1,7 @@
-export interface Frontmatter { name?: string; description?: string }
+export interface Frontmatter {
+  name?: string;
+  description?: string;
+}
 
 export function parseFrontmatter(content: string): Frontmatter | null {
   if (!content.startsWith("---\n")) return null;

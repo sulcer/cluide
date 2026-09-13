@@ -11,7 +11,9 @@ export function OfflineBanner() {
         <code className="rounded-sm bg-secondary px-[5px] py-px font-mono">bun run start</code>
       </span>
       <div className="flex-1" />
-      <Button size="xs" onClick={() => emit("cluide:retry")}>Retry</Button>
+      <Button size="xs" onClick={() => emit("cluide:retry")}>
+        Retry
+      </Button>
     </div>
   );
 }

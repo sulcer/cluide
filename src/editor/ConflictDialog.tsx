@@ -5,12 +5,24 @@ import { Kbd } from "@/components/Kbd";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import type { Conflict } from "@/hooks/useDraft";
 
-interface Props { conflict: Conflict | undefined; name: string; path: string; onReload: () => void; onOverwrite: () => void; onDismiss: () => void }
+interface Props {
+  conflict: Conflict | undefined;
+  name: string;
+  path: string;
+  onReload: () => void;
+  onOverwrite: () => void;
+  onDismiss: () => void;
+}
 
 export function ConflictDialog({ conflict, name, path, onReload, onOverwrite, onDismiss }: Props) {
   const reloadButton = useRef<HTMLButtonElement>(null);
   return (
-    <Dialog open={conflict !== undefined} onOpenChange={(open) => { if (!open) onDismiss(); }}>
+    <Dialog
+      open={conflict !== undefined}
+      onOpenChange={(open) => {
+        if (!open) onDismiss();
+      }}
+    >
       <DialogContent
         showCloseButton={false}
         className="w-[440px] sm:max-w-[440px] gap-0 rounded-lg p-0"
@@ -31,7 +43,9 @@ export function ConflictDialog({ conflict, name, path, onReload, onOverwrite, on
           </DialogDescription>
         </div>
         <div className="flex items-center justify-end gap-2 border-t px-4 py-3">
-          <Button size="md" onClick={onOverwrite}>Overwrite</Button>
+          <Button size="md" onClick={onOverwrite}>
+            Overwrite
+          </Button>
           <Button size="md" variant="primary" ref={reloadButton} onClick={onReload}>
             Reload <Kbd onPrimary>↵</Kbd>
           </Button>

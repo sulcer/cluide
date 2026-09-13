@@ -30,7 +30,10 @@ test.describe("render", () => {
 
   test("shell-scope-open", async ({ page }) => {
     await page.goto("/global/settings");
-    await page.getByRole("button", { name: /Global/ }).first().click();
+    await page
+      .getByRole("button", { name: /Global/ })
+      .first()
+      .click();
     await expect(page.getByPlaceholder("Switch scope")).toBeFocused();
     await expect(page.getByText("4 projects")).toBeVisible();
     await shot(page, "shell-scope-open");
@@ -183,7 +186,12 @@ test.describe("render", () => {
     // A boolean gate, not a counter: the reload may fire the GET more than once.
     let failing = true;
     await page.route("**/api/file?**", async (route) => {
-      if (failing) await route.fulfill({ status: 404, contentType: "application/json", body: JSON.stringify({ error: { code: "not_found", message: "gone" } }) });
+      if (failing)
+        await route.fulfill({
+          status: 404,
+          contentType: "application/json",
+          body: JSON.stringify({ error: { code: "not_found", message: "gone" } }),
+        });
       else await route.continue();
     });
     await page.reload();
@@ -200,7 +208,9 @@ test.describe("render", () => {
     await page.getByRole("button", { name: "security.md" }).click();
     const ta = page.locator("textarea");
     const before = await ta.inputValue();
-    const after = before.endsWith("\n") ? `${before}Added by the render spec.\n` : `${before}\nAdded by the render spec.\n`;
+    const after = before.endsWith("\n")
+      ? `${before}Added by the render spec.\n`
+      : `${before}\nAdded by the render spec.\n`;
     await ta.fill(after);
     await page.keyboard.press("ControlOrMeta+s");
     await page.getByRole("button", { name: "View diff" }).click();
@@ -284,7 +294,10 @@ test.describe("render", () => {
   test("editor-delete", async ({ page }) => {
     await page.goto("/global/rules");
     // Its own file: no other case may depend on what editor-new or editor-delete create.
-    await page.request.post("/api/file", { headers: { "X-Cluide": "1" }, data: { path: `${homeDir()}/.claude/rules/to-delete.md`, content: "" } });
+    await page.request.post("/api/file", {
+      headers: { "X-Cluide": "1" },
+      data: { path: `${homeDir()}/.claude/rules/to-delete.md`, content: "" },
+    });
     await page.reload();
     await page.getByRole("button", { name: "to-delete.md" }).click();
     // exact: the just-clicked "to-delete.md" item also matches a "Delete" substring.
@@ -301,7 +314,11 @@ test.describe("render", () => {
     await page.getByRole("button", { name: "security.md" }).click();
     await page.route("**/api/file?**", async (route) => {
       if (route.request().method() === "DELETE") {
-        await route.fulfill({ status: 409, contentType: "application/json", body: JSON.stringify({ error: { code: "conflict", message: "security.md changed on disk" } }) });
+        await route.fulfill({
+          status: 409,
+          contentType: "application/json",
+          body: JSON.stringify({ error: { code: "conflict", message: "security.md changed on disk" } }),
+        });
       } else {
         await route.continue();
       }
@@ -384,7 +401,10 @@ test.describe("render", () => {
     await expect(page.getByText("PreToolUse")).toBeVisible();
     await expect(page.getByText("Scripts in hooks/")).toBeVisible();
     await shot(page, "hooks");
-    await page.getByRole("link", { name: /validate-git-ops\.py/ }).first().click();
+    await page
+      .getByRole("link", { name: /validate-git-ops\.py/ })
+      .first()
+      .click();
     await expect(page).toHaveURL(/\/global\/hooks\/validate-git-ops\.py$/);
     await expect(page.getByText("Hooks / validate-git-ops.py")).toBeVisible();
     await expect(page.getByRole("button", { name: "New script" })).toBeVisible();
@@ -437,7 +457,11 @@ test.describe("render", () => {
   test("mcp-approval failure keeps the switch checked and toasts", async ({ page }) => {
     await page.goto(`${projectUrl("fetcher")}/mcp`);
     await page.route("**/api/mcp/approval", (route) =>
-      route.fulfill({ status: 500, contentType: "application/json", body: JSON.stringify({ error: { code: "internal", message: "backup failed" } }) }),
+      route.fulfill({
+        status: 500,
+        contentType: "application/json",
+        body: JSON.stringify({ error: { code: "internal", message: "backup failed" } }),
+      }),
     );
     const sw = page.getByRole("switch", { name: "Approve fetcher-postgres-local" });
     await expect(sw).toBeChecked();
@@ -456,7 +480,10 @@ test.describe("render", () => {
     await page.getByRole("button", { name: /^Local/ }).click();
     await page.getByPlaceholder("my-server").fill("echo");
     await page.getByPlaceholder("npx").fill("echo");
-    await page.getByRole("button", { name: /^Add server/ }).last().click();
+    await page
+      .getByRole("button", { name: /^Add server/ })
+      .last()
+      .click();
     await expect(page.getByText("Added echo")).toBeVisible();
     await expect(page.getByRole("row", { name: /^echo/ })).toBeVisible();
     await page.getByRole("row", { name: /^echo/ }).click();
@@ -472,7 +499,9 @@ test.describe("render", () => {
     await page.setViewportSize({ width: 1024, height: 768 });
     await page.goto(`${projectUrl("fetcher")}/mcp`);
     await expect(page.getByText("Shadowed by local")).toBeVisible();
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth),
+    ).toBe(true);
     await shot(page, "mcp-project-1024");
   });
 
@@ -504,7 +533,13 @@ test.describe("render", () => {
     let failing = true;
     await page.route("**/api/plugins", async (route) => {
       if (failing) {
-        await route.fulfill({ status: 422, contentType: "application/json", body: JSON.stringify({ error: { code: "unprocessable", message: "installed_plugins.json is not valid JSON" } }) });
+        await route.fulfill({
+          status: 422,
+          contentType: "application/json",
+          body: JSON.stringify({
+            error: { code: "unprocessable", message: "installed_plugins.json is not valid JSON" },
+          }),
+        });
       } else {
         await route.continue();
       }

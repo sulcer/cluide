@@ -11,9 +11,19 @@ export const commandText = (config: McpConfig): string =>
 
 export const readOnly = (e: McpEntry): boolean => e.scope === "plugin" || e.scope === "managed";
 
-export interface AddForm { transport: Transport; command: string; args: string; url: string; headers: string }
+export interface AddForm {
+  transport: Transport;
+  command: string;
+  args: string;
+  url: string;
+  headers: string;
+}
 
-const lines = (s: string): string[] => s.split("\n").map((l) => l.trim()).filter((l) => l !== "");
+const lines = (s: string): string[] =>
+  s
+    .split("\n")
+    .map((l) => l.trim())
+    .filter((l) => l !== "");
 
 export function buildConfig(form: AddForm): McpConfig {
   if (form.transport === "stdio") {

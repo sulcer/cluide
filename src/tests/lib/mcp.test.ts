@@ -23,16 +23,32 @@ describe("mcp", () => {
   });
 
   test("builds a stdio config without empty args", () => {
-    expect(buildConfig({ transport: "stdio", command: " npx ", args: "", url: "", headers: "" })).toEqual({ command: "npx" });
-    expect(buildConfig({ transport: "stdio", command: "npx", args: "-y\n\nx\n", url: "", headers: "" })).toEqual({ command: "npx", args: ["-y", "x"] });
+    expect(buildConfig({ transport: "stdio", command: " npx ", args: "", url: "", headers: "" })).toEqual({
+      command: "npx",
+    });
+    expect(buildConfig({ transport: "stdio", command: "npx", args: "-y\n\nx\n", url: "", headers: "" })).toEqual({
+      command: "npx",
+      args: ["-y", "x"],
+    });
   });
 
   test("builds an http config with parsed headers", () => {
-    expect(buildConfig({ transport: "http", command: "", args: "", url: "https://a ", headers: "Authorization: Bearer t\nbad\n" })).toEqual({
+    expect(
+      buildConfig({
+        transport: "http",
+        command: "",
+        args: "",
+        url: "https://a ",
+        headers: "Authorization: Bearer t\nbad\n",
+      }),
+    ).toEqual({
       type: "http",
       url: "https://a",
       headers: { Authorization: "Bearer t", bad: "" },
     });
-    expect(buildConfig({ transport: "sse", command: "", args: "", url: "https://b", headers: "" })).toEqual({ type: "sse", url: "https://b" });
+    expect(buildConfig({ transport: "sse", command: "", args: "", url: "https://b", headers: "" })).toEqual({
+      type: "sse",
+      url: "https://b",
+    });
   });
 });

@@ -4,10 +4,20 @@ import type { ApiError } from "@/api/client";
 import { useWindowEvent } from "@/hooks/useWindowEvent";
 import { toast } from "@/lib/toast";
 
-export interface Loaded { content: string; etag: string | null; draft?: string }
+export interface Loaded {
+  content: string;
+  etag: string | null;
+  draft?: string;
+}
 // etag null: the file was deleted on disk, so the next save is a create.
-export interface Conflict { content: string; etag: string | null }
-export interface DraftError { status: number; message: string }
+export interface Conflict {
+  content: string;
+  etag: string | null;
+}
+export interface DraftError {
+  status: number;
+  message: string;
+}
 export type SaveFn = (content: string, etag: string | undefined) => Promise<WriteResult | { etag: string }>;
 
 interface Options {
@@ -50,17 +60,26 @@ export function useDraft(loaded: Loaded | undefined, save: SaveFn, name: string,
       setBase({ content: snapshot, etag: result.etag });
       if ("diff" in result) {
         setDiff(result.diff);
-        toast({ title: "Saved", description: options.savedDescription, action: { label: "View diff", run: () => setDiffOpen(true) } });
+        toast({
+          title: "Saved",
+          description: options.savedDescription,
+          action: { label: "View diff", run: () => setDiffOpen(true) },
+        });
       }
     } catch (e) {
       const err = e as ApiError;
       // A 409 without a loadable `current` is not a usable conflict; fall through to the failure toast.
-      const mapped = err.status === 409 && err.current !== undefined ? (options.conflictOf ?? asConflict)(err.current) : undefined;
+      const mapped =
+        err.status === 409 && err.current !== undefined ? (options.conflictOf ?? asConflict)(err.current) : undefined;
       if (mapped?.etag !== undefined) {
         setConflict(mapped);
       } else {
         if (err.status === 400 || err.status === 422) setError({ status: err.status, message: err.message });
-        toast({ title: "Save failed", description: err.status ? `${err.status} · ${err.message}` : err.message, error: true });
+        toast({
+          title: "Save failed",
+          description: err.status ? `${err.status} · ${err.message}` : err.message,
+          error: true,
+        });
       }
     } finally {
       setSaving(false);
@@ -99,10 +118,21 @@ export function useDraft(loaded: Loaded | undefined, save: SaveFn, name: string,
   }, [dirty]);
 
   return {
-    content, setContent, dirty, saving, error, conflict, diff, diffOpen, setDiffOpen,
+    content,
+    setContent,
+    dirty,
+    saving,
+    error,
+    conflict,
+    diff,
+    diffOpen,
+    setDiffOpen,
     etag: base?.etag ?? null,
     ready: base !== undefined,
-    save: doSave, discard, reload, overwrite,
+    save: doSave,
+    discard,
+    reload,
+    overwrite,
     dismissConflict: () => setConflict(undefined),
   };
 }

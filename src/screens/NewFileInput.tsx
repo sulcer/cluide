@@ -4,7 +4,11 @@ import { useState } from "react";
 
 const SUFFIX: Partial<Record<FileKind, string>> = { skills: "/SKILL.md", hooks: ".sh" };
 
-interface Props { kind: FileKind; onCreate: (name: string) => Promise<void>; onCancel: () => void }
+interface Props {
+  kind: FileKind;
+  onCreate: (name: string) => Promise<void>;
+  onCancel: () => void;
+}
 
 export function NewFileInput({ kind, onCreate, onCancel }: Props) {
   const [name, setName] = useState("");

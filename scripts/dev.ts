@@ -1,4 +1,5 @@
 export {};
+
 const procs = [
   Bun.spawn(["bun", "--hot", "server/index.ts"], { stdio: ["inherit", "inherit", "inherit"] }),
   Bun.spawn(["bunx", "vite"], { stdio: ["inherit", "inherit", "inherit"] }),

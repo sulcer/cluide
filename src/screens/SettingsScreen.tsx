@@ -1,4 +1,5 @@
-import type { PutSettingsResult, Scope, SchemaError, SettingsDoc, SettingsFile, WriteResult } from "@shared/api";
+import type { PutSettingsResult, SchemaError, Scope, SettingsDoc, SettingsFile, WriteResult } from "@shared/api";
+import { cn } from "cn";
 import { CircleAlert } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 import { ApiError, api, q } from "@/api/client";
@@ -12,7 +13,6 @@ import { SaveBar } from "@/editor/SaveBar";
 import { type Loaded, type SaveFn, useDraft } from "@/hooks/useDraft";
 import { useResource } from "@/hooks/useResource";
 import { describeJsonError, jsonText } from "@/lib/json";
-import { cn } from "cn";
 import { WarningsPanel } from "./WarningsPanel";
 
 const NAMES: Record<SettingsFile, string> = { settings: "settings.json", local: "settings.local.json" };
@@ -105,7 +105,8 @@ function SettingsEditor({ scope, file, onFile, doc, error, onRetry, missing, onW
           onClick={() => onFile(f)}
           className={cn(
             "relative flex h-10 items-center gap-1.5 font-mono text-xs text-muted-foreground hover:text-foreground",
-            f === file && "text-foreground after:absolute after:inset-x-0 after:-bottom-px after:h-0.5 after:bg-foreground",
+            f === file &&
+              "text-foreground after:absolute after:inset-x-0 after:-bottom-px after:h-0.5 after:bg-foreground",
           )}
         >
           {NAMES[f]}
@@ -113,7 +114,9 @@ function SettingsEditor({ scope, file, onFile, doc, error, onRetry, missing, onW
         </button>
       ))}
       <div className="flex-1" />
-      {draft.ready && <SaveBar dirty={draft.dirty} saving={draft.saving} onSave={draft.save} onDiscard={draft.discard} />}
+      {draft.ready && (
+        <SaveBar dirty={draft.dirty} saving={draft.saving} onSave={draft.save} onDiscard={draft.discard} />
+      )}
     </div>
   );
 
@@ -147,7 +150,9 @@ function SettingsEditor({ scope, file, onFile, doc, error, onRetry, missing, onW
       {tabs}
       <div className="flex min-h-0 flex-1 flex-col min-[1200px]:flex-row">
         <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-          <div className="flex h-8 shrink-0 items-center border-b px-4 font-mono text-xs text-muted-foreground">{doc.path}</div>
+          <div className="flex h-8 shrink-0 items-center border-b px-4 font-mono text-xs text-muted-foreground">
+            {doc.path}
+          </div>
           {raw && (
             <div className="mx-4 mt-3 flex items-center gap-2 rounded-md border border-destructive px-2.5 py-1.5 text-xs text-destructive">
               <CircleAlert className="size-4 shrink-0" />
@@ -161,8 +166,21 @@ function SettingsEditor({ scope, file, onFile, doc, error, onRetry, missing, onW
         </div>
         <WarningsPanel errors={shownErrors} unavailable={doc.schema === "unavailable"} onJump={jump} />
       </div>
-      <DiffSheet open={draft.diffOpen} onOpenChange={draft.setDiffOpen} name={NAMES[file]} path={doc.path} diff={draft.diff} />
-      <ConflictDialog conflict={draft.conflict} name={NAMES[file]} path={doc.path} onReload={draft.reload} onOverwrite={draft.overwrite} onDismiss={draft.dismissConflict} />
+      <DiffSheet
+        open={draft.diffOpen}
+        onOpenChange={draft.setDiffOpen}
+        name={NAMES[file]}
+        path={doc.path}
+        diff={draft.diff}
+      />
+      <ConflictDialog
+        conflict={draft.conflict}
+        name={NAMES[file]}
+        path={doc.path}
+        onReload={draft.reload}
+        onOverwrite={draft.overwrite}
+        onDismiss={draft.dismissConflict}
+      />
     </>
   );
 }

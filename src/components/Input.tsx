@@ -1,7 +1,7 @@
 import { cva, type VariantProps } from "class-variance-authority";
+import { cn } from "cn";
 import { Search } from "lucide-react";
 import type { ComponentProps } from "react";
-import { cn } from "cn";
 
 const input = cva("w-full min-w-0 border border-input bg-transparent placeholder:text-muted-foreground", {
   variants: { size: { sm: "h-7 rounded-sm px-2 text-xs", md: "h-8 rounded-md px-2.5 text-[13px]" } },

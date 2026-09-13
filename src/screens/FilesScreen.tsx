@@ -17,12 +17,16 @@ import { useResource } from "@/hooks/useResource";
 import { useWindowEvent } from "@/hooks/useWindowEvent";
 import { parseFrontmatter } from "@/lib/frontmatter";
 import { pushRecent } from "@/lib/recent";
-import { HOOK_SCRIPT_PRIMARY, kindDir, screenDef, screenUrl, scopeName, scopeUrl } from "@/lib/routes";
+import { HOOK_SCRIPT_PRIMARY, kindDir, scopeName, scopeUrl, screenDef, screenUrl } from "@/lib/routes";
 import { toast } from "@/lib/toast";
 import type { ShellContext } from "@/shell/Shell";
 import { FileList } from "./FileList";
 
-interface Props { scope: Scope; kind: FileKind; file?: string }
+interface Props {
+  scope: Scope;
+  kind: FileKind;
+  file?: string;
+}
 
 const FIXED: FileKind[] = ["memory", "keybindings"];
 
@@ -31,7 +35,9 @@ export function FilesScreen({ scope, kind, file }: Props) {
   const location = useLocation();
   const { claudeDir } = useOutletContext<ShellContext>();
   const list = useResource<FileEntry[]>(`/api/files${q({ scope, kind })}`);
-  const [selectedPath, setSelectedPath] = useState<string | undefined>((location.state as { path?: string } | null)?.path);
+  const [selectedPath, setSelectedPath] = useState<string | undefined>(
+    (location.state as { path?: string } | null)?.path,
+  );
   // Recent files of one kind share a route pattern, so re-apply location.state on every navigation.
   useEffect(() => {
     const p = (location.state as { path?: string } | null)?.path;
@@ -76,7 +82,11 @@ export function FilesScreen({ scope, kind, file }: Props) {
       await api.post("/api/file", { path, content: "" });
     } catch (e) {
       const err = e as ApiError;
-      toast({ title: "Save failed", description: err.status ? `${err.status} · ${err.message}` : err.message, error: true });
+      toast({
+        title: "Save failed",
+        description: err.status ? `${err.status} · ${err.message}` : err.message,
+        error: true,
+      });
       return;
     }
     toast({ title: `Created ${name}`, description: path });
@@ -90,7 +100,8 @@ export function FilesScreen({ scope, kind, file }: Props) {
   const afterDelete = () => {
     const i = entries?.findIndex((e) => e.path === selected?.path) ?? -1;
     const next = entries?.[i + 1] ?? entries?.[i - 1];
-    if (kind === "hooks") navigate(next ? `${scopeUrl(scope)}/hooks/${encodeURIComponent(next.name)}` : screenUrl(scope, "hooks"));
+    if (kind === "hooks")
+      navigate(next ? `${scopeUrl(scope)}/hooks/${encodeURIComponent(next.name)}` : screenUrl(scope, "hooks"));
     else setSelectedPath(next?.path);
     list.reload();
   };
@@ -101,7 +112,15 @@ export function FilesScreen({ scope, kind, file }: Props) {
 
   return (
     <div className="flex min-h-0 flex-1">
-      <FileList kind={kind} entries={entries} selected={selected} onSelect={select} creating={creating} onCreate={create} onCancelCreate={() => setCreating(false)} />
+      <FileList
+        kind={kind}
+        entries={entries}
+        selected={selected}
+        onSelect={select}
+        creating={creating}
+        onCreate={create}
+        onCancelCreate={() => setCreating(false)}
+      />
       {entries !== undefined && entries.length === 0 ? (
         <Centered title={`No ${kind} in this scope`} path={dir}>
           {canCreate && (
@@ -112,7 +131,15 @@ export function FilesScreen({ scope, kind, file }: Props) {
           )}
         </Centered>
       ) : selected ? (
-        <FileEditor key={selected.path} scope={scope} kind={kind} entry={selected} autoFocus={focusEditor} onCreated={list.reload} onDeleted={afterDelete} />
+        <FileEditor
+          key={selected.path}
+          scope={scope}
+          kind={kind}
+          entry={selected}
+          autoFocus={focusEditor}
+          onCreated={list.reload}
+          onDeleted={afterDelete}
+        />
       ) : (
         <div className="flex-1" />
       )}
@@ -120,7 +147,14 @@ export function FilesScreen({ scope, kind, file }: Props) {
   );
 }
 
-interface EditorProps { scope: Scope; kind: FileKind; entry: FileEntry; autoFocus: boolean; onCreated: () => void; onDeleted: () => void }
+interface EditorProps {
+  scope: Scope;
+  kind: FileKind;
+  entry: FileEntry;
+  autoFocus: boolean;
+  onCreated: () => void;
+  onDeleted: () => void;
+}
 
 function FileEditor({ scope, kind, entry, autoFocus, onCreated, onDeleted }: EditorProps) {
   const doc = useResource<FileDoc>(entry.exists ? `/api/file${q({ path: entry.path })}` : null);
@@ -154,7 +188,10 @@ function FileEditor({ scope, kind, entry, autoFocus, onCreated, onDeleted }: Edi
   if (!entry.exists && created === undefined) {
     return (
       <Centered icon={FileText} title={`${entry.name} does not exist in this scope`} path={entry.path}>
-        <Button variant="primary" onClick={() => setCreated({ content: "", etag: null, draft: `# ${scopeName(scope)}\n\n` })}>
+        <Button
+          variant="primary"
+          onClick={() => setCreated({ content: "", etag: null, draft: `# ${scopeName(scope)}\n\n` })}
+        >
           Create {entry.name}
         </Button>
       </Centered>
@@ -193,9 +230,28 @@ function FileEditor({ scope, kind, entry, autoFocus, onCreated, onDeleted }: Edi
         </div>
       )}
       <Editor value={draft.content} onChange={draft.setContent} error={draft.error} autoFocus={autoFocus} />
-      <DiffSheet open={draft.diffOpen} onOpenChange={draft.setDiffOpen} name={entry.name} path={entry.path} diff={draft.diff} />
-      <ConflictDialog conflict={draft.conflict} name={entry.name} path={entry.path} onReload={draft.reload} onOverwrite={draft.overwrite} onDismiss={draft.dismissConflict} />
-      <DeleteDialog open={deleting} onOpenChange={setDeleting} name={entry.name} body={`This removes ${entry.path} from disk.`} onConfirm={remove} />
+      <DiffSheet
+        open={draft.diffOpen}
+        onOpenChange={draft.setDiffOpen}
+        name={entry.name}
+        path={entry.path}
+        diff={draft.diff}
+      />
+      <ConflictDialog
+        conflict={draft.conflict}
+        name={entry.name}
+        path={entry.path}
+        onReload={draft.reload}
+        onOverwrite={draft.overwrite}
+        onDismiss={draft.dismissConflict}
+      />
+      <DeleteDialog
+        open={deleting}
+        onOpenChange={setDeleting}
+        name={entry.name}
+        body={`This removes ${entry.path} from disk.`}
+        onConfirm={remove}
+      />
     </div>
   );
 }

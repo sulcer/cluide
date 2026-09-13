@@ -1,10 +1,12 @@
 import { afterEach, beforeEach, expect, test } from "bun:test";
 import { join } from "node:path";
-import { tempHome, type TempHome } from "../temp-home";
 import { listProjects } from "../../resources/projects";
+import { type TempHome, tempHome } from "../temp-home";
 
 let t: TempHome;
-beforeEach(() => { t = tempHome(); });
+beforeEach(() => {
+  t = tempHome();
+});
 afterEach(() => t.cleanup());
 
 test("lists projects from ~/.claude.json sorted by code point, with existence and ~ for home", () => {

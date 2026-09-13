@@ -86,7 +86,10 @@ export function patchJson(
   const json = readJsonOrEmpty(path);
   const before = sliceEtag(slice(json));
   if (expectedEtag !== undefined && before !== expectedEtag) {
-    throw new ApiError(409, "conflict", `${basename(path)} changed on disk`, { content: slice(json) ?? null, etag: before });
+    throw new ApiError(409, "conflict", `${basename(path)} changed on disk`, {
+      content: slice(json) ?? null,
+      etag: before,
+    });
   }
   mutate(json);
   const { diff } = writeText(path, jsonText(json));

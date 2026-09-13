@@ -1,8 +1,15 @@
 import type { FileKind, Scope } from "@shared/api";
 
 export type ScreenId =
-  | "settings" | "memory" | "rules" | "keybindings"
-  | "agents" | "skills" | "commands" | "hooks" | "plugins"
+  | "settings"
+  | "memory"
+  | "rules"
+  | "keybindings"
+  | "agents"
+  | "skills"
+  | "commands"
+  | "hooks"
+  | "plugins"
   | "mcp";
 
 export interface ScreenDef {
@@ -31,11 +38,9 @@ export const HOOK_SCRIPT_PRIMARY = "New script";
 
 export const screenDef = (id: string | undefined): ScreenDef | undefined => SCREENS.find((s) => s.id === id);
 
-export const visibleScreens = (scope: Scope): ScreenDef[] =>
-  SCREENS.filter((s) => scope === "global" || !s.globalOnly);
+export const visibleScreens = (scope: Scope): ScreenDef[] => SCREENS.filter((s) => scope === "global" || !s.globalOnly);
 
-export const scopeUrl = (scope: Scope): string =>
-  scope === "global" ? "/global" : `/p/${encodeURIComponent(scope)}`;
+export const scopeUrl = (scope: Scope): string => (scope === "global" ? "/global" : `/p/${encodeURIComponent(scope)}`);
 
 export const screenUrl = (scope: Scope, id: ScreenId): string => `${scopeUrl(scope)}/${id}`;
 

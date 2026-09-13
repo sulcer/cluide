@@ -1,5 +1,5 @@
-import type { ComponentProps } from "react";
 import { cn } from "cn";
+import type { ComponentProps } from "react";
 
 export function IconButton({ className, label, ...props }: ComponentProps<"button"> & { label: string }) {
   return (

@@ -16,7 +16,12 @@ import { jsonText } from "@/lib/json";
 import { readOnly } from "@/lib/mcp";
 import { toast } from "@/lib/toast";
 
-interface Props { scope: Scope; entry: McpEntry; onClose: () => void; onChanged: () => void }
+interface Props {
+  scope: Scope;
+  entry: McpEntry;
+  onClose: () => void;
+  onChanged: () => void;
+}
 
 export function McpSheet({ scope, entry, onClose, onChanged }: Props) {
   const ro = readOnly(entry);
@@ -30,7 +35,13 @@ export function McpSheet({ scope, entry, onClose, onChanged }: Props) {
     } catch {
       throw new ApiError(422, "unprocessable", "config must be valid JSON");
     }
-    const result = await api.put<WriteResult>("/api/mcp", { scope, target: entry.scope, name: entry.name, config, etag });
+    const result = await api.put<WriteResult>("/api/mcp", {
+      scope,
+      target: entry.scope,
+      name: entry.name,
+      config,
+      etag,
+    });
     onChanged();
     return result;
   };
@@ -50,8 +61,17 @@ export function McpSheet({ scope, entry, onClose, onChanged }: Props) {
   };
 
   return (
-    <Sheet open onOpenChange={(open) => { if (!open) onClose(); }}>
-      <SheetContent side="right" showCloseButton={false} className="flex w-[520px] max-w-full flex-col gap-0 border-l bg-background p-0 shadow-float sm:max-w-[520px]">
+    <Sheet
+      open
+      onOpenChange={(open) => {
+        if (!open) onClose();
+      }}
+    >
+      <SheetContent
+        side="right"
+        showCloseButton={false}
+        className="flex w-[520px] max-w-full flex-col gap-0 border-l bg-background p-0 shadow-float sm:max-w-[520px]"
+      >
         <div className="flex items-start gap-2 px-4 pt-3.5 pb-3">
           <div className="min-w-0 flex-1">
             <SheetTitle className="flex items-center gap-2 text-[13px] font-medium">
@@ -64,7 +84,9 @@ export function McpSheet({ scope, entry, onClose, onChanged }: Props) {
                 </DashedBadge>
               )}
             </SheetTitle>
-            <SheetDescription className="truncate font-mono text-xs text-muted-foreground">{entry.file}</SheetDescription>
+            <SheetDescription className="truncate font-mono text-xs text-muted-foreground">
+              {entry.file}
+            </SheetDescription>
           </div>
           <SheetClose asChild>
             <IconButton label="Close">
@@ -80,7 +102,9 @@ export function McpSheet({ scope, entry, onClose, onChanged }: Props) {
         <Editor value={draft.content} onChange={draft.setContent} error={draft.error} disabled={ro} autoFocus={!ro} />
         {ro && (
           <div className="px-4 py-2 text-xs text-muted-foreground">
-            {entry.scope === "plugin" ? "Defined by the plugin. Disable the plugin to remove it." : "Managed by your organisation in settings.json → managedMcpServers."}
+            {entry.scope === "plugin"
+              ? "Defined by the plugin. Disable the plugin to remove it."
+              : "Managed by your organisation in settings.json → managedMcpServers."}
           </div>
         )}
         <div className="flex items-center gap-2 border-t px-4 py-3">
@@ -95,9 +119,28 @@ export function McpSheet({ scope, entry, onClose, onChanged }: Props) {
             <Button>Close</Button>
           </SheetClose>
         </div>
-        <DiffSheet open={draft.diffOpen} onOpenChange={draft.setDiffOpen} name={entry.name} path={entry.file} diff={draft.diff} />
-        <ConflictDialog conflict={draft.conflict} name={entry.name} path={entry.file} onReload={draft.reload} onOverwrite={draft.overwrite} onDismiss={draft.dismissConflict} />
-        <DeleteDialog open={deleting} onOpenChange={setDeleting} name={entry.name} body={`This removes the server from ${entry.file}.`} onConfirm={remove} />
+        <DiffSheet
+          open={draft.diffOpen}
+          onOpenChange={draft.setDiffOpen}
+          name={entry.name}
+          path={entry.file}
+          diff={draft.diff}
+        />
+        <ConflictDialog
+          conflict={draft.conflict}
+          name={entry.name}
+          path={entry.file}
+          onReload={draft.reload}
+          onOverwrite={draft.overwrite}
+          onDismiss={draft.dismissConflict}
+        />
+        <DeleteDialog
+          open={deleting}
+          onOpenChange={setDeleting}
+          name={entry.name}
+          body={`This removes the server from ${entry.file}.`}
+          onConfirm={remove}
+        />
       </SheetContent>
     </Sheet>
   );

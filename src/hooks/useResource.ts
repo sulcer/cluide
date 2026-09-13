@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { api, type ApiError } from "@/api/client";
+import { type ApiError, api } from "@/api/client";
 import { useWindowEvent } from "@/hooks/useWindowEvent";
 
 export function useResource<T>(url: string | null) {
@@ -17,10 +17,19 @@ export function useResource<T>(url: string | null) {
     if (url === null) return;
     let live = true;
     api.get<T>(url).then(
-      (d) => { if (live) { setData(d); setError(undefined); } },
-      (e) => { if (live) setError(e as ApiError); },
+      (d) => {
+        if (live) {
+          setData(d);
+          setError(undefined);
+        }
+      },
+      (e) => {
+        if (live) setError(e as ApiError);
+      },
     );
-    return () => { live = false; };
+    return () => {
+      live = false;
+    };
   }, [url, tick]);
 
   const reload = useCallback(() => setTick((t) => t + 1), []);

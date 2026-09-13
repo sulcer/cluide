@@ -1,7 +1,7 @@
-import Ajv, { type ValidateFunction } from "ajv";
 import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import type { SchemaError } from "@shared/api";
+import Ajv, { type ValidateFunction } from "ajv";
 import { cluideDir } from "./paths";
 
 const SCHEMA_URL = "https://www.schemastore.org/claude-code-settings.json";

@@ -13,7 +13,9 @@ import { Header } from "./Header";
 import { OfflineBanner } from "./OfflineBanner";
 import { Sidebar } from "./Sidebar";
 
-export interface ShellContext { claudeDir: string | null }
+export interface ShellContext {
+  claudeDir: string | null;
+}
 
 export function Shell() {
   const { scope, screen, file } = useRoute();

@@ -1,6 +1,6 @@
+import type { Scope } from "@shared/api";
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
-import type { Scope } from "@shared/api";
 import { emit } from "@/lib/events";
 import { isMod } from "@/lib/keys";
 import { screenUrl, visibleScreens } from "@/lib/routes";

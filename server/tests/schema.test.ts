@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { join } from "node:path";
 import { loadSchema, schemaAvailable, validateSettings } from "../schema";
-import { tempHome, type TempHome } from "./temp-home";
+import { type TempHome, tempHome } from "./temp-home";
 
 const TINY_SCHEMA = JSON.stringify({
   $schema: "http://json-schema.org/draft-07/schema#",
@@ -15,13 +15,20 @@ const TINY_SCHEMA = JSON.stringify({
 
 let t: TempHome;
 const realFetch = globalThis.fetch;
-beforeEach(() => { t = tempHome(); });
-afterEach(() => { globalThis.fetch = realFetch; t.cleanup(); });
+beforeEach(() => {
+  t = tempHome();
+});
+afterEach(() => {
+  globalThis.fetch = realFetch;
+  t.cleanup();
+});
 
 describe("loadSchema", () => {
   test("uses a fresh cache without fetching", async () => {
     t.write(".cluide/schema-cache.json", TINY_SCHEMA);
-    globalThis.fetch = (() => { throw new Error("must not fetch"); }) as unknown as typeof fetch;
+    globalThis.fetch = (() => {
+      throw new Error("must not fetch");
+    }) as unknown as typeof fetch;
     expect([await loadSchema(), schemaAvailable()]).toEqual([true, true]);
   });
   test("reports unavailable when there is no cache and the fetch fails", async () => {

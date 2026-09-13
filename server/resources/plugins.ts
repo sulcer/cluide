@@ -51,7 +51,9 @@ export function setPluginEnabled(body: unknown): WriteResult {
   return patchJson(
     settingsPath(),
     (json) => json.enabledPlugins,
-    (json) => { (json.enabledPlugins ??= {})[id] = enabled; },
+    (json) => {
+      (json.enabledPlugins ??= {})[id] = enabled;
+    },
     etag,
   );
 }

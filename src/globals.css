@@ -64,7 +64,8 @@
   }
 }
 
-:root, [data-theme="dark"] {
+:root,
+[data-theme="dark"] {
   --background: oklch(0.175 0.004 264);
   --foreground: oklch(0.92 0.004 264);
   --card: oklch(0.175 0.004 264);
@@ -181,26 +182,36 @@
   * {
     @apply border-border;
   }
-  html, body, #root {
+  html,
+  body,
+  #root {
     height: 100%;
   }
   body {
     @apply bg-background font-sans text-[13px] leading-5 text-foreground antialiased;
   }
-  button, input, textarea {
+  button,
+  input,
+  textarea {
     font: inherit;
   }
   :focus-visible {
     outline: 2px solid var(--ring);
     outline-offset: 1px;
   }
-  input:focus-visible, textarea:focus-visible {
+  input:focus-visible,
+  textarea:focus-visible {
     outline-offset: -1px;
   }
   .selected {
     box-shadow: inset 2px 0 0 var(--foreground);
   }
-  button:not(:disabled), [role="button"]:not([aria-disabled="true"]), [role="option"], [role="switch"]:not(:disabled), a[href], label[for] {
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  [role="option"],
+  [role="switch"]:not(:disabled),
+  a[href],
+  label[for] {
     cursor: pointer;
   }
 }
