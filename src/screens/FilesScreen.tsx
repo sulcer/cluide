@@ -7,6 +7,9 @@ import { useResource } from "@/api/useResource";
 import { Button } from "@/components/Button";
 import { Centered } from "@/components/Centered";
 import { IconButton } from "@/components/IconButton";
+import { ConflictDialog } from "@/editor/ConflictDialog";
+import { DeleteDialog } from "@/editor/DeleteDialog";
+import { DiffSheet } from "@/editor/DiffSheet";
 import { Editor } from "@/editor/Editor";
 import { SaveBar } from "@/editor/SaveBar";
 import { type Loaded, type SaveFn, useDraft } from "@/editor/useDraft";
@@ -184,7 +187,9 @@ function FileEditor({ scope, kind, entry, autoFocus, onCreated, onDeleted }: Edi
         </div>
       )}
       <Editor value={draft.content} onChange={draft.setContent} error={draft.error} autoFocus={autoFocus} />
-      {/* Task 5 adds: <DiffSheet />, <ConflictDialog />, <DeleteDialog open={deleting} ... onConfirm={remove} /> */}
+      <DiffSheet open={draft.diffOpen} onOpenChange={draft.setDiffOpen} name={entry.name} path={entry.path} diff={draft.diff} />
+      <ConflictDialog conflict={draft.conflict} name={entry.name} path={entry.path} onReload={draft.reload} onOverwrite={draft.overwrite} onDismiss={draft.dismissConflict} />
+      <DeleteDialog open={deleting} onOpenChange={setDeleting} name={entry.name} body={`This removes ${entry.path} from disk.`} onConfirm={remove} />
     </div>
   );
 }

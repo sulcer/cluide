@@ -85,6 +85,13 @@ export function useDraft(loaded: Loaded | undefined, save: SaveFn, name: string,
   useWindowEvent("cluide:save", doSave);
   useWindowEvent("cluide:escape", discard);
 
+  useEffect(() => {
+    if (!dirty) return;
+    const warn = (e: BeforeUnloadEvent) => e.preventDefault();
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [dirty]);
+
   return {
     content, setContent, dirty, saving, error, conflict, diff, diffOpen, setDiffOpen,
     etag: base?.etag ?? null,

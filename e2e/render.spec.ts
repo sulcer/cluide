@@ -1,5 +1,7 @@
+import { writeFileSync } from "node:fs";
+import { join } from "node:path";
 import { expect, test } from "@playwright/test";
-import { main, projectUrl, shot, toast } from "./helpers";
+import { homeDir, main, projectUrl, shot } from "./helpers";
 
 test.describe("render", () => {
   test("shell: fonts load and / redirects", async ({ page }) => {
@@ -177,5 +179,69 @@ test.describe("render", () => {
     await page.evaluate(() => window.dispatchEvent(new Event("cluide:retry")));
     await expect(page.locator("textarea")).toBeVisible();
     await expect(page.getByText("could not be read")).toHaveCount(0);
+  });
+
+  test("editor-diff", async ({ page }) => {
+    await page.goto("/global/rules");
+    const ta = page.locator("textarea");
+    await ta.click();
+    await ta.press("End");
+    await ta.pressSequentially("\nAdded by the render spec.");
+    await page.keyboard.press("ControlOrMeta+s");
+    await page.getByRole("button", { name: "View diff" }).click();
+    // The sheet sits over the still-mounted textarea, which shares the same edited text; scope to
+    // the sheet (a Radix Dialog, role="dialog") so the match is unambiguous.
+    const sheet = page.getByRole("dialog");
+    await expect(sheet.getByText("Added by the render spec.")).toBeVisible();
+    // The click lands after the file's trailing newline, so the appended text starts its own new
+    // line: always 2 added lines, not 1. In the full suite (not run in isolation), "editor-saving"
+    // above already strips git-workflow.md's trailing newline, so this also rewrites that
+    // no-newline last line, making it +2 -1 rather than +2 -0 — either way, +2.
+    await expect(sheet.getByText("+2", { exact: true })).toBeVisible();
+    await shot(page, "editor-diff");
+    await page.keyboard.press("Escape");
+    await expect(page.getByText("Diff ·")).toHaveCount(0);
+  });
+
+  test("editor-conflict", async ({ page }) => {
+    await page.goto("/global/memory");
+    const ta = page.locator("textarea");
+    await ta.click();
+    await ta.press("End");
+    await ta.pressSequentially(" mine");
+    writeFileSync(join(homeDir(), ".claude", "CLAUDE.md"), "# Changed outside\n");
+    await page.keyboard.press("ControlOrMeta+s");
+    await expect(page.getByText("changed on disk")).toBeVisible();
+    await expect(page.getByText("Unsaved changes")).toBeVisible();
+    await shot(page, "editor-conflict");
+    await page.keyboard.press("Enter");
+    await expect(ta).toHaveValue("# Changed outside\n");
+    await expect(page.getByText("Reloaded CLAUDE.md from disk")).toBeVisible();
+  });
+
+  test("editor-delete", async ({ page }) => {
+    await page.goto("/global/rules");
+    await page.getByRole("button", { name: "style.md" }).click();
+    await page.getByRole("button", { name: "Delete" }).click();
+    await expect(page.getByText("Delete style.md?")).toBeVisible();
+    await shot(page, "editor-delete");
+    await page.getByRole("button", { name: "Delete", exact: true }).last().click();
+    await expect(page.getByText("Deleted style.md")).toBeVisible();
+    await expect(page.getByRole("button", { name: "style.md" })).toHaveCount(0);
+  });
+
+  test("esc: an open layer takes Esc before the editor", async ({ page }) => {
+    await page.goto("/global/memory");
+    const ta = page.locator("textarea");
+    await ta.click();
+    await ta.press("End");
+    await ta.pressSequentially(" edited");
+    await expect(page.getByText("Unsaved changes")).toBeVisible();
+    await page.keyboard.press("ControlOrMeta+k");
+    await page.keyboard.press("Escape");
+    await expect(page.getByPlaceholder("Type a command or search")).toHaveCount(0);
+    await expect(page.getByText("Unsaved changes")).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(main(page).getByText("Saved")).toBeVisible();
   });
 });
