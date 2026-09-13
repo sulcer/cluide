@@ -16,7 +16,7 @@ Two processes in development: Vite serves the page with hot reload on port 5173 
 | `bun run dev` | `bun scripts/dev.ts`, which starts `bun --hot server/index.ts` and `vite` | Vite on `http://localhost:5173`, proxy `/api` → `127.0.0.1:8787` with `changeOrigin: true` so the `Host` check in [`security.md`](./security.md) passes; Ctrl+C stops both processes |
 | `bun run build` | `vite build` | outputs `dist/` |
 | `bun run start` | `bun server/index.ts --open` | serves `dist/` with SPA fallback plus `/api`; opens the browser |
-| `bun run test` | `bun test server shared src` | the path filter keeps `bun test` (which also picks up `e2e/*.spec.ts`) away from `e2e/`; see [`testing.md`](./testing.md) |
+| `bun run test` | `bun test server shared src scripts` | the path filter keeps `bun test` (which also picks up `e2e/*.spec.ts`) away from `e2e/`; see [`testing.md`](./testing.md) |
 | `bun run typecheck` | `tsc --noEmit` against both `tsconfig.json` and `src/tsconfig.json` | the app has its own tsconfig for DOM and JSX types |
 | `bun run e2e` | Playwright | builds, seeds a temporary home, runs the render and smoke specs against `127.0.0.1:8790` in the installed Chrome |
 | `bun run render` | Playwright, `render.spec.ts` only | screenshots land in `e2e/renders/` |

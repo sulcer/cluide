@@ -1,6 +1,6 @@
 # CI and releases
 
-Status: Stable · Planned · 2026-09-13 · What runs on every pull request, how a release is cut from a release pull request, how the npm package is published, and what changes when the repository goes public.
+Status: Stable · Built · 2026-09-13 · What runs on every pull request, how a release is cut from a release pull request, how the npm package is published, and what changes when the repository goes public.
 
 ## At a glance
 
@@ -35,8 +35,8 @@ adds only what it needs.
 
 | Job | Runs | Artifacts | Proves |
 |---|---|---|---|
-| `check` | `bun run typecheck`, `bun run test` | | Both tsconfigs compile; the 98 unit tests pass against a temporary home |
-| `e2e` | `bun run e2e` | `renders` (every run, 14 days), `e2e-results` (on failure) | The build works and the 42 Playwright cases pass in the runner's Google Chrome; every pull request has its screenshots |
+| `check` | `bun run typecheck`, `bun run test` | | Both tsconfigs compile; the unit tests pass against a temporary home |
+| `e2e` | `bun run e2e` | `renders` (every run, 14 days), `e2e-results` (on failure) | The build works and the Playwright suite passes in the runner's Google Chrome; every pull request has its screenshots |
 | `docs` | `bun run check-docs` | | Every relative link under `docs/` and in `CLAUDE.md` resolves; every spec file's `Status:` line has the shape in [`spec-discipline.md`](../../../.claude/rules/always-on/spec-discipline.md); no forbidden name appears in the tree |
 
 The forbidden names are not in the repository. `scripts/check-docs.ts` reads the repository
@@ -52,10 +52,10 @@ The tool is release-please, in manifest mode: `.release-please-config.json` and
 |---|---|---|
 | release type | `node` | bumps `package.json` and writes `CHANGELOG.md` |
 | version | from the commit types since the last release: `feat` → minor, `fix` → patch, `!` or `BREAKING CHANGE` → major; while the major is 0, a breaking change bumps the minor | one source of truth: the commits the hook already checks |
-| notes | GitHub's generated notes from pull request titles, categorised by `.github/release.yml` | pull requests merge with a merge commit, so per-task commits stay in history without doubling the changelog |
+| notes | GitHub's generated notes from pull request titles, categorised by `.github/release.yml` | pull requests merge with a merge commit, so per-task commits stay in history without doubling the changelog; release-please writes the same notes into `CHANGELOG.md` and the release body, so the two never differ |
 | release pull request title | `chore: release X.Y.Z` | Conventional Commits, no scope |
-| tag | `vX.Y.Z` | |
-| first release | `0.1.0`, the version already on `main`; the manifest starts at `0.0.0`, which means nothing has been released | |
+| tag | `vX.Y.Z` | manifest mode would otherwise tag `cluide-vX.Y.Z`, so the config sets `include-component-in-tag` to `false` |
+| first release | `0.1.0`, set by `initial-version` in the config, which applies only while no release exists; the manifest starts at `0.0.0`, which means nothing has been released | |
 
 The release pull request only ever changes `package.json`, `CHANGELOG.md` and the manifest.
 `bun.lock` does not record the root package's version, so the lockfile stays untouched. The bot's
@@ -64,7 +64,9 @@ Actions token creates; the publish job is the gate for the tagged commit.
 
 `.github/release.yml` puts pull requests into Features (`enhancement`), Fixes (`bug`),
 Documentation (`documentation`) and Other changes, and excludes the bot's own pull requests
-(labels `autorelease: pending` and `autorelease: tagged`).
+(labels `autorelease: pending` and `autorelease: tagged`). A pull request without one of those
+labels lands under Other changes, which is where every pull request lands until pull requests
+carry them; the notes still list every pull request title.
 
 ## Publish
 
@@ -141,6 +143,4 @@ package carries a known advisory, so it shows up without anyone running `bun aud
 
 ## Open questions
 
-- Whether release-please writes the pull-request-title notes into `CHANGELOG.md` as well as the
-  release body, or only the latter; the plan's dry run against the repository answers it, and this
-  section then says which.
+None.
