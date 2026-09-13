@@ -1,6 +1,6 @@
 import type { Project, Scope } from "@shared/api";
 import { Command as CommandPrimitive } from "cmdk";
-import { History, Moon, Plus, Search, Sun } from "lucide-react";
+import { Folder, FolderX, History, Moon, Plus, Search, Sun } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { Kbd } from "@/components/Kbd";
@@ -69,7 +69,7 @@ export function CommandMenu({ open, onOpenChange, scope, projects }: Props) {
             {projectCount > 0 && (
               <Group heading="Switch scope">
                 {shown.map((p) => (
-                  <Item key={p.path} icon={<Search className="size-4" />} label={p.name} hint={p.path} onSelect={() => go(screenUrl(p.path, "settings"))} />
+                  <Item key={p.path} icon={p.exists ? <Folder className="size-4" /> : <FolderX className="size-4" />} label={p.name} hint={p.path} onSelect={() => go(screenUrl(p.path, "settings"))} />
                 ))}
               </Group>
             )}
@@ -117,7 +117,7 @@ function Item(props: { icon: React.ReactNode; label: string; hint?: string; kbd?
     >
       <span className="text-muted-foreground">{props.icon}</span>
       <span>{props.label}</span>
-      {props.hint && <span className="ml-2 truncate font-mono text-[11px] text-muted-foreground">{props.hint}</span>}
+      {props.hint && <span className="truncate font-mono text-[11px] text-muted-foreground">{props.hint}</span>}
       {props.kbd && <Kbd className="ml-auto">{props.kbd}</Kbd>}
     </CommandPrimitive.Item>
   );

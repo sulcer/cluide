@@ -17,10 +17,12 @@ test.describe("render", () => {
   test("shell-collapsed", async ({ page }) => {
     await page.goto("/global/settings");
     await page.getByRole("button", { name: "Toggle sidebar" }).click();
-    await expect(page.getByRole("link", { name: "Settings" })).toHaveCount(0);
+    // Rail mode drops the <nav> landmark (the group labels move into it); the rail's own
+    // icon-only links carry the same accessible name, so scope to <nav> to detect collapse.
+    await expect(page.locator("nav").getByRole("link", { name: "Settings" })).toHaveCount(0);
     await shot(page, "shell-collapsed");
     await page.reload();
-    await expect(page.getByRole("link", { name: "Settings" })).toHaveCount(0); // persisted
+    await expect(page.locator("nav").getByRole("link", { name: "Settings" })).toHaveCount(0); // persisted
     await page.getByRole("button", { name: "Toggle sidebar" }).click();
   });
 

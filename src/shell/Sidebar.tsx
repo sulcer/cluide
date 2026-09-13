@@ -41,6 +41,7 @@ export function Sidebar({ rail, scope, screen, projects, onOpenMenu }: Props) {
             <TooltipTrigger asChild>
               <NavLink
                 to={screenUrl(scope, def.id)}
+                aria-label={def.label}
                 className={({ isActive }) =>
                   cn(
                     "flex size-8 items-center justify-center rounded-md text-muted-foreground hover:bg-sidebar-accent",
