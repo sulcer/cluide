@@ -48,8 +48,8 @@ and the `Host` the server sees is its own.
 
 Few, pinned to exact versions, installed from the lockfile. The published package depends on
 `ajv` alone: the page ships built in `dist/`, so React, react-router, the shadcn primitives
-(`radix-ui`, `cmdk`), lucide, `cn`, `class-variance-authority`, the fontsource fonts, Vite and
-Tailwind are dev dependencies. Anything new must earn its place against "a few lines of code do
+(`radix-ui`, `cmdk`), lucide, `cn`, `class-variance-authority`, the fontsource fonts, Vite,
+Tailwind and biome are dev dependencies. Anything new must earn its place against "a few lines of code do
 it". `bun install` runs with the lockfile committed and, in CI, frozen; a diff in the lockfile is
 reviewed like code. Actions are pinned to commit SHAs, Dependabot proposes updates weekly, and a
 weekly `bun audit` fails on known advisories. Publishing uses npm trusted publishing over OIDC, so

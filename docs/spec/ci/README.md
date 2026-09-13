@@ -35,7 +35,7 @@ adds only what it needs.
 
 | Job | Runs | Artifacts | Proves |
 |---|---|---|---|
-| `check` | `bun run typecheck`, `bun run test` | | Both tsconfigs compile; the unit tests pass against a temporary home |
+| `check` | `bun run typecheck`, `bun run lint`, `bun run test` | | Both tsconfigs compile; biome's format, import order and lint rules hold; the unit tests pass against a temporary home |
 | `e2e` | `bun run e2e` | `renders` (every run, 14 days), `e2e-results` (on failure) | The build works and the Playwright suite passes in the runner's Google Chrome; every pull request has its screenshots |
 | `docs` | `bun run check-docs` | | Every relative link under `docs/` and in `CLAUDE.md` resolves; every spec file's `Status:` line has the shape in [`spec-discipline.md`](../../../.claude/rules/always-on/spec-discipline.md); no forbidden name appears in the tree |
 
@@ -77,7 +77,7 @@ Runs when the `release` job reports a new release and the repository variable `N
 first release after going public, or a retry).
 
 1. Check out the tag; install with the frozen lockfile.
-2. `bun run typecheck`, `bun run test`, `bun run e2e` on the tagged commit.
+2. `bun run typecheck`, `bun run lint`, `bun run test`, `bun run e2e` on the tagged commit.
 3. `bun run build`, then `bun pm pack` → `cluide-X.Y.Z.tgz`.
 4. `npm publish cluide-X.Y.Z.tgz --provenance --access public` with the job's OIDC token
    (`id-token: write`). The job installs npm 11 first so the 11.5.1 minimum that trusted publishing
@@ -93,8 +93,8 @@ under `next`; a plain version under `latest`.
 |---|---|
 | `name` | `cluide` |
 | `bin` | `cluide` → `bin/cluide.ts`, which prints `cluide runs on Bun: https://bun.sh` and `Try: bunx cluide` and exits 1 when `Bun` is undefined, and otherwise starts `server/index.ts` |
-| `files` | `bin`, `server` without `*.test.ts` and `testing.ts`, `shared`, `dist`, `README.md`, `CHANGELOG.md`, `LICENSE` |
-| `dependencies` | `ajv` only; React, react-router, the shadcn packages, lucide, the fonts, Vite and Tailwind are `devDependencies`, since `dist/` ships built |
+| `files` | `bin`, `server` without `tests`, `shared`, `dist`, `README.md`, `CHANGELOG.md`, `LICENSE` |
+| `dependencies` | `ajv` only; React, react-router, the shadcn packages, lucide, the fonts, Vite, Tailwind and biome are `devDependencies`, since `dist/` ships built |
 | `engines` | `bun >= 1.3.0` |
 | `publishConfig` | `access: public`, `provenance: true` |
 | `repository`, `homepage`, `bugs` | `github.com/sulcer/cluide` |

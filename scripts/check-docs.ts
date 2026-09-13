@@ -4,7 +4,16 @@ import { dirname, join, relative, resolve } from "node:path";
 const STATUS = /^Status: (Draft|Stable) · (Built|Partial|Planned) · \d{4}-\d{2}-\d{2} · .+$/;
 const LINK = /\]\((?!https?:\/\/|#|mailto:|\/)([^)#\s]+)/g;
 const TEXT = /\.(md|ts|tsx|json|css|yml|yaml|html|svg|txt)$/;
-const SKIP = ["node_modules", "dist", ".git", "e2e/renders", "docs/spec/ui/design", ".agents", ".claude/skills", ".superpowers"];
+const SKIP = [
+  "node_modules",
+  "dist",
+  ".git",
+  "e2e/renders",
+  "docs/spec/ui/design",
+  ".agents",
+  ".claude/skills",
+  ".superpowers",
+];
 
 function* walk(root: string, dir = root): Generator<string> {
   for (const name of readdirSync(dir).sort()) {
@@ -19,7 +28,10 @@ function* walk(root: string, dir = root): Generator<string> {
 // Every violation as "<relative path>:<line> <message>", sorted, so CI output is stable.
 export function checkDocs(root: string, forbidden: string[]): string[] {
   const out: string[] = [];
-  const names = forbidden.map((n) => n.trim()).filter(Boolean).map((n) => new RegExp(`\\b${n.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i"));
+  const names = forbidden
+    .map((n) => n.trim())
+    .filter(Boolean)
+    .map((n) => new RegExp(`\\b${n.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i"));
   for (const path of walk(root)) {
     const rel = relative(root, path);
     if (!TEXT.test(rel)) continue;
@@ -36,19 +48,31 @@ export function checkDocs(root: string, forbidden: string[]): string[] {
           if (!existsSync(resolve(dirname(path), m[1]))) out.push(`${rel}:${i + 1} broken link: ${m[1]}`);
         }
       });
-      if (rel.startsWith("docs/spec/") && rel !== "docs/spec/README.md" && rel.endsWith(".md") && !rel.endsWith("design-brief.md")) {
-        if (!STATUS.test(lines[2] ?? "")) out.push(`${rel}:3 status line must read \`Status: <Draft|Stable> · <Built|Partial|Planned> · <date> · <sentence>\``);
+      if (
+        rel.startsWith("docs/spec/") &&
+        rel !== "docs/spec/README.md" &&
+        rel.endsWith(".md") &&
+        !rel.endsWith("design-brief.md")
+      ) {
+        if (!STATUS.test(lines[2] ?? ""))
+          out.push(
+            `${rel}:3 status line must read \`Status: <Draft|Stable> · <Built|Partial|Planned> · <date> · <sentence>\``,
+          );
       }
     }
     lines.forEach((line, i) => {
-      for (const [k, re] of names.entries()) if (re.test(line)) out.push(`${rel}:${i + 1} forbidden name: ${forbidden[k].trim().toLowerCase()}`);
+      for (const [k, re] of names.entries())
+        if (re.test(line)) out.push(`${rel}:${i + 1} forbidden name: ${forbidden[k].trim().toLowerCase()}`);
     });
   }
   return out.sort();
 }
 
 if (import.meta.main) {
-  const names = (process.env.FORBIDDEN_NAMES ?? "").split(",").map((n) => n.trim()).filter(Boolean);
+  const names = (process.env.FORBIDDEN_NAMES ?? "")
+    .split(",")
+    .map((n) => n.trim())
+    .filter(Boolean);
   if (names.length === 0) console.log("FORBIDDEN_NAMES is not set; the names check is skipped");
   const violations = checkDocs(process.cwd(), names);
   for (const v of violations) console.log(v);

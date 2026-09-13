@@ -14,8 +14,7 @@
   "files": [
     "bin",
     "server",
-    "!server/**/*.test.ts",
-    "!server/testing.ts",
+    "!server/tests",
     "shared",
     "dist",
     "README.md",
