@@ -1,6 +1,6 @@
 # UI
 
-Status: Stable · Built · 2026-09-12 · The page: one shell, nine screens, and the save experience every editing screen shares.
+Status: Stable · Built · 2026-09-12 · The page: one shell, ten screens, and the save experience every editing screen shares.
 
 ## At a glance
 
@@ -55,7 +55,8 @@ without hunting for a focusable element.
 ## Data flow
 
 - No global store. Each screen owns its data through a small `useResource(url)` hook that returns
-  `{ data, error, loading, reload }` over `fetch`; every resource carries its etag inside `data`.
+  `{ data, error, loading, reload, setData }` over `fetch`; every resource carries its etag inside
+  `data`.
   Cross-cutting signals (save, escape, the header's primary action, offline, retry) are window
   events, not a store.
 - `src/api/client.ts` adds `X-Cluide: 1` to every mutating call, unwraps the error shape from the

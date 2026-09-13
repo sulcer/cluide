@@ -56,6 +56,7 @@ added when a concrete need appears, not before.
 cluide/
   package.json            # single package; scripts: dev, build, start, test, typecheck, e2e, render
   vite.config.ts          # @tailwindcss/vite; proxy /api -> 127.0.0.1:8787 with changeOrigin
+  index.html              # Vite's entry point; loads src/main.tsx
   tsconfig.json           # server, shared, scripts, e2e; paths: @/* -> src/*, @shared/* -> shared/*
   components.json         # shadcn
   CLAUDE.md, .claude/rules/
@@ -83,10 +84,12 @@ cluide/
       projects.ts, files.ts, settings.ts, mcp.ts, plugins.ts
   src/
     tsconfig.json         # the app's own tsconfig: DOM + JSX types, paths relative to src/
+    vite-env.d.ts         # Vite's ambient client types
     main.tsx, router.tsx, globals.css
     api/                  # client.ts, useResource.ts
-    lib/                  # routes, events, storage, theme, toast, diff, frontmatter, hooks, mcp,
-                           # recent — pure, unit tested next to source
+    lib/                  # pure, unit tested next to source: routes, diff, frontmatter, hooks, mcp.
+                           # React or browser helpers: useRoute, icons, keys, json, events, storage,
+                           # theme, toast, recent.
     components/           # Button, Input, Badge, Kbd, IconButton, Skeleton, Centered, Toaster
     components/ui/        # shadcn (generated)
     shell/                # Shell, Sidebar, ScopeSwitcher, Header, OfflineBanner, CommandMenu

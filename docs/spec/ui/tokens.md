@@ -75,7 +75,7 @@ through fontsource so the app looks the same offline; system fallbacks are
 - Borders are 1px `--border` (`--sidebar-border` inside the sidebar, `--input` on inputs).
 - Shadows only on floating layers: `--shadow` on the scope popover, command menu, sheet, dialogs and
   toasts. Segmented-control selections carry `0 1px 2px rgba(0,0,0,.2)`.
-- Overlays: the command menu shares the dialog overlay, `rgba(0,0,0,.45)`; sheets are `.3`.
+- Overlays: command menu `rgba(0,0,0,.4)`, sheets `.3`, dialogs `.45`.
 - Focus: `2px solid var(--ring)` outline, offset `-1px` on inputs and textareas, `1px` on buttons,
   only for `:focus-visible` on buttons.
 
@@ -91,7 +91,7 @@ through fontsource so the app looks the same offline; system fallbacks are
 | Input | 28px in toolbars, 32px in dialogs; padding 0 8px or 10px; 1px `--input`; radius 4px in toolbars, 6px in dialogs |
 | Switch | 32×18, radius 9px, 14px white thumb with `0 1px 2px rgba(0,0,0,.3)`, track `--primary` on and `--input` off, 150ms transitions |
 | Kbd | 11px, padding 0 4px, radius 4px, `--muted` with 1px `--border`; inside a primary button `rgba(255,255,255,.16)` and no border |
-| Badge, scope | 18px, padding 0 6px, radius 4px, mono 11px 500. `local`: `--foreground` on `--background`. `project`: 1px solid `--foreground`. `user`: `--secondary` with 1px `--border`. `plugin`: 1px dashed `--muted-foreground`, muted text. `managed`: `--muted` with 1px `--border`, muted text. |
+| Badge, scope | 18px, padding 0 6px, radius 4px, mono 11px 500. `local`: `--background` text on a `--foreground` chip. `project`: 1px solid `--foreground`. `user`: `--secondary` with 1px `--border`. `plugin`: 1px dashed `--muted-foreground`, muted text. `managed`: `--muted` with 1px `--border`, muted text. |
 | Badge, provides | 18px, padding 0 6px, radius 4px, `--secondary` with 1px `--border`, 11px 500 |
 | Badge, count | 18px round, min-width 18px, `--warning` with dark text when the count is above zero, `--muted` with muted text at zero |
 | Badge, dashed note | 18px, padding 0 6px, radius 4px, 1px dashed `--border`, muted 11px, icon gap 4px |
