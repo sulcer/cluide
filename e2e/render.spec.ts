@@ -311,4 +311,22 @@ test.describe("render", () => {
     await expect(toast(page)).toContainText("Save failed");
     await page.keyboard.press("Escape");
   });
+
+  test("hooks", async ({ page }) => {
+    await page.goto("/global/hooks");
+    await expect(page.getByText("PreToolUse")).toBeVisible();
+    await expect(page.getByText("Scripts in hooks/")).toBeVisible();
+    await shot(page, "hooks");
+    await page.getByRole("link", { name: /validate-git-ops\.py/ }).first().click();
+    await expect(page).toHaveURL(/\/global\/hooks\/validate-git-ops\.py$/);
+    await expect(page.getByText("Hooks / validate-git-ops.py")).toBeVisible();
+    await expect(page.getByRole("button", { name: "New script" })).toBeVisible();
+    await expect(page.locator("textarea")).toHaveValue(/python3/);
+  });
+
+  test("hooks-empty", async ({ page }) => {
+    await page.goto(`${projectUrl("reporting-api")}/hooks`);
+    await expect(page.getByText("No hooks in this scope")).toBeVisible();
+    await shot(page, "hooks-empty");
+  });
 });

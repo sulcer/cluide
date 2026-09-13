@@ -2,6 +2,7 @@ import { Navigate } from "react-router";
 import { screenDef, screenUrl } from "@/lib/routes";
 import { useRoute } from "@/lib/useRoute";
 import { FilesScreen } from "./FilesScreen";
+import { HooksScreen } from "./HooksScreen";
 import { SettingsScreen } from "./SettingsScreen";
 
 export function Screen() {
@@ -13,7 +14,7 @@ export function Screen() {
   const key = `${scope}/${def.id}`;
   switch (def.id) {
     case "hooks":
-      return file === undefined ? <Soon key={key} name="Hooks" /> : <FilesScreen key={`${key}/${file}`} scope={scope} kind="hooks" file={file} />;
+      return file === undefined ? <HooksScreen key={key} scope={scope} /> : <FilesScreen key={`${key}/${file}`} scope={scope} kind="hooks" file={file} />;
     case "settings":
       return <SettingsScreen key={key} scope={scope} />;
     case "mcp":
