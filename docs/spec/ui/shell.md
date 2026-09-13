@@ -83,7 +83,8 @@ top 96px, centred, `--popover`, 1px `--border`, radius 8px, `--shadow`.
 - Groups: **Go to**, one item per navigation item shown with its `⌘n` and the route as hint.
   **Switch scope**, the first five projects, or every match when the query is not empty, path as
   hint. **Open file**, the last four files opened, from `localStorage`, `History` icon, path as
-  hint. **Actions**: `Toggle theme` with `⌘⇧T`, `Add server`.
+  hint. **Actions**: `Toggle theme`, `Add server`. Changes:
+  [`2026-09-13-keyboard-and-cursor-after-hands-on-testing.md`](../../adr/2026-09-13-keyboard-and-cursor-after-hands-on-testing.md)
 - Matching is case-insensitive on label and hint; a group with no matches disappears; no matches at
   all shows `No results for “<query>”` centred, 12px muted.
 - Footer 32px, 11px muted: `↑↓ move`, `↵ open`, and `<scope> scope` on the right.

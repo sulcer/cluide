@@ -88,7 +88,7 @@ function ScopeItem(props: { icon: typeof Folder; name: string; path: string; sel
       value={props.path === "" ? "Global" : props.name}
       keywords={[props.path]}
       onSelect={props.onSelect}
-      className={cn("flex min-h-9 cursor-default items-start gap-2 rounded-sm px-2 py-1 outline-none select-none", props.selected && "bg-accent", props.missing && "opacity-50")}
+      className={cn("flex min-h-9 items-start gap-2 rounded-sm px-2 py-1 outline-none select-none", props.selected && "bg-accent", props.missing && "opacity-50")}
     >
       <props.icon className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
       <span className="min-w-0 flex-1">

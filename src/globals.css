@@ -200,4 +200,7 @@
   .selected {
     box-shadow: inset 2px 0 0 var(--foreground);
   }
+  button:not(:disabled), [role="button"]:not([aria-disabled="true"]), [role="option"], [role="switch"]:not(:disabled), a[href], label[for] {
+    cursor: pointer;
+  }
 }
