@@ -53,17 +53,31 @@ test.describe("render", () => {
     await expect(page).toHaveURL(/\/global\/plugins$/);
   });
 
-  test("shortcuts: ⌘n follows the visible items and ⌘⇧T flips the theme", async ({ page }) => {
+  test("shortcuts: ⌘n follows the visible items and the theme flips from the menu", async ({ page }) => {
     await page.goto("/global/settings");
     await page.keyboard.press("ControlOrMeta+9");
     await expect(page).toHaveURL(/\/global\/plugins$/);
     await page.goto(`${projectUrl("fetcher")}/settings`);
     await page.keyboard.press("ControlOrMeta+8");
     await expect(page).toHaveURL(/\/mcp$/);
-    await page.keyboard.press("ControlOrMeta+Shift+t");
-    await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
-    await page.keyboard.press("ControlOrMeta+Shift+t");
+    await page.keyboard.press("ControlOrMeta+Shift+t"); // Chrome's reopen-closed-tab; the page must ignore it
     await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+    await page.keyboard.press("ControlOrMeta+k");
+    await page.keyboard.type("Toggle theme");
+    await page.keyboard.press("Enter");
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+    await page.getByRole("button", { name: "Toggle theme" }).click();
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  });
+
+  test("clickable controls show the pointer cursor", async ({ page }) => {
+    await page.goto("/global/rules");
+    const cursor = (locator: ReturnType<typeof page.locator>) => locator.evaluate((el) => getComputedStyle(el).cursor);
+    await expect.poll(() => cursor(page.getByRole("button", { name: "security.md" }))).toBe("pointer");
+    await expect.poll(() => cursor(page.getByRole("link", { name: /^Settings/ }))).toBe("pointer");
+    await expect.poll(() => cursor(page.getByRole("button", { name: "Toggle theme" }))).toBe("pointer");
+    await page.keyboard.press("ControlOrMeta+k");
+    await expect.poll(() => cursor(page.getByRole("option", { name: /^Memory/ }))).toBe("pointer");
   });
 
   test("offline banner", async ({ page }) => {

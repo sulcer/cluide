@@ -98,6 +98,7 @@ through fontsource so the app looks the same offline; system fallbacks are
 | Selected row or item | `--accent` background (`--sidebar-accent` in the sidebar) plus `box-shadow: inset 2px 0 0 var(--foreground)` |
 | Hovered row or item | background only, `--accent` or `--sidebar-accent`; text stays as it was |
 | Dimmed row | opacity 0.5 (shadowed MCP entries), 0.55 (disabled plugins), 0.6 (disabled Save, read-only textarea) |
+| Cursor | `pointer` on every enabled button, link, option, switch and `label[for]`; Tailwind v4's preflight leaves buttons at `default`, so one base rule in `globals.css` sets it. Changes: [`2026-09-13-keyboard-and-cursor-after-hands-on-testing.md`](../../adr/2026-09-13-keyboard-and-cursor-after-hands-on-testing.md) |
 
 ## Icons
 

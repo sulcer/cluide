@@ -4,9 +4,8 @@ import type { Scope } from "@shared/api";
 import { emit } from "@/lib/events";
 import { isMod } from "@/lib/keys";
 import { screenUrl, visibleScreens } from "@/lib/routes";
-import { toggleTheme } from "@/lib/theme";
 
-// ⌘K, ⌘S, ⌘1-9, ⌘⇧T and Esc. Radix layers take Esc first (document, capture) and
+// ⌘K, ⌘S, ⌘1-9 and Esc. No ⌘⇧ chord: Chrome acts on those before the page sees them. Radix layers take Esc first (document, capture) and
 // preventDefault when they dismiss, so an Esc that reaches here with nothing open discards edits.
 export function useShortcuts(scope: Scope, toggleMenu: () => void): void {
   const navigate = useNavigate();
@@ -16,9 +15,6 @@ export function useShortcuts(scope: Scope, toggleMenu: () => void): void {
       if (isMod(e) && key === "k") {
         e.preventDefault();
         toggleMenu();
-      } else if (isMod(e) && e.shiftKey && key === "t") {
-        e.preventDefault();
-        toggleTheme();
       } else if (isMod(e) && key === "s") {
         e.preventDefault();
         emit("cluide:save");

@@ -83,7 +83,7 @@ export function CommandMenu({ open, onOpenChange, scope, projects }: Props) {
             )}
             {actionCount > 0 && (
               <Group heading="Actions">
-                <Item icon={theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />} label="Toggle theme" kbd={`${MOD}⇧T`} onSelect={() => { close(); toggleTheme(); }} />
+                <Item icon={theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />} label="Toggle theme" onSelect={() => { close(); toggleTheme(); }} />
                 <Item icon={<Plus className="size-4" />} label="Add server" onSelect={() => go(screenUrl(scope, "mcp"), { primary: true })} />
               </Group>
             )}
@@ -114,7 +114,7 @@ function Item(props: { icon: React.ReactNode; label: string; hint?: string; kbd?
       value={props.label}
       keywords={props.hint ? [props.hint] : undefined}
       onSelect={props.onSelect}
-      className="flex h-8 cursor-default items-center gap-2.5 rounded-sm px-2 text-[13px] outline-none select-none data-[selected=true]:bg-accent"
+      className="flex h-8 items-center gap-2.5 rounded-sm px-2 text-[13px] outline-none select-none data-[selected=true]:bg-accent"
     >
       <span className="text-muted-foreground">{props.icon}</span>
       <span>{props.label}</span>

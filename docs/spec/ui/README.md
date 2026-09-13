@@ -48,7 +48,10 @@ without hunting for a focusable element.
 | `Esc` | Close the command menu, dialog, sheet, scope switcher or new-file input; with none open, discard edits |
 | `⌘1` to `⌘9` | Go to the nth item of the sidebar as currently shown; the numbers shift when global-only items hide |
 | `j` / `k` | Move the selection in a file list when focus is not in an input |
-| `⌘⇧T` | Toggle theme, from the command menu |
+
+The theme toggle has no chord: the sidebar footer button and the command menu's `Toggle theme` action
+are its two paths. Chrome acts on every `⌘⇧` letter before the page sees it, so no such chord can
+work there. Changes: [`2026-09-13-keyboard-and-cursor-after-hands-on-testing.md`](../../adr/2026-09-13-keyboard-and-cursor-after-hands-on-testing.md)
 
 `⌘` is `Ctrl` outside macOS.
 
