@@ -1,6 +1,6 @@
 import { Navigate } from "react-router";
+import { useRoute } from "@/hooks/useRoute";
 import { screenDef, screenUrl } from "@/lib/routes";
-import { useRoute } from "@/lib/useRoute";
 import { FilesScreen } from "./FilesScreen";
 import { HooksScreen } from "./HooksScreen";
 import { McpScreen } from "./McpScreen";

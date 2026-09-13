@@ -1,7 +1,7 @@
 import { CircleAlert } from "lucide-react";
 import { type Ref, useCallback, useEffect, useRef } from "react";
 import { cn } from "cn";
-import type { DraftError } from "./useDraft";
+import type { DraftError } from "@/hooks/useDraft";
 
 interface Props {
   value: string;

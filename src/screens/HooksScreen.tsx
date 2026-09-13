@@ -2,10 +2,10 @@ import type { FileEntry, Scope, SettingsDoc } from "@shared/api";
 import { ArrowRight, FileCode } from "lucide-react";
 import { Link } from "react-router";
 import { q } from "@/api/client";
-import { useResource } from "@/api/useResource";
 import { Centered } from "@/components/Centered";
 import { LoadFailed } from "@/components/LoadFailed";
 import { SkeletonRows } from "@/components/Skeleton";
+import { useResource } from "@/hooks/useResource";
 import { flattenHooks, language, scriptFor } from "@/lib/hooks";
 import { screenUrl, scopeUrl } from "@/lib/routes";
 

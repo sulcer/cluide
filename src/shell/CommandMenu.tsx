@@ -6,11 +6,12 @@ import { useNavigate } from "react-router";
 import { Kbd } from "@/components/Kbd";
 import { Command, CommandEmpty, CommandList } from "@/components/ui/command";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { useTheme } from "@/hooks/useTheme";
 import { ScreenIcon } from "@/lib/icons";
 import { MOD } from "@/lib/keys";
 import { readRecent } from "@/lib/recent";
 import { screenUrl, scopeName, visibleScreens } from "@/lib/routes";
-import { toggleTheme, useTheme } from "@/lib/theme";
+import { toggleTheme } from "@/lib/theme";
 import { contains } from "./ScopeSwitcher";
 
 interface Props { open: boolean; onOpenChange: (open: boolean) => void; scope: Scope; projects: Project[] }

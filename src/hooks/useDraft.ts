@@ -1,7 +1,7 @@
 import type { WriteResult } from "@shared/api";
 import { useEffect, useState } from "react";
 import type { ApiError } from "@/api/client";
-import { useWindowEvent } from "@/lib/events";
+import { useWindowEvent } from "@/hooks/useWindowEvent";
 import { toast } from "@/lib/toast";
 
 export interface Loaded { content: string; etag: string | null; draft?: string }

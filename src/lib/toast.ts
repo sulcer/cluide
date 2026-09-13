@@ -1,5 +1,3 @@
-import { useSyncExternalStore } from "react";
-
 export interface Toast {
   id: number;
   title: string;
@@ -27,8 +25,9 @@ export function dismiss(): void {
   notify();
 }
 
-export const useToast = (): Toast | null =>
-  useSyncExternalStore((l) => {
-    listeners.add(l);
-    return () => listeners.delete(l);
-  }, () => current);
+export const currentToast = (): Toast | null => current;
+
+export const subscribe = (listener: () => void): (() => void) => {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+};

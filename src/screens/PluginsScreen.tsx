@@ -1,12 +1,12 @@
 import type { Plugin, WriteResult } from "@shared/api";
 import { useState } from "react";
 import { type ApiError, api } from "@/api/client";
-import { useResource } from "@/api/useResource";
 import { ProvidesBadge } from "@/components/Badge";
 import { SearchInput } from "@/components/Input";
 import { LoadFailed } from "@/components/LoadFailed";
 import { SkeletonRows } from "@/components/Skeleton";
 import { Switch } from "@/components/Switch";
+import { useResource } from "@/hooks/useResource";
 import { toast } from "@/lib/toast";
 import { cn } from "cn";
 

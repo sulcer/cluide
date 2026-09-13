@@ -11,7 +11,7 @@ import { DeleteDialog } from "@/editor/DeleteDialog";
 import { DiffSheet } from "@/editor/DiffSheet";
 import { Editor } from "@/editor/Editor";
 import { SaveBar } from "@/editor/SaveBar";
-import { type Loaded, type SaveFn, useDraft } from "@/editor/useDraft";
+import { type Loaded, type SaveFn, useDraft } from "@/hooks/useDraft";
 import { jsonText } from "@/lib/json";
 import { readOnly } from "@/lib/mcp";
 import { toast } from "@/lib/toast";

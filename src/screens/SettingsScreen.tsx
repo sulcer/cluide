@@ -2,7 +2,6 @@ import type { PutSettingsResult, Scope, SchemaError, SettingsDoc, SettingsFile, 
 import { CircleAlert } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 import { ApiError, api, q } from "@/api/client";
-import { useResource } from "@/api/useResource";
 import { Button } from "@/components/Button";
 import { Centered } from "@/components/Centered";
 import { LoadFailed } from "@/components/LoadFailed";
@@ -10,7 +9,8 @@ import { ConflictDialog } from "@/editor/ConflictDialog";
 import { DiffSheet } from "@/editor/DiffSheet";
 import { Editor } from "@/editor/Editor";
 import { SaveBar } from "@/editor/SaveBar";
-import { type Loaded, type SaveFn, useDraft } from "@/editor/useDraft";
+import { type Loaded, type SaveFn, useDraft } from "@/hooks/useDraft";
+import { useResource } from "@/hooks/useResource";
 import { describeJsonError, jsonText } from "@/lib/json";
 import { cn } from "cn";
 import { WarningsPanel } from "./WarningsPanel";

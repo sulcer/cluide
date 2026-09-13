@@ -1,5 +1,6 @@
 import { Check, CircleAlert, X } from "lucide-react";
-import { dismiss, useToast } from "@/lib/toast";
+import { useToast } from "@/hooks/useToast";
+import { dismiss } from "@/lib/toast";
 
 export function Toaster() {
   const t = useToast();

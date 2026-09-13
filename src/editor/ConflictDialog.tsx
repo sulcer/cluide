@@ -3,7 +3,7 @@ import { useRef } from "react";
 import { Button } from "@/components/Button";
 import { Kbd } from "@/components/Kbd";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
-import type { Conflict } from "./useDraft";
+import type { Conflict } from "@/hooks/useDraft";
 
 interface Props { conflict: Conflict | undefined; name: string; path: string; onReload: () => void; onOverwrite: () => void; onDismiss: () => void }
 

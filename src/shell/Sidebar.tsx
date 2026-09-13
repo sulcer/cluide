@@ -5,10 +5,11 @@ import { Button } from "@/components/Button";
 import { IconButton } from "@/components/IconButton";
 import { Kbd } from "@/components/Kbd";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { useTheme } from "@/hooks/useTheme";
 import { ScreenIcon } from "@/lib/icons";
 import { MOD } from "@/lib/keys";
 import { type ScreenDef, type ScreenId, screenUrl, visibleScreens } from "@/lib/routes";
-import { toggleTheme, useTheme } from "@/lib/theme";
+import { toggleTheme } from "@/lib/theme";
 import { cn } from "cn";
 import { ScopeSwitcher } from "./ScopeSwitcher";
 

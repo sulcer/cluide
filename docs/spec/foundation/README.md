@@ -86,21 +86,24 @@ cluide/
     tsconfig.json         # the app's own tsconfig: DOM + JSX types, paths relative to src/
     vite-env.d.ts         # Vite's ambient client types
     main.tsx, router.tsx, globals.css
-    api/                  # client.ts, useResource.ts
-    lib/                  # pure: routes, diff, frontmatter, hooks, mcp. React or browser helpers:
-                           # useRoute, icons, keys, json, events, storage, theme, toast, recent.
+    api/                  # client.ts
+    hooks/                # every React hook: useResource, useDraft (the save-state machine),
+                           # useRoute, useShortcuts, useWindowEvent, useToast, useTheme
+    lib/                  # pure: routes, diff, frontmatter, hooks, mcp. Browser helpers: icons,
+                           # keys, json, events, storage, theme, toast, recent.
     components/           # Button, Input, Badge, Kbd, IconButton, Skeleton, Centered, Toaster
     components/ui/        # shadcn (generated)
     shell/                # Shell, Sidebar, ScopeSwitcher, Header, OfflineBanner, CommandMenu
-    editor/                # useDraft (the save-state machine), SaveBar, Editor, DiffSheet,
-                           # ConflictDialog, DeleteDialog — shared by every editing screen
+    editor/                # SaveBar, Editor, DiffSheet, ConflictDialog, DeleteDialog — shared by
+                           # every editing screen
     screens/               # Screen (picks a screen from the route) plus one file per screen
     tests/                 # bun test, mirroring src/: tests/lib/*.test.ts
 ```
 
 Rules for growth: one file per screen under `screens/`, sharing `editor/` for editing and `shell/`
 for layout; one module per resource under `server/resources/`; both sides import types only from
-`shared/api.ts`. Tests live in `<package>/tests/`, mirroring the package.
+`shared/api.ts`. Tests live in `<package>/tests/`, mirroring the package; React hooks live in
+`src/hooks/`.
 
 ## Topic files
 
