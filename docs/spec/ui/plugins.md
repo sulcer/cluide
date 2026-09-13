@@ -1,6 +1,6 @@
 # Plugins screen
 
-Status: Stable · Planned · 2026-09-12 · Installed plugins and their enable switch.
+Status: Stable · Built · 2026-09-12 · Installed plugins and their enable switch.
 
 ## At a glance
 

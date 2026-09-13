@@ -1,6 +1,6 @@
 # Tokens
 
-Status: Stable · Planned · 2026-09-12 · The colours, type, spacing, radii, fonts and icons every screen is built from.
+Status: Stable · Built · 2026-09-12 · The colours, type, spacing, radii, fonts and icons every screen is built from.
 
 ## At a glance
 
@@ -75,7 +75,7 @@ through fontsource so the app looks the same offline; system fallbacks are
 - Borders are 1px `--border` (`--sidebar-border` inside the sidebar, `--input` on inputs).
 - Shadows only on floating layers: `--shadow` on the scope popover, command menu, sheet, dialogs and
   toasts. Segmented-control selections carry `0 1px 2px rgba(0,0,0,.2)`.
-- Overlays: command menu `rgba(0,0,0,.4)`, sheets `.3`, dialogs `.45`.
+- Overlays: the command menu shares the dialog overlay, `rgba(0,0,0,.45)`; sheets are `.3`.
 - Focus: `2px solid var(--ring)` outline, offset `-1px` on inputs and textareas, `1px` on buttons,
   only for `:focus-visible` on buttons.
 

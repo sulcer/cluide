@@ -1,6 +1,6 @@
 # Hooks screen
 
-Status: Stable · Planned · 2026-09-12 · What fires when, read from settings, with links into the scripts.
+Status: Stable · Built · 2026-09-12 · What fires when, read from settings, with links into the scripts.
 
 ## At a glance
 

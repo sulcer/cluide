@@ -1,6 +1,6 @@
 # Editing
 
-Status: Stable · Planned · 2026-09-12 · The file editor shared by memory, rules, agents, skills, commands, hook scripts and keybindings, and the save experience every editor in cluide follows.
+Status: Stable · Built · 2026-09-12 · The file editor shared by memory, rules, agents, skills, commands, hook scripts and keybindings, and the save experience every editor in cluide follows.
 
 ## At a glance
 

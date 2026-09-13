@@ -1,6 +1,6 @@
 # Settings screen
 
-Status: Stable · Planned · 2026-09-12 · The two settings files of a scope in a JSON editor with a warnings panel.
+Status: Stable · Built · 2026-09-12 · The two settings files of a scope in a JSON editor with a warnings panel.
 
 ## At a glance
 

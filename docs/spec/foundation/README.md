@@ -1,7 +1,6 @@
 # Foundation
 
-Status: Stable · Partial · 2026-09-12 · The stack, repository shape and safety rules every part of cluide builds on.
-Not built: the Vite frontend, the dev proxy, the Playwright smoke test.
+Status: Stable · Built · 2026-09-12 · The stack, repository shape and safety rules every part of cluide builds on.
 
 ## At a glance
 
@@ -44,7 +43,7 @@ files on its own schedule, which is why conflict detection exists.
 | Routing | react-router | Per-screen URLs that carry the scope, deep links, back and forward. |
 | Validation | ajv | `settings.json` has a published JSON schema on SchemaStore (142 properties). |
 | Diff | `git diff --no-index` via `Bun.spawn` | Always present on a dev box; no diff library. |
-| Tests | `bun test` for server modules | Playwright smoke test later. |
+| Tests | `bun test` for server modules | Playwright covers the frontend: a smoke test plus a render spec for visual review. |
 
 Vite over Bun's own bundler is decided in [`2026-09-12-vite-builds-the-page.md`](../../adr/2026-09-12-vite-builds-the-page.md).
 

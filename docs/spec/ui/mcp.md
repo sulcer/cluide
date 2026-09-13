@@ -1,6 +1,6 @@
 # MCP servers screen
 
-Status: Stable · Planned · 2026-09-12 · The merged server list, the server sheet, the add dialog, and approval.
+Status: Stable · Built · 2026-09-12 · The merged server list, the server sheet, the add dialog, and approval.
 
 ## At a glance
 
