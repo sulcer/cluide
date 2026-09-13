@@ -18,7 +18,7 @@ export function useResource<T>(url: string | null) {
     if (url === null) return;
     let live = true;
     api.get<T>(url).then(
-      (d) => { if (live) setData(d); },
+      (d) => { if (live) { setData(d); setError(undefined); } },
       (e) => { if (live) setError(e as ApiError); },
     );
     return () => { live = false; };

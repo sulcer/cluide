@@ -160,4 +160,22 @@ test.describe("render", () => {
     await expect(page.getByRole("button", { name: "security.md" })).toHaveClass(/selected/);
     await expect(page.locator("textarea")).toHaveValue(/Never paste raw logs into chat/);
   });
+
+  test("a failed read clears once retried", async ({ page }) => {
+    await page.goto("/global/rules");
+    // A boolean gate, not a one-shot counter: the reload can fire the file GET more than once in
+    // quick succession, and a counter races on which request lands "first". Fulfilling 404 for
+    // every request while failing is true is idempotent regardless of how many fire.
+    let failing = true;
+    await page.route("**/api/file?**", async (route) => {
+      if (failing) await route.fulfill({ status: 404, contentType: "application/json", body: JSON.stringify({ error: { code: "not_found", message: "gone" } }) });
+      else await route.continue();
+    });
+    await page.reload();
+    await expect(page.getByText("git-workflow.md could not be read")).toBeVisible();
+    failing = false;
+    await page.evaluate(() => window.dispatchEvent(new Event("cluide:retry")));
+    await expect(page.locator("textarea")).toBeVisible();
+    await expect(page.getByText("could not be read")).toHaveCount(0);
+  });
 });

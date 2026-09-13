@@ -76,7 +76,7 @@ export function CommandMenu({ open, onOpenChange, scope, projects }: Props) {
             {recentCount > 0 && (
               <Group heading="Open file">
                 {recent.map((r) => (
-                  <Item key={r.url} icon={<History className="size-4" />} label={r.label} hint={r.path} onSelect={() => go(r.url, { path: r.path })} />
+                  <Item key={r.path} icon={<History className="size-4" />} label={r.label} hint={r.path} onSelect={() => go(r.url, { path: r.path })} />
                 ))}
               </Group>
             )}
