@@ -10,12 +10,11 @@
     "skipLibCheck": true,
     "verbatimModuleSyntax": true,
     "allowImportingTsExtensions": true,
-    "types": ["vite/client"],
+    "types": ["vite/client", "bun"],
     "paths": {
-      "@shared/*": ["./shared/*"],
-      "@/*": ["./src/*"]
+      "@shared/*": ["../shared/*"],
+      "@/*": ["./*"]
     }
   },
-  "include": ["src", "shared"],
-  "exclude": ["src/**/*.test.ts"]
+  "include": [".", "../shared"]
 }
