@@ -140,9 +140,7 @@ export function McpAddDialog({ open, onOpenChange, scope, onAdded }: Props) {
   );
 }
 
-// `plain` renders a <div>+<span> caption instead of a <label>: a <label> forwards a click
-// anywhere in it (including the caption text) to its first control, which for a segmented
-// button group would activate that button instead of just focusing it.
+// `plain`: a <label> would forward a caption click to the first segmented button and press it.
 function Field({ label, hint, children, plain }: { label: string; hint?: string; children: React.ReactNode; plain?: boolean }) {
   const Caption = plain ? "div" : "label";
   return (

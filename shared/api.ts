@@ -1,5 +1,4 @@
-// The HTTP contract between server/ and src/. docs/spec/api is the authority;
-// when this file and the spec disagree, the spec wins and this file is fixed.
+// Mirrors docs/spec/api; when the two disagree, the spec wins.
 
 export type Scope = "global" | string;
 
@@ -20,14 +19,12 @@ export interface WriteResult {
   diff: string;
 }
 
-// projects
 export interface Project {
   path: string;
   name: string;
   exists: boolean;
 }
 
-// files
 export type FileKind =
   | "memory"
   | "rules"
@@ -60,7 +57,6 @@ export interface PostFileBody {
   content: string;
 }
 
-// settings
 export type SettingsFile = "settings" | "local";
 
 export interface SchemaError {
@@ -89,7 +85,6 @@ export interface PutSettingsResult extends WriteResult {
   errors: SchemaError[];
 }
 
-// mcp
 export type McpScope = "local" | "project" | "user" | "plugin" | "managed";
 export type McpTarget = "local" | "project" | "user";
 
@@ -122,7 +117,6 @@ export interface McpApprovalBody {
   enabled: boolean;
 }
 
-// plugins
 export interface Plugin {
   id: string;
   name: string;

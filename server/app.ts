@@ -17,7 +17,6 @@ const DIST = join(import.meta.dir, "..", "dist");
 export function startServer(port: number, dist: string = DIST) {
   let actualPort = port;
 
-  // Wraps a resource call: guard, run, JSON, and never a raw exception.
   const handle: Handle = (fn, status = 200) => async (req) => {
     try {
       assertTrusted(req, actualPort);
@@ -55,7 +54,6 @@ export const optional = (req: Request, name: string): string | undefined =>
 
 export const noContent = (): Response => new Response(null, { status: 204 });
 
-// Resource routes are added here task by task.
 function routes(handle: Handle) {
   return {
     "/api/projects": { GET: handle(() => listProjects()) },

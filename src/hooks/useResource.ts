@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from "react";
 import { api, type ApiError } from "@/api/client";
 import { useWindowEvent } from "@/hooks/useWindowEvent";
 
-// One resource per screen, loaded on mount, reloaded on demand or on the offline banner's Retry.
 export function useResource<T>(url: string | null) {
   const [data, setData] = useState<T | undefined>(undefined);
   const [error, setError] = useState<ApiError | undefined>(undefined);

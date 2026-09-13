@@ -2,8 +2,7 @@ import type { ComponentProps } from "react";
 import { cn } from "cn";
 import { Switch as ShadcnSwitch } from "@/components/ui/switch";
 
-// tokens.md Controls: 32×18, 14px thumb with a drop shadow. The generated component alone is
-// 32×18.4 with an unshadowed 16px thumb; every call site wants the spec's numbers, once.
+// tokens.md Controls: 32×18 with a 14px shadowed thumb; shadcn's default is 32×18.4 with a 16px one.
 export function Switch({ className, ...props }: ComponentProps<typeof ShadcnSwitch>) {
   return (
     <ShadcnSwitch

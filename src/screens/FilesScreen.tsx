@@ -32,15 +32,12 @@ export function FilesScreen({ scope, kind, file }: Props) {
   const { claudeDir } = useOutletContext<ShellContext>();
   const list = useResource<FileEntry[]>(`/api/files${q({ scope, kind })}`);
   const [selectedPath, setSelectedPath] = useState<string | undefined>((location.state as { path?: string } | null)?.path);
-  // Reopening a different recent file of the same kind navigates within the same route pattern, so
-  // FilesScreen doesn't remount; re-apply location.state's path on every navigation, not just the first.
+  // Recent files of one kind share a route pattern, so re-apply location.state on every navigation.
   useEffect(() => {
     const p = (location.state as { path?: string } | null)?.path;
     if (p !== undefined) setSelectedPath(p);
   }, [location.key]);
   const [creating, setCreating] = useState(false);
-  // A click, a create, or opening a file directly all focus the editor; j/k browsing must not,
-  // or the next j/k types into the now-focused textarea instead of moving the selection.
   const [focusEditor, setFocusEditor] = useState(true);
   const entries = list.data;
   const selected =
@@ -98,7 +95,6 @@ export function FilesScreen({ scope, kind, file }: Props) {
     list.reload();
   };
 
-  // A network failure is the shell's offline banner, not this screen's own retry state.
   if (list.error !== undefined && list.error.code !== "offline" && entries === undefined) {
     return <LoadFailed what={screenDef(kind)?.label ?? kind} error={list.error} onRetry={list.reload} />;
   }

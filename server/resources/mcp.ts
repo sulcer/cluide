@@ -66,7 +66,6 @@ export function listMcp(scopeArg: string): McpEntry[] {
   return entries.sort((a, b) => a.name.localeCompare(b.name) || rank(a) - rank(b));
 }
 
-// Approval of .mcp.json servers, read from every settings file that may hold the keys.
 function approvalOf(project: string): (name: string) => boolean {
   const files = [
     join(claudeDir(), "settings.json"),

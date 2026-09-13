@@ -39,8 +39,7 @@ export const scopeUrl = (scope: Scope): string =>
 
 export const screenUrl = (scope: Scope, id: ScreenId): string => `${scopeUrl(scope)}/${id}`;
 
-// react-router's matchPath decodes every escape in a param, %2F included, before
-// useParams() sees it, so the project path arrives already as a real path with slashes.
+// react-router decodes every escape, %2F included, before useParams, so the param is already a path.
 export const decodeProject = (param: string): string => param;
 
 export const scopeName = (scope: Scope): string =>

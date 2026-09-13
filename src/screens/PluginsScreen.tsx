@@ -17,7 +17,6 @@ export function PluginsScreen() {
   const shown = plugins?.filter((p) => `${p.name} ${p.marketplace}`.toLowerCase().includes(filter.toLowerCase())) ?? [];
   const enabledCount = plugins?.filter((p) => p.enabled).length ?? 0;
 
-  // A network failure is the shell's offline banner, not this screen's own retry state.
   if (list.error !== undefined && list.error.code !== "offline" && plugins === undefined) {
     return <LoadFailed what="Plugins" error={list.error} onRetry={list.reload} />;
   }
@@ -25,8 +24,7 @@ export function PluginsScreen() {
   const toggle = async (plugin: Plugin, enabled: boolean) => {
     try {
       const result = await api.put<WriteResult>("/api/plugins", { id: plugin.id, enabled, etag: plugin.etag });
-      // Applied only after the PUT resolves (not optimistically), and via an updater rather than
-      // the closed-over `plugins` snapshot, so two quick toggles can't revert each other.
+      // Updater form, not the closed-over snapshot: two quick toggles must not revert each other.
       list.setData((prev) => prev?.map((p) => ({ ...p, etag: result.etag, enabled: p.id === plugin.id ? enabled : p.enabled })));
       toast({ title: `${enabled ? "Enabled" : "Disabled"} ${plugin.name}`, description: "~/.claude/settings.json → enabledPlugins" });
     } catch (e) {

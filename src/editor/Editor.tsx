@@ -15,15 +15,7 @@ interface Props {
 export function Editor({ value, onChange, error, disabled, autoFocus = true, ref }: Props) {
   const local = useRef<HTMLTextAreaElement>(null);
   useEffect(() => {
-    // Autofocus only when nothing that matters has focus. A field that is mid-typing (the
-    // new-file input, another editor) must not be interrupted by a late-mounting editor (its
-    // data arrived after the field was focused). A dialog that does not contain this editor (the
-    // command menu, a conflict) also keeps focus; a dialog that does contain it (the MCP sheet)
-    // does not block, so the editor still focuses itself when it is the thing that opened. A
-    // closing dialog stays mounted with data-state="closed" for its exit animation, so only an
-    // open one counts — for both the dialog check and for what "typing" means: a command-menu
-    // "Open file" selection navigates while the menu's own input still holds DOM focus through its
-    // exit animation, and that stale focus must not block the file's editor from taking it.
+    // A closing dialog holds stale DOM focus through its exit animation, so only an open dialog counts.
     const active = document.activeElement as HTMLElement | null;
     const editorDialog = local.current?.closest('[role="dialog"]');
     const activeDialog = active?.closest('[role="dialog"]');

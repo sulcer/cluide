@@ -84,7 +84,6 @@ function SettingsEditor({ scope, file, onFile, doc, error, onRetry, missing, onW
   const draft = useDraft(loaded, save, NAMES[file]);
   const shownErrors = raw ? [] : (errors ?? doc?.errors ?? []);
 
-  // Moves the caret to the first occurrence of the pointer's last key and scrolls it into the middle.
   const jump = (pointer: string) => {
     const key = pointer.split("/").filter(Boolean).at(-1);
     const ta = textarea.current;
@@ -119,7 +118,6 @@ function SettingsEditor({ scope, file, onFile, doc, error, onRetry, missing, onW
   );
 
   if (doc === undefined) {
-    // A network failure is the shell's offline banner, not this screen's own retry state.
     if (error !== undefined && error.code !== "offline") {
       return (
         <>

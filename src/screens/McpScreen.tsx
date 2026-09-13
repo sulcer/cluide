@@ -27,7 +27,6 @@ export function McpScreen({ scope }: { scope: Scope }) {
   const open = entries?.find((e) => keyOf(e) === openKey);
   const effective = entries?.filter((e) => e.effective).length ?? 0;
 
-  // A network failure is the shell's offline banner, not this screen's own retry state.
   if (list.error !== undefined && list.error.code !== "offline" && entries === undefined) {
     return <LoadFailed what="MCP servers" error={list.error} onRetry={list.reload} />;
   }
@@ -40,8 +39,7 @@ export function McpScreen({ scope }: { scope: Scope }) {
       toast({ title: "Save failed", description: err.status ? `${err.status} · ${err.message}` : err.message, error: true });
       return;
     }
-    // Applied only after the POST resolves (not optimistically), and via an updater rather than
-    // the closed-over `entries` snapshot, so two quick toggles can't revert each other.
+    // Updater form, not the closed-over snapshot: two quick toggles must not revert each other.
     list.setData((prev) => prev?.map((e) => (e === entry ? { ...e, enabled } : e)));
     toast({ title: enabled ? `Approved ${entry.name}` : `Approval removed for ${entry.name}`, description: `${scope}/.claude/settings.local.json` });
   };

@@ -1,7 +1,7 @@
 import { existsSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, test } from "@playwright/test";
-import { homeDir, main, projectUrl, shot, toast } from "./helpers";
+import { homeDir, main, projectUrl, shot, toast, toastUnderModal } from "./helpers";
 
 test.describe("render", () => {
   test("shell: fonts load and / redirects", async ({ page }) => {
@@ -19,10 +19,8 @@ test.describe("render", () => {
   test("shell-collapsed", async ({ page }) => {
     await page.goto("/global/settings");
     await page.getByRole("button", { name: "Toggle sidebar" }).click();
-    // Rail mode drops the <nav> landmark (the group labels move into it); the rail's own
-    // icon-only links carry the same accessible name, so scope to <nav> to detect collapse.
+    // Rail mode drops the <nav> landmark, so a link missing from <nav> proves the collapse.
     await expect(page.locator("nav").getByRole("link", { name: "Settings" })).toHaveCount(0);
-    // The rail still shows the item, now as an icon-only link labelled by its accessible name.
     await expect(page.getByRole("link", { name: "Settings" })).toBeVisible();
     await shot(page, "shell-collapsed");
     await page.reload();
@@ -182,9 +180,7 @@ test.describe("render", () => {
 
   test("a failed read clears once retried", async ({ page }) => {
     await page.goto("/global/rules");
-    // A boolean gate, not a one-shot counter: the reload can fire the file GET more than once in
-    // quick succession, and a counter races on which request lands "first". Fulfilling 404 for
-    // every request while failing is true is idempotent regardless of how many fire.
+    // A boolean gate, not a counter: the reload may fire the GET more than once.
     let failing = true;
     await page.route("**/api/file?**", async (route) => {
       if (failing) await route.fulfill({ status: 404, contentType: "application/json", body: JSON.stringify({ error: { code: "not_found", message: "gone" } }) });
@@ -200,8 +196,7 @@ test.describe("render", () => {
 
   test("editor-diff", async ({ page }) => {
     await page.goto("/global/rules");
-    // security.md, not the default first file: no other case edits it, so the diff below is
-    // exactly +1 regardless of what else in the suite has run.
+    // security.md: no other case edits it, so the diff is exactly +1.
     await page.getByRole("button", { name: "security.md" }).click();
     const ta = page.locator("textarea");
     const before = await ta.inputValue();
@@ -209,8 +204,7 @@ test.describe("render", () => {
     await ta.fill(after);
     await page.keyboard.press("ControlOrMeta+s");
     await page.getByRole("button", { name: "View diff" }).click();
-    // The sheet sits over the still-mounted textarea, which shares the same edited text; scope to
-    // the sheet (a Radix Dialog, role="dialog") so the match is unambiguous.
+    // Scope to the sheet: the still-mounted textarea shares the same text.
     const sheet = page.getByRole("dialog");
     await expect(sheet.getByText("Added by the render spec.")).toBeVisible();
     await expect(sheet.getByText("+1", { exact: true })).toBeVisible();
@@ -238,9 +232,7 @@ test.describe("render", () => {
   test("conflict dialog: Escape leaves the on-disk rewrite untouched", async ({ page }) => {
     await page.goto("/global/memory");
     const ta = page.locator("textarea");
-    // fill(), not click+End+type: whatever the previous test in the suite left CLAUDE.md as, this
-    // always ends with a trailing newline, so a later diff elsewhere in the suite stays a clean
-    // pure addition instead of a "no newline at end of file" line change (see editor-diff's note).
+    // fill() keeps the trailing newline, so later diffs in the suite stay pure additions.
     const before = await ta.inputValue();
     await ta.fill(before.endsWith("\n") ? `${before}mine\n` : `${before}\nmine\n`);
     const claudeMd = join(homeDir(), ".claude", "CLAUDE.md");
@@ -264,11 +256,7 @@ test.describe("render", () => {
     await page.keyboard.press("ControlOrMeta+s");
     await expect(page.getByText("changed on disk")).toBeVisible();
     await page.getByRole("button", { name: "Overwrite" }).click();
-    // The conflict dialog is a Radix modal, which marks the rest of the page (the Toaster
-    // included) aria-hidden while its exit animation plays, so getByRole("status") and
-    // getByText("Saved") (the save bar reads "Saved" too) are both ambiguous or hidden here.
-    // Match the toast's DOM attribute directly, as the mcp-sheet flow does for the same reason.
-    await expect(page.locator('[role="status"]')).toContainText("Saved");
+    await expect(toastUnderModal(page)).toContainText("Saved");
     expect(readFileSync(claudeMd, "utf8")).toBe(edited);
   });
 
@@ -284,25 +272,22 @@ test.describe("render", () => {
     await page.keyboard.press("ControlOrMeta+s");
     await expect(page.getByText("changed on disk")).toBeVisible();
     await page.keyboard.press("Enter");
-    // Radix returns focus to the textarea only after the dialog's exit animation finishes; wait
-    // for the dialog to be gone before typing, or the keystrokes land on its closing button.
+    // Focus returns to the textarea only after the dialog's exit animation; wait for it to be gone.
     await expect(page.getByText("changed on disk")).toHaveCount(0);
     await expect(ta).toHaveValue("");
     await ta.fill("# Back");
     await page.keyboard.press("ControlOrMeta+s");
-    await expect(page.locator('[role="status"]')).toContainText("Saved");
+    await expect(toastUnderModal(page)).toContainText("Saved");
     expect(existsSync(join(homeDir(), ".claude", "rules", "testing.md"))).toBe(true);
   });
 
   test("editor-delete", async ({ page }) => {
     await page.goto("/global/rules");
-    // Its own file, not style.md from "editor-new creates a file": nothing else may depend on
-    // which files editor-new or editor-delete each create.
+    // Its own file: no other case may depend on what editor-new or editor-delete create.
     await page.request.post("/api/file", { headers: { "X-Cluide": "1" }, data: { path: `${homeDir()}/.claude/rules/to-delete.md`, content: "" } });
     await page.reload();
     await page.getByRole("button", { name: "to-delete.md" }).click();
-    // exact: true, unlike every other case here — "to-delete.md" itself contains "delete", so a
-    // substring match on the header's trash button would also match the just-clicked list item.
+    // exact: the just-clicked "to-delete.md" item also matches a "Delete" substring.
     await page.getByRole("button", { name: "Delete", exact: true }).click();
     await expect(page.getByText("Delete to-delete.md?")).toBeVisible();
     await shot(page, "editor-delete");
@@ -324,9 +309,7 @@ test.describe("render", () => {
     await page.getByRole("button", { name: "Delete" }).click();
     await expect(page.getByText("Delete security.md?")).toBeVisible();
     await page.getByRole("button", { name: "Delete", exact: true }).last().click();
-    // The delete dialog stays open (a Radix modal), which marks the rest of the page — including
-    // the Toaster, a sibling of <main> — aria-hidden; getByRole("status") would find nothing even
-    // though the toast is visible, so match its text directly, as every other toast check here does.
+    // The open delete dialog marks the toaster aria-hidden, so match the toast text, not its role.
     await expect(page.getByText("Delete failed")).toBeVisible();
     await expect(page.getByText("409 · security.md changed on disk")).toBeVisible();
     await expect(page.getByText("Delete security.md?")).toBeVisible();
@@ -442,12 +425,7 @@ test.describe("render", () => {
     await expect(page.getByRole("dialog").getByText("config must be valid JSON")).toBeVisible();
     await ta.fill('{\n  "type": "http",\n  "url": "https://mcp.asana.com/mcp",\n  "headers": {}\n}\n');
     await page.keyboard.press("ControlOrMeta+s");
-    // The sheet is a Radix dialog, which marks the rest of the page (the Toaster included)
-    // aria-hidden, so getByRole("status") finds nothing even though the toast is visible. A
-    // plain "Saved" text match is ambiguous here too: the sheet's own now-clean SaveBar reads
-    // "Saved" as well. Match the toast's DOM attribute directly instead, which — unlike
-    // getByRole — isn't filtered by aria-hidden.
-    await expect(page.locator('[role="status"]')).toContainText("Saved");
+    await expect(toastUnderModal(page)).toContainText("Saved");
     await page.keyboard.press("Escape");
 
     await page.getByRole("row", { name: /^corp-proxy/ }).click();
@@ -474,8 +452,7 @@ test.describe("render", () => {
     await page.getByRole("button", { name: "Add server" }).click();
     await expect(page.getByPlaceholder("my-server")).toBeFocused();
     await shot(page, "mcp-add");
-    // Pick a non-default target before the first add, so reopening the dialog afterwards proves
-    // it reset to the scope's default rather than remembering the last choice.
+    // A non-default target first, so the reopened dialog proves it reset to the scope's default.
     await page.getByRole("button", { name: /^Local/ }).click();
     await page.getByPlaceholder("my-server").fill("echo");
     await page.getByPlaceholder("npx").fill("echo");
@@ -561,8 +538,7 @@ test.describe("light", () => {
     await ta.pressSequentially("\nLight render line.");
     await page.keyboard.press("ControlOrMeta+s");
     await page.getByRole("button", { name: "View diff" }).click();
-    // The sheet sits over the still-mounted textarea, which shares the same edited text (see the
-    // "editor-diff" test above); scope to the sheet so the match is unambiguous.
+    // Scope to the sheet: the still-mounted textarea shares the same text.
     await expect(page.getByRole("dialog").getByText("Light render line.")).toBeVisible();
     await shot(page, "light-editor-diff");
   });

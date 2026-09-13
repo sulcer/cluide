@@ -23,14 +23,12 @@ export function FileList({ kind, entries, selected, onSelect, creating, onCreate
   const shown = (entries ?? []).filter((e) => e.name.toLowerCase().includes(filter.toLowerCase()));
   const Icon = kind === "skills" ? Folder : kind === "hooks" ? FileCode : FileText;
 
-  // j/k move the selection while no field has focus.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.key !== "j" && e.key !== "k") || e.metaKey || e.ctrlKey || e.altKey) return;
       const tag = document.activeElement?.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA") return;
-      // An open dialog (the delete confirmation) must keep j/k from moving the selection under it,
-      // which would remount the editor behind the dialog.
+      // An open dialog must keep j/k from moving the selection and remounting the editor beneath it.
       if (document.querySelector('[role="dialog"]:not([data-state="closed"])')) return;
       const i = shown.findIndex((x) => x.path === selected?.path);
       const next = shown[i + (e.key === "j" ? 1 : -1)];

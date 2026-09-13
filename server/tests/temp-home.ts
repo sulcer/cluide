@@ -10,7 +10,6 @@ export interface TempHome {
   cleanup(): void;
 }
 
-// A fresh HOME per test: ~/.claude, ~/.claude.json with one project, ~/repo as that project.
 export function tempHome(): TempHome {
   const home = realpathSync(mkdtempSync(join(tmpdir(), "cluide-test-")));
   const claude = join(home, ".claude");

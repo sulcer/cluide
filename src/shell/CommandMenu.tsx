@@ -31,7 +31,6 @@ export function CommandMenu({ open, onOpenChange, scope, projects }: Props) {
   const shown = query === "" ? projects.slice(0, 5) : projects;
   const recent = readRecent();
 
-  // Matching is case-insensitive on label and hint; a group with no matches disappears.
   const matches = (label: string, hint?: string) => query === "" || contains(label, query, hint ? [hint] : undefined) > 0;
   const screens = visibleScreens(scope);
   const screenCount = screens.filter((def) => matches(def.label, screenUrl(scope, def.id))).length;

@@ -4,7 +4,6 @@ import { dirname, join } from "node:path";
 
 const json = (v: unknown) => `${JSON.stringify(v, null, 2)}\n`;
 
-// A temporary home whose contents mirror the design's sample data. Returns its path.
 export function seedHome(): string {
   const home = mkdtempSync(join(tmpdir(), "cluide-e2e-"));
   const write = (rel: string, content: string) => {
@@ -132,8 +131,7 @@ export function seedHome(): string {
   write("cluide/.claude/settings.json", json({}));
   write("cluide/.claude/settings.local.json", '{\n  "permissions": {\n    "allow": [\n  }\n}\n');
 
-  // A small deterministic draft-07 schema, so the settings warnings are the same on every machine
-  // regardless of what SchemaStore's real schema currently says.
+  // A small fixed schema, so the settings warnings are identical on every machine.
   write(".cluide/schema-cache.json", json({
     $schema: "http://json-schema.org/draft-07/schema#",
     type: "object",

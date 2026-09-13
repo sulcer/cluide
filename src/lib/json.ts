@@ -1,6 +1,5 @@
 export const jsonText = (value: unknown): string => `${JSON.stringify(value, null, 2)}\n`;
 
-// "line 18 · unexpected token }" from the browser's JSON.parse message; "" when the text parses.
 export function describeJsonError(text: string): string {
   try {
     JSON.parse(text);

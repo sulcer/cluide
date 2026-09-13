@@ -4,7 +4,6 @@ import { decodeProject, kindDir, scopeName, scopeUrl, screenUrl, visibleScreens 
 describe("routes", () => {
   test("a project path round-trips through the url", () => {
     expect(scopeUrl("/Users/me/my repo")).toBe("/p/%2FUsers%2Fme%2Fmy%20repo");
-    // react-router's useParams() decodes every escape, %2F included, before cluide sees it
     expect(decodeProject("/Users/me/my repo")).toBe("/Users/me/my repo");
     expect(decodeProject("/Users/me/repo")).toBe("/Users/me/repo");
   });

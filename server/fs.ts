@@ -68,7 +68,7 @@ export function readJsonDoc(path: string): JsonDoc {
   }
 }
 
-// For files cluide itself locates. A file that exists but does not parse is an error the user must fix.
+// An existing file that does not parse is the user's error to fix, not an empty document.
 export function readJsonOrEmpty(path: string): Record<string, any> {
   const doc = readJsonDoc(path);
   if (doc.exists && doc.json === null) {
@@ -77,7 +77,6 @@ export function readJsonOrEmpty(path: string): Record<string, any> {
   return doc.json ?? {};
 }
 
-// Re-read, check the managed slice's etag, mutate, write the whole file.
 export function patchJson(
   path: string,
   slice: (json: any) => unknown,
