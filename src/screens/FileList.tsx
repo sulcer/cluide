@@ -29,6 +29,9 @@ export function FileList({ kind, entries, selected, onSelect, creating, onCreate
       if ((e.key !== "j" && e.key !== "k") || e.metaKey || e.ctrlKey || e.altKey) return;
       const tag = document.activeElement?.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA") return;
+      // An open dialog (the delete confirmation) must keep j/k from moving the selection under it,
+      // which would remount the editor behind the dialog.
+      if (document.querySelector('[role="dialog"]:not([data-state="closed"])')) return;
       const i = shown.findIndex((x) => x.path === selected?.path);
       const next = shown[i + (e.key === "j" ? 1 : -1)];
       if (next) {

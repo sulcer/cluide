@@ -69,6 +69,10 @@ export function FilesScreen({ scope, kind, file }: Props) {
   });
 
   const create = async (name: string) => {
+    if (scope === "global" && claudeDir === null) {
+      toast({ title: "Save failed", description: "the global .claude directory is not known yet", error: true });
+      return;
+    }
     const path = `${dir}/${name}`;
     try {
       await api.post("/api/file", { path, content: "" });

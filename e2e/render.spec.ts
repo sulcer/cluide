@@ -1,4 +1,4 @@
-import { writeFileSync } from "node:fs";
+import { existsSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, test } from "@playwright/test";
 import { homeDir, main, projectUrl, shot, toast } from "./helpers";
@@ -220,6 +220,28 @@ test.describe("render", () => {
     await expect(page.getByText("Reloaded CLAUDE.md from disk")).toBeVisible();
   });
 
+  test("a conflict with no version on disk recovers as a create", async ({ page }) => {
+    await page.goto("/global/rules");
+    await page.getByRole("button", { name: "testing.md" }).click();
+    const ta = page.locator("textarea");
+    await expect(ta).toHaveValue(/Assert whole payloads/);
+    await ta.click();
+    await ta.press("End");
+    await ta.pressSequentially(" edited");
+    unlinkSync(join(homeDir(), ".claude", "rules", "testing.md"));
+    await page.keyboard.press("ControlOrMeta+s");
+    await expect(page.getByText("changed on disk")).toBeVisible();
+    await page.keyboard.press("Enter");
+    // Radix returns focus to the textarea only after the dialog's exit animation finishes; wait
+    // for the dialog to be gone before typing, or the keystrokes land on its closing button.
+    await expect(page.getByText("changed on disk")).toHaveCount(0);
+    await expect(ta).toHaveValue("");
+    await ta.fill("# Back");
+    await page.keyboard.press("ControlOrMeta+s");
+    await expect(page.locator('[role="status"]')).toContainText("Saved");
+    expect(existsSync(join(homeDir(), ".claude", "rules", "testing.md"))).toBe(true);
+  });
+
   test("editor-delete", async ({ page }) => {
     await page.goto("/global/rules");
     await page.getByRole("button", { name: "style.md" }).click();
@@ -349,6 +371,7 @@ test.describe("render", () => {
 
     await page.getByRole("row", { name: /^asana/ }).click();
     await expect(page.getByRole("dialog")).toContainText("Config");
+    await expect(page.getByRole("dialog").locator("textarea")).toBeFocused();
     expect((await page.getByRole("dialog").boundingBox())?.width).toBe(520);
     await shot(page, "mcp-sheet");
     const ta = page.getByRole("dialog").locator("textarea");

@@ -5,7 +5,9 @@ import { useWindowEvent } from "@/lib/events";
 import { toast } from "@/lib/toast";
 
 export interface Loaded { content: string; etag: string | null; draft?: string }
-export interface Conflict { content: string; etag: string }
+// etag is null when the 409 body carries no version at all (the file was deleted on disk); the
+// next save then goes through as a create.
+export interface Conflict { content: string; etag: string | null }
 export interface DraftError { status: number; message: string }
 export type SaveFn = (content: string, etag: string | undefined) => Promise<WriteResult | { etag: string }>;
 
@@ -16,7 +18,10 @@ interface Options {
   savedDescription?: string;
 }
 
-const asConflict = (current: unknown): Conflict => current as Conflict;
+const asConflict = (current: unknown): Conflict => {
+  const c = current as { content: string | null; etag: string | null };
+  return { content: c.content ?? "", etag: c.etag };
+};
 
 export function useDraft(loaded: Loaded | undefined, save: SaveFn, name: string, options: Options = {}) {
   const [base, setBase] = useState<Loaded>();
@@ -29,6 +34,11 @@ export function useDraft(loaded: Loaded | undefined, save: SaveFn, name: string,
 
   useEffect(() => {
     if (loaded === undefined) return;
+    // A re-fetch that returns the version already loaded (identified by its etag, not by content:
+    // formatting can differ) must not touch the draft — it would erase keystrokes typed since, or
+    // reformat text the user already saved. `base` is read from the render this effect runs in,
+    // not from a stale closure: the effect only re-runs when `loaded` itself changes.
+    if (loaded.etag !== null && loaded.etag === base?.etag) return;
     setBase({ content: loaded.content, etag: loaded.etag });
     setContent(loaded.draft ?? loaded.content);
     setError(undefined);
