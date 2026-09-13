@@ -1,8 +1,8 @@
 import type { FileDoc, FileEntry, FileKind, Scope, WriteResult } from "@shared/api";
-import { FileText, Plus, Trash2 } from "lucide-react";
+import { CircleAlert, FileText, Plus, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate, useOutletContext } from "react-router";
-import { api, q } from "@/api/client";
+import { type ApiError, api, q } from "@/api/client";
 import { useResource } from "@/api/useResource";
 import { Button } from "@/components/Button";
 import { Centered } from "@/components/Centered";
@@ -28,6 +28,12 @@ export function FilesScreen({ scope, kind, file }: Props) {
   const { claudeDir } = useOutletContext<ShellContext>();
   const list = useResource<FileEntry[]>(`/api/files${q({ scope, kind })}`);
   const [selectedPath, setSelectedPath] = useState<string | undefined>((location.state as { path?: string } | null)?.path);
+  // Reopening a different recent file of the same kind navigates within the same route pattern, so
+  // FilesScreen doesn't remount; re-apply location.state's path on every navigation, not just the first.
+  useEffect(() => {
+    const p = (location.state as { path?: string } | null)?.path;
+    if (p !== undefined) setSelectedPath(p);
+  }, [location.key]);
   const [creating, setCreating] = useState(false);
   // A click, a create, or opening a file directly all focus the editor; j/k browsing must not,
   // or the next j/k types into the now-focused textarea instead of moving the selection.
@@ -61,7 +67,13 @@ export function FilesScreen({ scope, kind, file }: Props) {
 
   const create = async (name: string) => {
     const path = `${dir}/${name}`;
-    await api.post("/api/file", { path, content: "" });
+    try {
+      await api.post("/api/file", { path, content: "" });
+    } catch (e) {
+      const err = e as ApiError;
+      toast({ title: "Save failed", description: err.status ? `${err.status} · ${err.message}` : err.message, error: true });
+      return;
+    }
     toast({ title: `Created ${name}`, description: path });
     setCreating(false);
     list.reload();
@@ -137,6 +149,15 @@ function FileEditor({ scope, kind, entry, autoFocus, onCreated, onDeleted }: Edi
           Create {entry.name}
         </Button>
       </Centered>
+    );
+  }
+  if (doc.error) {
+    return (
+      <Centered
+        icon={CircleAlert}
+        title={`${entry.name} could not be read`}
+        path={doc.error.status ? `${doc.error.status} · ${doc.error.message}` : doc.error.message}
+      />
     );
   }
   if (!draft.ready) return <div className="flex-1" />;

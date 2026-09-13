@@ -149,4 +149,15 @@ test.describe("render", () => {
     await page.keyboard.press("k");
     await expect(page.getByRole("button", { name: "git-workflow.md" })).toHaveClass(/selected/);
   });
+
+  test("reopening a recent file of the same kind", async ({ page }) => {
+    await page.goto("/global/rules");
+    await page.getByRole("button", { name: "security.md" }).click();
+    await page.getByRole("button", { name: "testing.md" }).click();
+    await page.keyboard.press("ControlOrMeta+k");
+    await page.keyboard.type("security");
+    await page.keyboard.press("Enter");
+    await expect(page.getByRole("button", { name: "security.md" })).toHaveClass(/selected/);
+    await expect(page.locator("textarea")).toHaveValue(/Never paste raw logs into chat/);
+  });
 });
