@@ -1,0 +1,73 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: An existing release tag to publish, for example v0.1.0
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    name: Release pull request
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+      pull-requests: write
+    outputs:
+      created: ${{ steps.rp.outputs.release_created }}
+      tag: ${{ steps.rp.outputs.tag_name }}
+    steps:
+      - id: rp
+        uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
+        with:
+          config-file: .release-please-config.json
+          manifest-file: .release-please-manifest.json
+      - if: steps.rp.outputs.release_created == 'true' && vars.NPM_PUBLISH != 'true'
+        run: echo "::notice::${{ steps.rp.outputs.tag_name }} is released on GitHub; npm publishing is off until the repository variable NPM_PUBLISH is true"
+
+  publish:
+    name: Publish
+    needs: [release]
+    if: always() && (github.event_name == 'workflow_dispatch' || (needs.release.outputs.created == 'true' && vars.NPM_PUBLISH == 'true'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+      id-token: write
+    env:
+      TAG: ${{ inputs.tag || needs.release.outputs.tag }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ env.TAG }}
+      - uses: ./.github/actions/setup
+      - run: bun run typecheck
+      - run: bun run test
+      - run: bun run e2e
+      - run: bun run build
+      - id: pack
+        run: |
+          bun pm pack
+          TGZ=$(ls cluide-*.tgz)
+          VERSION="${TAG#v}"
+          case "$VERSION" in
+            *-alpha.*) DIST_TAG=alpha ;;
+            *-*) DIST_TAG=next ;;
+            *) DIST_TAG=latest ;;
+          esac
+          echo "tgz=$TGZ" >> "$GITHUB_OUTPUT"
+          echo "dist_tag=$DIST_TAG" >> "$GITHUB_OUTPUT"
+      - run: npm install -g npm@11
+      - run: npm publish "${{ steps.pack.outputs.tgz }}" --provenance --access public --tag "${{ steps.pack.outputs.dist_tag }}"
+      - run: gh release upload "$TAG" "${{ steps.pack.outputs.tgz }}" --clobber
+        env:
+          GH_TOKEN: ${{ github.token }}
