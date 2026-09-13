@@ -5,3 +5,4 @@ if (typeof Bun === "undefined") {
   process.exit(1);
 }
 await import("../server/index.ts");
+export {};
