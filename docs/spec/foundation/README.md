@@ -1,7 +1,6 @@
 # Foundation
 
-Status: Stable · Partial · 2026-09-12 · The stack, repository shape and safety rules every part of cluide builds on.
-Not built: the Vite frontend, the dev proxy, the Playwright smoke test.
+Status: Stable · Built · 2026-09-12 · The stack, repository shape and safety rules every part of cluide builds on.
 
 ## At a glance
 
@@ -44,7 +43,7 @@ files on its own schedule, which is why conflict detection exists.
 | Routing | react-router | Per-screen URLs that carry the scope, deep links, back and forward. |
 | Validation | ajv | `settings.json` has a published JSON schema on SchemaStore (142 properties). |
 | Diff | `git diff --no-index` via `Bun.spawn` | Always present on a dev box; no diff library. |
-| Tests | `bun test` for server modules | Playwright smoke test later. |
+| Tests | `bun test` for server modules and pure frontend helpers | Playwright covers the rest of the frontend: a smoke test plus a render spec for visual review. |
 
 Vite over Bun's own bundler is decided in [`2026-09-12-vite-builds-the-page.md`](../../adr/2026-09-12-vite-builds-the-page.md).
 
@@ -55,12 +54,21 @@ added when a concrete need appears, not before.
 
 ```
 cluide/
-  package.json            # single package; scripts: dev, build, start, test
+  package.json            # single package; scripts: dev, build, start, test, typecheck, e2e, render
   vite.config.ts          # @tailwindcss/vite; proxy /api -> 127.0.0.1:8787 with changeOrigin
-  tsconfig.json           # paths: @/* -> src/*, @shared/* -> shared/*
+  index.html              # Vite's entry point; loads src/main.tsx
+  tsconfig.json           # server, shared, scripts, e2e; paths: @/* -> src/*, @shared/* -> shared/*
   components.json         # shadcn
   CLAUDE.md, .claude/rules/
   docs/                   # adr/, spec/, plans/, nice-to-have.md
+  scripts/
+    dev.ts                # spawns the api server and vite, kills both on exit
+    seed-home.ts          # a temp home mirroring the design's sample data, for tests and e2e
+    e2e-server.ts         # seeds a home and runs the server on 8790
+  e2e/
+    playwright.config.ts, helpers.ts
+    render.spec.ts        # one screenshot per spec state, written to e2e/renders/
+    smoke.spec.ts         # load, edit global memory, save, see the diff
   shared/
     api.ts                # request/response types; mirrors docs/spec/api, the spec wins on conflict
   server/
@@ -75,15 +83,24 @@ cluide/
     resources/
       projects.ts, files.ts, settings.ts, mcp.ts, plugins.ts
   src/
-    main.tsx, App.tsx, router.tsx
-    api/client.ts         # fetch wrapper: X-Cluide header, etag, error shape
+    tsconfig.json         # the app's own tsconfig: DOM + JSX types, paths relative to src/
+    vite-env.d.ts         # Vite's ambient client types
+    main.tsx, router.tsx, globals.css
+    api/                  # client.ts, useResource.ts
+    lib/                  # pure, unit tested next to source: routes, diff, frontmatter, hooks, mcp.
+                           # React or browser helpers: useRoute, icons, keys, json, events, storage,
+                           # theme, toast, recent.
+    components/           # Button, Input, Badge, Kbd, IconButton, Skeleton, Centered, Toaster
     components/ui/        # shadcn (generated)
-    components/           # AppSidebar, ScopeSwitcher, SaveBar, DiffView
-    features/             # one folder per screen: files/, settings/, mcp/, plugins/
+    shell/                # Shell, Sidebar, ScopeSwitcher, Header, OfflineBanner, CommandMenu
+    editor/                # useDraft (the save-state machine), SaveBar, Editor, DiffSheet,
+                           # ConflictDialog, DeleteDialog — shared by every editing screen
+    screens/               # Screen (picks a screen from the route) plus one file per screen
 ```
 
-Rules for growth: one folder per screen under `features/`; one module per resource under
-`server/resources/`; both sides import types only from `shared/api.ts`.
+Rules for growth: one file per screen under `screens/`, sharing `editor/` for editing and `shell/`
+for layout; one module per resource under `server/resources/`; both sides import types only from
+`shared/api.ts`.
 
 ## Topic files
 

@@ -1,14 +1,14 @@
 # Testing
 
-Status: Stable · Partial · 2026-09-12 · What is tested, how tests stay off the real configuration, and what is deliberately untested in v1.
-Not built: the Vite frontend, the dev proxy, the Playwright smoke test.
+Status: Stable · Built · 2026-09-12 · What is tested, how tests stay off the real configuration, and what is deliberately untested in v1.
 
 ## At a glance
 
 The server modules are where mistakes cost something: a bad allowlist writes outside `~/.claude`,
 a bad merge shows the wrong MCP server, a bad toggle rewrites `settings.json`. Those are unit
 tested with `bun test` against a temporary home directory, so no test ever touches the real
-`~/.claude`. The frontend gets one browser smoke test once the UI settles, and no unit tests in v1.
+`~/.claude`. The frontend has `bun test` unit tests for its pure helpers, one browser smoke test,
+and a render spec that screenshots every screen state for visual review.
 
 ## Server tests
 
@@ -26,8 +26,11 @@ compare whole payloads, not single fields.
 
 ## Frontend
 
-No unit tests in v1. One Playwright smoke test after the UI is in: load, edit the global memory
-file, save, see the diff. It runs against `bun run start` with a temp `HOME`.
+Pure helpers under `src/lib` (routes, diff, frontmatter, hooks, mcp) have `bun test` tests next to
+them. Components have no unit tests. `e2e/smoke.spec.ts` is the one browser test: load, edit the
+global memory file, save, see the diff. `e2e/render.spec.ts` screenshots every screen state for
+visual review. Both run against `bun run build` served by the real server on a seeded temporary
+home from `scripts/seed-home.ts`; the real `~/.claude` is never touched.
 
 ## Open questions
 

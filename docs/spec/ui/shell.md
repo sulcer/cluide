@@ -1,6 +1,6 @@
 # Shell
 
-Status: Stable · Planned · 2026-09-12 · The sidebar, header, footer, scope switcher, command menu, offline banner and toasts that every screen sits in.
+Status: Stable · Built · 2026-09-12 · The sidebar, header, footer, scope switcher, command menu, offline banner and toasts that every screen sits in.
 
 ## At a glance
 

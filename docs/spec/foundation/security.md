@@ -47,9 +47,10 @@ and the `Host` the server sees is its own.
 ## Dependencies
 
 Few, pinned to exact versions, installed from the lockfile. The runtime set is React, react-router,
-the shadcn primitives, ajv and lucide. Anything new must earn its place against "a few lines of
-code do it". `bun install` runs with the lockfile committed; a diff in the lockfile is reviewed
-like code.
+the shadcn primitives (`radix-ui`, `cmdk`), ajv, lucide, `cn` and `class-variance-authority` (the
+shadcn class helpers), and the two fontsource font packages. Anything new must earn its place
+against "a few lines of code do it". `bun install` runs with the lockfile committed; a diff in the
+lockfile is reviewed like code.
 
 ## Open questions
 

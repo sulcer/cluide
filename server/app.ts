@@ -14,7 +14,7 @@ type Handle = (fn: Handler, status?: number) => (req: Request) => Promise<Respon
 
 const DIST = join(import.meta.dir, "..", "dist");
 
-export function startServer(port: number) {
+export function startServer(port: number, dist: string = DIST) {
   let actualPort = port;
 
   // Wraps a resource call: guard, run, JSON, and never a raw exception.
@@ -37,7 +37,7 @@ export function startServer(port: number) {
     fetch: handle(async (req) => {
       const { pathname } = new URL(req.url);
       if (pathname.startsWith("/api/")) throw new ApiError(404, "not_found", `no route ${pathname}`);
-      return serveStatic(pathname);
+      return serveStatic(dist, pathname);
     }),
   });
   actualPort = server.port ?? port;
@@ -96,12 +96,12 @@ function routes(handle: Handle) {
   };
 }
 
-async function serveStatic(pathname: string): Promise<Response> {
-  if (!existsSync(DIST)) return new Response("No dist/ yet. Run: bun run build", { status: 503 });
-  const index = Bun.file(join(DIST, "index.html"));
+async function serveStatic(dist: string, pathname: string): Promise<Response> {
+  if (!existsSync(dist)) return new Response("No dist/ yet. Run: bun run build", { status: 503 });
+  const index = Bun.file(join(dist, "index.html"));
   if (pathname === "/") return new Response(index);
-  const target = normalize(join(DIST, pathname));
-  if (!target.startsWith(`${DIST}${sep}`)) return new Response(index);
+  const target = normalize(join(dist, pathname));
+  if (!target.startsWith(`${dist}${sep}`)) return new Response(index);
   const file = Bun.file(target);
   return (await file.exists()) ? new Response(file) : new Response(index);
 }

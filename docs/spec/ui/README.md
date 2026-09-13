@@ -1,6 +1,6 @@
 # UI
 
-Status: Stable · Planned · 2026-09-12 · The page: one shell, nine screens, and the save experience every editing screen shares.
+Status: Stable · Built · 2026-09-12 · The page: one shell, ten screens, and the save experience every editing screen shares.
 
 ## At a glance
 
@@ -55,13 +55,19 @@ without hunting for a focusable element.
 ## Data flow
 
 - No global store. Each screen owns its data through a small `useResource(url)` hook that returns
-  `{ data, etag, error, reload }` over `fetch`.
+  `{ data, error, loading, reload, setData }` over `fetch`; every resource carries its etag inside
+  `data`.
+  Cross-cutting signals (save, escape, the header's primary action, offline, retry) are window
+  events, not a store.
 - `src/api/client.ts` adds `X-Cluide: 1` to every mutating call, unwraps the error shape from the
   [`api` conventions](../api/README.md), and throws a typed error the screen can switch on.
 - Types are imported from `shared/api.ts` only, so a server change breaks the page at compile time.
 - Theme, sidebar collapse and the command menu's recent files are per-viewer conveniences kept in
   `localStorage`, read inside `try`, and default sanely when missing.
 - The app version shown in the sidebar footer is `package.json`'s `version`, inlined at build time.
+- A read that fails with a status shows `<screen> could not be loaded`, the status and message, and
+  a `Retry` button that reloads; a network failure shows the offline banner instead.
+  *Changes: [2026-09-13-frontend-build-reconciliations.md](../../adr/2026-09-13-frontend-build-reconciliations.md)*
 
 ## Topic files
 

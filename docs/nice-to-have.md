@@ -94,6 +94,36 @@ trigger to revisit, reference. Add an item when deferring. Remove it when it lan
 
 ---
 
+## Frontend fix-wave loose ends
+
+Found reconciling the built frontend against its specs; each too small for its own section above.
+
+- Reserved browser chords (`⌘⇧T`, `⌘1`–`⌘9`) must be pressed by hand in Chrome once — Playwright's
+  `page.keyboard.press` bypasses the browser's own shortcut layer.
+- e2e per-test independence: seed a home per worker instead of sharing one across the whole run.
+- A linter/formatter (`eslint-plugin-react-hooks`) and the partial `useEffect` dependency arrays it
+  would flag.
+- The `Toaster` is `aria-hidden` behind an open Radix dialog or sheet — portal it outside, or make
+  it `aria-live` from outside.
+- `bun` in `src/tsconfig.json`'s `types` lets a stray `Bun.*` call typecheck in browser code.
+- The MCP sheet's width comes from an explicit `max-width` over the generated `w-3/4` — a comment
+  in `sheet.tsx`, not a cleaner fix.
+- `0 plugins · 0 enabled` shows for one frame while `PluginsScreen` is loading.
+- The plugin toggle e2e case proves only the toggled row's own etag updates.
+- The hooks screen's "Read from" separator is untested with exactly two source files.
+- `flattenHooks` has no test for a plain-string (non-array) `matcher`.
+- The scripts list under the hooks empty state has no render case.
+- Command-menu hint spacing renders at 10px; `shell.md` says 8px.
+- `describeJsonError` shows Chrome's raw `JSON.parse` message, which carries no line number in
+  Chrome.
+- The SchemaStore schema types `managedMcpServers` as an array; the backend reads it as a map.
+- Untested: the `Schema unavailable` badge, a `409` on the settings path, and `Retry` after a
+  failed write.
+- `cluide:save` broadcasts to every mounted draft; today exactly one is ever mounted at a time
+  (also noted as a comment in `src/lib/events.ts`).
+
+---
+
 ## Plugin MCP servers declared in `plugin.json`
 
 - **What:** Read MCP servers a plugin declares inside its `plugin.json` manifest, not only in a
