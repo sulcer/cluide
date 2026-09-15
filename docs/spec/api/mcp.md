@@ -1,6 +1,6 @@
 # MCP resource
 
-Status: Stable · Built · 2026-09-12 · The merged list of MCP servers a scope sees, where each one comes from, and how to change it.
+Status: Stable · Partial · 2026-09-15 · The merged list of MCP servers a scope sees, where each one comes from, and how to change it.
 
 ## At a glance
 
@@ -54,7 +54,7 @@ for it at session start.
 
 | Method and path | Body | Response |
 |---|---|---|
-| `GET /api/mcp?scope` | | `McpEntry[]` |
+| `GET /api/mcp?scope` | | `McpList` |
 | `PUT /api/mcp` | `{ scope, target, name, config, etag? }` | `{ etag, diff }` |
 | `DELETE /api/mcp?scope&target&name&etag` | | `204` |
 | `POST /api/mcp/approval` | `{ scope, name, enabled }` | `{ etag, diff }` |
@@ -63,7 +63,22 @@ for it at session start.
 the entry `name` in that file. The etag is the hash of that file's `mcpServers` slice.
 `POST /api/mcp/approval` is only valid for a `project` entry and a project scope.
 
+A source file that exists but does not parse is skipped: it appears in `errors` with its path and
+the parse message, and every other source is returned as usual. Writes to that file still answer
+`422`, since a file that cannot be parsed cannot be patched. *Planned; `Changes:`
+[`2026-09-15-pre-release-refinements.md`](../../adr/2026-09-15-pre-release-refinements.md).*
+
 ## Shapes
+
+| `McpList` field | Type | Meaning |
+|---|---|---|
+| `entries` | `McpEntry[]` | Every server from the sources that parsed |
+| `errors` | `McpSourceError[]` | One per source file that exists but does not parse; empty when all parse |
+
+| `McpSourceError` field | Type | Meaning |
+|---|---|---|
+| `file` | string | Absolute path of the file |
+| `message` | string | `<basename> is not valid JSON` |
 
 | `McpEntry` field | Type | Meaning |
 |---|---|---|

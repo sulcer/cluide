@@ -1,6 +1,6 @@
 # Editing
 
-Status: Stable · Built · 2026-09-12 · The file editor shared by memory, rules, agents, skills, commands, hook scripts and keybindings, and the save experience every editor in cluide follows.
+Status: Stable · Partial · 2026-09-15 · The file editor shared by memory, rules, agents, skills, commands, hook scripts and keybindings, and the save experience every editor in cluide follows.
 
 ## At a glance
 
@@ -97,7 +97,10 @@ From the header's trash button, or the sheet's `Delete`. Dialog 440px. Title `De
 the name in mono. Body: `This removes <path> from disk.` (for a server: `This removes the server from
 <file>.`) `A copy is kept in ~/.cluide/backups.` Footer, right-aligned: secondary `Cancel` with
 focus, destructive `Delete`. Delete calls `DELETE /api/file?path&etag`, selects the next file,
-toasts `Deleted <name>` with `backup in ~/.cluide/backups`.
+toasts `Deleted <name>` with `backup in ~/.cluide/backups`. A failed delete keeps the dialog open
+and shows `Delete failed · <status> · <message>` in 12px `--destructive` under the body; no toast,
+since an open dialog hides one from assistive technology. *Planned; `Changes:`
+[`2026-09-15-pre-release-refinements.md`](../../adr/2026-09-15-pre-release-refinements.md).*
 
 ## Behaviour rules
 

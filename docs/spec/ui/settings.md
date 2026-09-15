@@ -1,6 +1,6 @@
 # Settings screen
 
-Status: Stable · Built · 2026-09-12 · The two settings files of a scope in a JSON editor with a warnings panel.
+Status: Stable · Partial · 2026-09-15 · The two settings files of a scope in a JSON editor with a warnings panel.
 
 ## At a glance
 
@@ -36,7 +36,7 @@ the name in 11px muted Inter. The save bar sits at the right of the same row.
 180px tall, 1px top border.
 *Changes: [2026-09-13-frontend-build-reconciliations.md](../../adr/2026-09-13-frontend-build-reconciliations.md)*
 
-- Header 32px, padding 0 12px, 12px 500: `Warnings`, the count badge (`--warning` with dark text
+- Header 32px, padding 0 12px, 12px 500: `Warnings`, the count badge (`--secondary` with `--foreground` text
   above zero, `--muted` at zero), then when the read carried `schema: "unavailable"` a dashed badge
   with `TriangleAlert` and `Schema unavailable`, tooltip `Last fetch failed. Validated against the
   cached copy.`; a spacer; and `schemastore.org` in 11px muted, hidden when the badge shows.
@@ -53,7 +53,7 @@ The warnings shown are the `errors` from the last read or the last successful sa
 | State | What shows |
 |---|---|
 | Missing file (`exists: false`) | The editor column centred: `<file> does not exist in this scope` in 500, the path in mono 12px muted, a primary `Create <file>`. Create opens the editor dirty with `{`, an empty indented line and `}`; the first save `PUT`s it. |
-| Three warnings | Count badge amber `3`, rows `/hooks/PreToolUse/0/matcher · must be string`, `/modelSettings · not a documented setting`, `/mcpServers · not a documented setting`. Save stays enabled. |
+| Three warnings | Count badge `3`, rows `/hooks/PreToolUse/0/matcher · must be string`, `/modelSettings · not a documented setting`, `/mcpServers · not a documented setting`. Save stays enabled. |
 | Schema unavailable | The dashed badge next to the count; rows may be empty. |
 | Unparsable | The red banner over the raw text; the panel shows zero warnings because validation needs a parse. |
 
