@@ -24,7 +24,7 @@ export const CountBadge = ({ count }: { count: number }) => (
   <span
     className={cn(
       "inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full px-1 text-[11px] font-medium",
-      count > 0 ? "bg-warning text-black" : "bg-muted text-muted-foreground",
+      count > 0 ? "bg-secondary text-foreground" : "bg-muted text-muted-foreground",
     )}
   >
     {count}
