@@ -91,7 +91,7 @@ export function McpScreen({ scope }: { scope: Scope }) {
                   className={cn(
                     "h-9 cursor-pointer border-b hover:bg-accent",
                     !e.effective && "opacity-50",
-                    keyOf(e) === openKey && "selected bg-accent",
+                    keyOf(e) === openKey && "selected bg-secondary",
                   )}
                 >
                   <td className="truncate px-4">

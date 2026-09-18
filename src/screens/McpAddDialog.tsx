@@ -174,7 +174,11 @@ export function McpAddDialog({ open, onOpenChange, scope, onAdded }: Props) {
               </Field>
             </>
           )}
-          {error && <div className="text-xs text-destructive">{error}</div>}
+          {error && (
+            <div role="alert" className="text-xs text-destructive">
+              {error}
+            </div>
+          )}
         </div>
         <div className="flex items-center justify-end gap-2 border-t px-4 py-3">
           <Button size="md" onClick={() => onOpenChange(false)}>

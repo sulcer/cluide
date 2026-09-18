@@ -25,7 +25,8 @@ unchanged; Tailwind reads them through `@theme inline`. Changes:
 | `--popover-foreground` | `oklch(0.925 0.002 60)` | `oklch(0.2 0.002 60)` |
 | `--primary` | `oklch(0.537 0.158 273)` | `oklch(0.537 0.158 273)` |
 | `--primary-foreground` | `oklch(0.985 0 0)` | `oklch(0.985 0 0)` |
-| `--secondary` | `oklch(0.272 0.002 60)` | `oklch(0.955 0.002 60)` |
+| `--secondary` | `oklch(0.272 0.002 60)` | `oklch(0.93 0.002 60)` |
+| `--secondary-hover` | `oklch(0.3 0.002 60)` | `oklch(0.9 0.002 60)` |
 | `--secondary-foreground` | `oklch(0.925 0.002 60)` | `oklch(0.2 0.002 60)` |
 | `--muted` | `oklch(0.235 0.002 60)` | `oklch(0.96 0.002 60)` |
 | `--muted-foreground` | `oklch(0.65 0.008 60)` | `oklch(0.5 0.008 60)` |
@@ -44,7 +45,7 @@ unchanged; Tailwind reads them through `@theme inline`. Changes:
 | `--sidebar-accent-foreground` | `oklch(0.925 0.002 60)` | `oklch(0.2 0.002 60)` |
 | `--sidebar-border` | `oklch(0.215 0.002 60)` | `oklch(0.9 0.002 60)` |
 | `--sidebar-ring` | `oklch(0.537 0.158 273)` | `oklch(0.537 0.158 273)` |
-| `--link` | `oklch(0.62 0.148 276)` | `oklch(0.48 0.16 273)` |
+| `--link` | `oklch(0.64 0.148 276)` | `oklch(0.48 0.16 273)` |
 | `--success` | `oklch(0.72 0.14 150)` | `oklch(0.55 0.15 150)` |
 | `--warning` | `oklch(0.72 0.17 55)` | `oklch(0.66 0.17 55)` |
 | `--diff-add` | `oklch(0.72 0.14 150 / 0.12)` | `oklch(0.55 0.15 150 / 0.12)` |
@@ -86,7 +87,7 @@ through fontsource so the app looks the same offline; system fallbacks are
 | Control | Size and shape |
 |---|---|
 | Button, primary | 28px tall (32px in dialogs), padding 0 10px (12px in dialogs), radius 6px, `--primary` on `--primary-foreground`, weight 500, icon gap 6px |
-| Button, secondary | same, `--secondary` fill and no border, hover one step lighter (`--accent` in light, `oklch(0.3 0.002 60)` in dark) |
+| Button, secondary | same, `--secondary` fill and no border, hover `--secondary-hover` |
 | Button, ghost | same, transparent, hover `--accent` |
 | Button, destructive | `--destructive` on white in dialogs; ghost with `--destructive` text in sheet footers |
 | Icon button | 28×28, radius 4px, `--muted-foreground`, hover `--accent` and `--foreground` |
@@ -97,7 +98,7 @@ through fontsource so the app looks the same offline; system fallbacks are
 | Badge, provides | 18px, padding 0 6px, radius 4px, `--secondary` with 1px `--border`, 11px 500 |
 | Badge, count | 18px round, min-width 18px, `--secondary` with `--foreground` text when the count is above zero, `--muted` with muted text at zero; the count is a number, not an alarm |
 | Badge, dashed note | 18px, padding 0 6px, radius 4px, 1px dashed `--border`, muted 11px, icon gap 4px |
-| Selected row or item | `--accent` background (`--sidebar-accent` in the sidebar), text in `--foreground`; no inset bar |
+| Selected row or item | `--secondary` background (`--sidebar-accent` stays in the sidebar), text in `--foreground`; no inset bar. `selected` is a marker class the render suite asserts, not a style. |
 | Hovered row or item | background only, `--accent` or `--sidebar-accent`; text stays as it was |
 | Dimmed row | opacity 0.5 (shadowed MCP entries), 0.55 (disabled plugins), 0.6 (disabled Save, read-only textarea) |
 | Cursor | `pointer` on every enabled button, link, option, switch and `label[for]`; Tailwind v4's preflight leaves buttons at `default`, so one base rule in `globals.css` sets it. Changes: [`2026-09-13-keyboard-and-cursor-after-hands-on-testing.md`](../../adr/2026-09-13-keyboard-and-cursor-after-hands-on-testing.md) |

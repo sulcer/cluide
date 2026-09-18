@@ -339,6 +339,7 @@ test.describe("render", () => {
     await expect(page.getByText("Delete security.md?")).toBeVisible();
     await page.getByRole("button", { name: "Delete", exact: true }).last().click();
     await expect(page.getByRole("dialog").getByText("Delete failed · 409 · security.md changed on disk")).toBeVisible();
+    await expect(page.getByRole("alert")).toHaveText("Delete failed · 409 · security.md changed on disk");
     await expect(page.getByText("Delete security.md?")).toBeVisible();
     await page.keyboard.press("Escape");
     await expect(page.getByRole("dialog")).toHaveCount(0);
@@ -528,6 +529,7 @@ test.describe("render", () => {
     await page.getByPlaceholder("npx").fill("echo");
     await page.getByRole("dialog").getByRole("button", { name: "Add server" }).click();
     await expect(page.getByRole("dialog").getByText("Save failed · 500 · backup failed")).toBeVisible();
+    await expect(page.getByRole("alert")).toHaveText("Save failed · 500 · backup failed");
   });
 
   test("mcp-project-1024", async ({ page }) => {

@@ -39,7 +39,11 @@ export function DeleteDialog({ open, onOpenChange, name, body, onConfirm }: Prop
           <DialogDescription className="mt-2 text-[13px] text-muted-foreground">
             {body} A copy is kept in ~/.cluide/backups.
           </DialogDescription>
-          {error && <div className="mt-2 text-xs text-destructive">{error}</div>}
+          {error && (
+            <div role="alert" className="mt-2 text-xs text-destructive">
+              {error}
+            </div>
+          )}
         </div>
         <div className="flex items-center justify-end gap-2 border-t px-4 py-3">
           <Button size="md" autoFocus onClick={() => onOpenChange(false)}>
