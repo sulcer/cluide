@@ -54,10 +54,15 @@ the dialog that stays open.
 
 ## Decision
 
-Option 3 for the list: a source that exists but does not parse is skipped and listed in
-`errors` as `{ file, message }`; the other sources are returned. Writes to that file still answer
-`422`, since a file that cannot be parsed cannot be patched. The screen shows one destructive line
-per broken file above the table and the parsed entries below it.
+Option 3 for the list: `readSource` in `server/fs.ts` is the tolerant reader — a source that exists
+but does not parse is skipped and pushed onto `errors` as `{ file, message }` instead of thrown.
+`listMcp` uses it for the merged list itself, the project-approval lookup and the plugin registry
+read, so a file that does not parse is named once in `errors` no matter how many of those reads
+touch it. Write paths keep `readJsonOrEmpty` and its `422`, since a file that cannot be parsed
+cannot be patched. A `~/.claude.json` that does not parse still answers `422` for a project scope,
+because the scope guard (`assertScope`, via `projectPaths`) validates the scope's project path from
+that same file before `listMcp` reads any source. The screen shows one destructive line per broken
+file above the table and the parsed entries below it.
 
 For the tokens: the second option. The neutrals move to hue 60 with chroma 0.002 at the reference's
 lightness steps (`#131313` main, `#0d0d0e` sidebar, `#1e1e1f` popover, `#262728` secondary);

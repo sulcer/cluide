@@ -1,6 +1,6 @@
 # Tokens
 
-Status: Stable · Partial · 2026-09-15 · The colours, type, spacing, radii, fonts and icons every screen is built from.
+Status: Stable · Built · 2026-09-15 · The colours, type, spacing, radii, fonts and icons every screen is built from.
 
 ## At a glance
 
@@ -10,11 +10,8 @@ floating-layer shadow. The neutrals are a warm gray with almost no chroma, and o
 indigo, carries the primary button, the switch's on state, links and the focus ring. Selected rows
 and the active navigation item are a background step, nothing more. Green, orange and red appear
 only on status icons, warnings and diff lines. The values below are pasted into `globals.css`
-unchanged; Tailwind reads them through `@theme inline`.
-
-*The values in this file are the target of the token pass; the tree still carries the previous
-blue-gray set until the pass lands. Changes:
-[`2026-09-15-pre-release-refinements.md`](../../adr/2026-09-15-pre-release-refinements.md).*
+unchanged; Tailwind reads them through `@theme inline`. Changes:
+[`2026-09-15-pre-release-refinements.md`](../../adr/2026-09-15-pre-release-refinements.md).
 
 ## Theme variables
 

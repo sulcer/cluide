@@ -399,6 +399,58 @@ describe("listMcp", () => {
       errors: [{ file: registry, message: "installed_plugins.json is not valid JSON" }],
     });
   });
+  test("a broken known_marketplaces.json leaves every source listed, with that file in errors", () => {
+    const claudeJson = join(t.home, ".claude.json");
+    const settings = join(t.claude, "settings.json");
+    const pluginFile = join(t.claude, "plugins", "cache", "shop", "tool", "1", ".mcp.json");
+    const marketplaces = join(t.claude, "plugins", "known_marketplaces.json");
+    writeFileSync(marketplaces, "{broken");
+    expect(listMcp("global")).toEqual({
+      entries: [
+        {
+          name: "corp",
+          scope: "managed",
+          file: settings,
+          config: { type: "http", url: "https://corp" },
+          effective: true,
+          shadowedBy: null,
+          enabled: null,
+          etag: null,
+        },
+        {
+          name: "github",
+          scope: "user",
+          file: claudeJson,
+          config: { type: "http", url: "https://api" },
+          effective: true,
+          shadowedBy: null,
+          enabled: null,
+          etag: sliceEtag(userServers),
+        },
+        {
+          name: "plugin_tool_es",
+          scope: "plugin",
+          file: pluginFile,
+          config: { command: "es" },
+          effective: true,
+          shadowedBy: null,
+          enabled: null,
+          etag: null,
+        },
+        {
+          name: "shared",
+          scope: "user",
+          file: claudeJson,
+          config: { command: "user-shared" },
+          effective: true,
+          shadowedBy: null,
+          enabled: null,
+          etag: sliceEtag(userServers),
+        },
+      ],
+      errors: [{ file: marketplaces, message: "known_marketplaces.json is not valid JSON" }],
+    });
+  });
 });
 
 describe("putMcp", () => {

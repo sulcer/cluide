@@ -1,6 +1,6 @@
 # Settings screen
 
-Status: Stable · Partial · 2026-09-15 · The two settings files of a scope in a JSON editor with a warnings panel.
+Status: Stable · Built · 2026-09-15 · The two settings files of a scope in a JSON editor with a warnings panel.
 
 ## At a glance
 
@@ -23,8 +23,8 @@ the name in 11px muted Inter. The save bar sits at the right of the same row.
 - A 32px path row, mono 12px muted, 1px bottom border: the file's absolute path.
 - **Unparsable banner**, when the read returned `raw`: margin 12px 16px 0, padding 6px 10px, 1px
   `--destructive` border, radius 6px, 12px destructive text: `CircleAlert`, the file name in mono,
-  `does not parse. Fix it and save.`, a spacer, and the parser position in mono at 80% opacity,
-  `line 18 · unexpected token }`, taken from `JSON.parse`'s message in the browser. The textarea
+  `does not parse. Fix it and save.`, a spacer, and the browser's message in mono at 80% opacity,
+  taken from `JSON.parse`, with the position when the message carries one. The textarea
   shows `raw`; saving it goes through `PUT /api/file` with the text, since the settings resource
   refuses a `PUT` over an unparsable file.
 - The textarea, mono 12.5px / 20px, holds the document pretty-printed with two spaces as the server

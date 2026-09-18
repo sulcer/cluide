@@ -1,6 +1,6 @@
 # MCP resource
 
-Status: Stable · Partial · 2026-09-15 · The merged list of MCP servers a scope sees, where each one comes from, and how to change it.
+Status: Stable · Built · 2026-09-15 · The merged list of MCP servers a scope sees, where each one comes from, and how to change it.
 
 ## At a glance
 
@@ -67,8 +67,8 @@ A file the list reads that exists but does not parse is skipped: it appears in `
 the parse message, and every other source is returned as usual — except a `~/.claude.json` that does
 not parse, which still answers `422` for a project scope, because the scope guard needs that file to
 validate the scope. Writes to that file still answer `422`, since a file that cannot be parsed cannot
-be patched. *Planned; `Changes:`
-[`2026-09-15-pre-release-refinements.md`](../../adr/2026-09-15-pre-release-refinements.md).*
+be patched. Changes:
+[`2026-09-15-pre-release-refinements.md`](../../adr/2026-09-15-pre-release-refinements.md).
 
 ## Shapes
 

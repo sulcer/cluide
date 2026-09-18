@@ -1,6 +1,6 @@
 # MCP servers screen
 
-Status: Stable · Partial · 2026-09-15 · The merged server list, the server sheet, the add dialog, and approval.
+Status: Stable · Built · 2026-09-15 · The merged server list, the server sheet, the add dialog, and approval.
 
 ## At a glance
 
@@ -32,8 +32,8 @@ Shadowed rows are at 50% opacity. Under the table a 32px line in 11px muted:
 Above the table, one line per entry in the list's `errors`, in the shape of the settings screen's
 parse banner: 12px `--destructive` text on a 1px `--destructive` border, radius 6px, margin 12px 16px
 0, `CircleAlert`, the file's basename in mono, `does not parse`, and the message in mono at 80% on
-the right. The parsed entries render under it as usual. *Planned; `Changes:`
-[`2026-09-15-pre-release-refinements.md`](../../adr/2026-09-15-pre-release-refinements.md).*
+the right. The parsed entries render under it as usual. Changes:
+[`2026-09-15-pre-release-refinements.md`](../../adr/2026-09-15-pre-release-refinements.md).
 
 At 1024px the Command column truncates and nothing scrolls horizontally.
 
@@ -83,8 +83,8 @@ opacity until a name and a command or URL are present. Submit builds the config,
 or `{ type, url, headers }` with empty parts omitted, calls `PUT /api/mcp`, closes, reloads the list,
 and toasts `Added <name>` with the file written. A failed save keeps the dialog open and shows
 `Save failed · <status> · <message>` in 12px `--destructive` under the fields; no toast, since an open
-dialog hides one from assistive technology. *Planned; `Changes:`
-[`2026-09-15-pre-release-refinements.md`](../../adr/2026-09-15-pre-release-refinements.md).*
+dialog hides one from assistive technology. Changes:
+[`2026-09-15-pre-release-refinements.md`](../../adr/2026-09-15-pre-release-refinements.md).
 
 ## Open questions
 
