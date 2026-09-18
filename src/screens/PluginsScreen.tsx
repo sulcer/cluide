@@ -52,9 +52,11 @@ export function PluginsScreen() {
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
         />
-        <span className="text-xs text-muted-foreground">
-          {plugins?.length ?? 0} plugins · {enabledCount} enabled
-        </span>
+        {plugins !== undefined && (
+          <span className="text-xs text-muted-foreground">
+            {plugins.length} plugins · {enabledCount} enabled
+          </span>
+        )}
       </div>
       {plugins === undefined ? (
         <SkeletonRows />

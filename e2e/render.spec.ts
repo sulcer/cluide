@@ -54,6 +54,16 @@ test.describe("render", () => {
     await expect(page).toHaveURL(/\/global\/plugins$/);
   });
 
+  test("command-menu hint sits 8px after the label", async ({ page }) => {
+    await page.goto("/global/settings");
+    await page.keyboard.press("ControlOrMeta+k");
+    const item = page.locator("[cmdk-item]").first();
+    const label = item.locator("span").nth(1);
+    const hint = item.locator("span.font-mono");
+    const [labelBox, hintBox] = await Promise.all([label.boundingBox(), hint.boundingBox()]);
+    expect(Math.round(hintBox!.x - (labelBox!.x + labelBox!.width))).toBe(8);
+  });
+
   test("shortcuts: ⌘n follows the visible items and the theme flips from the menu", async ({ page }) => {
     await page.goto("/global/settings");
     await page.keyboard.press("ControlOrMeta+9");
@@ -554,7 +564,13 @@ test.describe("render", () => {
   });
 
   test("plugins", async ({ page }) => {
+    await page.route("**/api/plugins", async (route) => {
+      if (route.request().method() === "GET") await new Promise((r) => setTimeout(r, 300));
+      await route.continue();
+    });
     await page.goto("/global/plugins");
+    await expect(page.locator(".animate-pulse").first()).toBeVisible();
+    expect(await page.getByText(/0 plugins/).count()).toBe(0);
     await expect(page.getByText("9 plugins · 6 enabled")).toBeVisible();
     await shot(page, "plugins");
     await page.getByRole("switch", { name: "Enable code-review" }).click();
