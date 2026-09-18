@@ -1,7 +1,7 @@
 import { existsSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, test } from "@playwright/test";
-import { homeDir, main, projectUrl, shot, toast, toastUnderModal } from "./helpers";
+import { homeDir, main, projectUrl, shot, toast } from "./helpers";
 
 test.describe("render", () => {
   test("shell: fonts load and / redirects", async ({ page }) => {
@@ -266,7 +266,8 @@ test.describe("render", () => {
     await page.keyboard.press("ControlOrMeta+s");
     await expect(page.getByText("changed on disk")).toBeVisible();
     await page.getByRole("button", { name: "Overwrite" }).click();
-    await expect(toastUnderModal(page)).toContainText("Saved");
+    // ConflictDialog is still mounted (open or mid-exit-animation) when the toast lands, hiding it from getByRole.
+    await expect(page.locator('[role="status"]')).toContainText("Saved");
     expect(readFileSync(claudeMd, "utf8")).toBe(edited);
   });
 
@@ -287,7 +288,8 @@ test.describe("render", () => {
     await expect(ta).toHaveValue("");
     await ta.fill("# Back");
     await page.keyboard.press("ControlOrMeta+s");
-    await expect(toastUnderModal(page)).toContainText("Saved");
+    // The dismissed conflict dialog is still mid-exit-animation when the toast lands, hiding it from getByRole.
+    await expect(page.locator('[role="status"]')).toContainText("Saved");
     expect(existsSync(join(homeDir(), ".claude", "rules", "testing.md"))).toBe(true);
   });
 
@@ -326,12 +328,16 @@ test.describe("render", () => {
     await page.getByRole("button", { name: "Delete" }).click();
     await expect(page.getByText("Delete security.md?")).toBeVisible();
     await page.getByRole("button", { name: "Delete", exact: true }).last().click();
-    // The open delete dialog marks the toaster aria-hidden, so match the toast text, not its role.
-    await expect(page.getByText("Delete failed")).toBeVisible();
-    await expect(page.getByText("409 · security.md changed on disk")).toBeVisible();
+    await expect(page.getByRole("dialog").getByText("Delete failed · 409 · security.md changed on disk")).toBeVisible();
     await expect(page.getByText("Delete security.md?")).toBeVisible();
     await page.keyboard.press("Escape");
+    await expect(page.getByRole("dialog")).toHaveCount(0);
     await expect(page.getByRole("button", { name: "security.md" })).toBeVisible();
+    // The error clears on reopen instead of lingering from the previous attempt.
+    await page.getByRole("button", { name: "Delete" }).click();
+    await expect(page.getByText("Delete security.md?")).toBeVisible();
+    await expect(page.getByRole("dialog").getByText("Delete failed", { exact: false })).toHaveCount(0);
+    await page.keyboard.press("Escape");
   });
 
   test("esc: an open layer takes Esc before the editor", async ({ page }) => {
@@ -445,7 +451,8 @@ test.describe("render", () => {
     await expect(page.getByRole("dialog").getByText("config must be valid JSON")).toBeVisible();
     await ta.fill('{\n  "type": "http",\n  "url": "https://mcp.asana.com/mcp",\n  "headers": {}\n}\n');
     await page.keyboard.press("ControlOrMeta+s");
-    await expect(toastUnderModal(page)).toContainText("Saved");
+    // The MCP sheet stays open on success and hides the toast from getByRole.
+    await expect(page.locator('[role="status"]')).toContainText("Saved");
     await page.keyboard.press("Escape");
 
     await page.getByRole("row", { name: /^corp-proxy/ }).click();
@@ -493,6 +500,24 @@ test.describe("render", () => {
 
     await page.getByRole("button", { name: "Add server" }).click();
     await expect(page.getByRole("button", { name: /^Project/ })).toHaveClass(/bg-background/);
+  });
+
+  test("a failed add keeps the dialog open and shows the error inside it", async ({ page }) => {
+    await page.route("**/api/mcp", (route) =>
+      route.request().method() === "PUT"
+        ? route.fulfill({
+            status: 500,
+            contentType: "application/json",
+            body: JSON.stringify({ error: { code: "internal", message: "backup failed" } }),
+          })
+        : route.continue(),
+    );
+    await page.goto(`${projectUrl("fetcher")}/mcp`);
+    await page.getByRole("button", { name: "Add server" }).click();
+    await page.getByPlaceholder("my-server").fill("echo");
+    await page.getByPlaceholder("npx").fill("echo");
+    await page.getByRole("dialog").getByRole("button", { name: "Add server" }).click();
+    await expect(page.getByRole("dialog").getByText("Save failed · 500 · backup failed")).toBeVisible();
   });
 
   test("mcp-project-1024", async ({ page }) => {

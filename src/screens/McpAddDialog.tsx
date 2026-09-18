@@ -1,6 +1,6 @@
 import type { McpTarget, Scope } from "@shared/api";
 import { cn } from "cn";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { type ApiError, api } from "@/api/client";
 import { Button } from "@/components/Button";
 import { Input } from "@/components/Input";
@@ -40,6 +40,10 @@ export function McpAddDialog({ open, onOpenChange, scope, onAdded }: Props) {
   const [url, setUrl] = useState("");
   const [headers, setHeaders] = useState("");
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string>();
+  useEffect(() => {
+    if (open) setError(undefined);
+  }, [open]);
   const ready = name.trim() !== "" && (transport === "stdio" ? command.trim() !== "" : url.trim() !== "");
 
   const reset = () => {
@@ -68,11 +72,7 @@ export function McpAddDialog({ open, onOpenChange, scope, onAdded }: Props) {
       onAdded();
     } catch (e) {
       const err = e as ApiError;
-      toast({
-        title: "Save failed",
-        description: err.status ? `${err.status} · ${err.message}` : err.message,
-        error: true,
-      });
+      setError(`Save failed · ${err.status ? `${err.status} · ` : ""}${err.message}`);
     } finally {
       setBusy(false);
     }
@@ -174,6 +174,7 @@ export function McpAddDialog({ open, onOpenChange, scope, onAdded }: Props) {
               </Field>
             </>
           )}
+          {error && <div className="text-xs text-destructive">{error}</div>}
         </div>
         <div className="flex items-center justify-end gap-2 border-t px-4 py-3">
           <Button size="md" onClick={() => onOpenChange(false)}>

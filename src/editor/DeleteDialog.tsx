@@ -1,8 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { ApiError } from "@/api/client";
 import { Button } from "@/components/Button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
-import { toast } from "@/lib/toast";
 
 interface Props {
   open: boolean;
@@ -14,6 +13,10 @@ interface Props {
 
 export function DeleteDialog({ open, onOpenChange, name, body, onConfirm }: Props) {
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string>();
+  useEffect(() => {
+    if (open) setError(undefined);
+  }, [open]);
   const confirm = async () => {
     setBusy(true);
     try {
@@ -21,11 +24,7 @@ export function DeleteDialog({ open, onOpenChange, name, body, onConfirm }: Prop
       onOpenChange(false);
     } catch (e) {
       const err = e as ApiError;
-      toast({
-        title: "Delete failed",
-        description: err.status ? `${err.status} · ${err.message}` : err.message,
-        error: true,
-      });
+      setError(`Delete failed · ${err.status ? `${err.status} · ` : ""}${err.message}`);
     } finally {
       setBusy(false);
     }
@@ -40,6 +39,7 @@ export function DeleteDialog({ open, onOpenChange, name, body, onConfirm }: Prop
           <DialogDescription className="mt-2 text-[13px] text-muted-foreground">
             {body} A copy is kept in ~/.cluide/backups.
           </DialogDescription>
+          {error && <div className="mt-2 text-xs text-destructive">{error}</div>}
         </div>
         <div className="flex items-center justify-end gap-2 border-t px-4 py-3">
           <Button size="md" autoFocus onClick={() => onOpenChange(false)}>
