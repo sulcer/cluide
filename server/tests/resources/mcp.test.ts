@@ -326,6 +326,79 @@ describe("listMcp", () => {
       errors: [{ file: settingsLocal, message: "settings.local.json is not valid JSON" }],
     });
   });
+  test("a global settings.json that does not parse is one error, not two, and drops managed and plugins", () => {
+    const claudeJson = join(t.home, ".claude.json");
+    const settings = join(t.claude, "settings.json");
+    // Read by listPlugins (enabledPlugins), the managed source, and would be by approvalOf too,
+    // were it called in global scope: proves the dedupe collapses every one of those to one error.
+    writeFileSync(settings, "{broken");
+    expect(listMcp("global")).toEqual({
+      entries: [
+        {
+          name: "github",
+          scope: "user",
+          file: claudeJson,
+          config: { type: "http", url: "https://api" },
+          effective: true,
+          shadowedBy: null,
+          enabled: null,
+          etag: sliceEtag(userServers),
+        },
+        {
+          name: "shared",
+          scope: "user",
+          file: claudeJson,
+          config: { command: "user-shared" },
+          effective: true,
+          shadowedBy: null,
+          enabled: null,
+          etag: sliceEtag(userServers),
+        },
+      ],
+      errors: [{ file: settings, message: "settings.json is not valid JSON" }],
+    });
+  });
+  test("a broken installed_plugins.json returns the non-plugin sources with that file in errors", () => {
+    const claudeJson = join(t.home, ".claude.json");
+    const settings = join(t.claude, "settings.json");
+    const registry = join(t.claude, "plugins", "installed_plugins.json");
+    writeFileSync(registry, "{broken");
+    expect(listMcp("global")).toEqual({
+      entries: [
+        {
+          name: "corp",
+          scope: "managed",
+          file: settings,
+          config: { type: "http", url: "https://corp" },
+          effective: true,
+          shadowedBy: null,
+          enabled: null,
+          etag: null,
+        },
+        {
+          name: "github",
+          scope: "user",
+          file: claudeJson,
+          config: { type: "http", url: "https://api" },
+          effective: true,
+          shadowedBy: null,
+          enabled: null,
+          etag: sliceEtag(userServers),
+        },
+        {
+          name: "shared",
+          scope: "user",
+          file: claudeJson,
+          config: { command: "user-shared" },
+          effective: true,
+          shadowedBy: null,
+          enabled: null,
+          etag: sliceEtag(userServers),
+        },
+      ],
+      errors: [{ file: registry, message: "installed_plugins.json is not valid JSON" }],
+    });
+  });
 });
 
 describe("putMcp", () => {

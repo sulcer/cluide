@@ -96,6 +96,21 @@ trigger to revisit, reference. Add an item when deferring. Remove it when it lan
 
 ---
 
+## Tolerant scope guard for a broken `~/.claude.json`
+
+- **What:** Let `assertScope`/`projectPaths` (`server/paths.ts`) do something other than throw `422`
+  for every project scope when `~/.claude.json` does not parse, so a project-scope MCP list (and
+  every other project-scope resource) is not the one case the per-source-errors work still fails.
+- **Why deferred:** `assertAllowed` uses the same project list to decide which paths may be read or
+  written; degrading it either still refuses every project scope (no improvement) or accepts any
+  absolute path when the file is broken, which drops that check. Picking between them is its own
+  decision, not a side effect of the MCP list.
+- **Trigger:** A broken `~/.claude.json` hiding a user's MCP servers in project scope becomes a real
+  complaint — today they can still see them in global scope, where the guard is not consulted.
+- **Reference:** [`api/mcp.md`](spec/api/mcp.md), `assertScope`/`assertAllowed` in `server/paths.ts`.
+
+---
+
 ## Frontend fix-wave loose ends
 
 Found reconciling the built frontend against its specs; each too small for its own section above.

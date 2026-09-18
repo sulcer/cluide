@@ -1,7 +1,7 @@
-import { basename, join } from "node:path";
+import { join } from "node:path";
 import type { McpConfig, McpEntry, McpList, McpScope, McpSourceError, Scope, WriteResult } from "@shared/api";
 import { ApiError, requireBoolean, requireString } from "../errors";
-import { patchJson, readJsonDoc, readJsonOrEmpty, sliceEtag } from "../fs";
+import { patchJson, readJsonOrEmpty, readSource, sliceEtag } from "../fs";
 import { assertScope, claudeDir, claudeJsonPath } from "../paths";
 import { listPlugins } from "./plugins";
 
@@ -12,16 +12,6 @@ interface Source {
   file: string;
   servers: Record<string, McpConfig>;
   etag: string | null;
-}
-
-// A source that exists but does not parse is skipped and reported; the rest of the list still loads.
-function readSource(path: string, errors: McpSourceError[]): Record<string, any> {
-  const doc = readJsonDoc(path);
-  if (doc.exists && doc.json === null) {
-    errors.push({ file: path, message: `${basename(path)} is not valid JSON` });
-    return {};
-  }
-  return doc.json ?? {};
 }
 
 export function listMcp(scopeArg: string): McpList {
@@ -38,7 +28,7 @@ export function listMcp(scopeArg: string): McpList {
   }
   const user = claudeJson.mcpServers ?? {};
   sources.push({ scope: "user", file: claudeJsonPath(), servers: user, etag: sliceEtag(user) });
-  for (const plugin of listPlugins()) {
+  for (const plugin of listPlugins(errors)) {
     if (!plugin.enabled || !plugin.hasMcp) continue;
     const file = join(plugin.installPath, ".mcp.json");
     const servers = readSource(file, errors).mcpServers ?? {};
@@ -80,9 +70,9 @@ export function listMcp(scopeArg: string): McpList {
     for (const shadowed of group.slice(1)) shadowed.shadowedBy = group[0].scope;
   }
   entries.sort((a, b) => a.name.localeCompare(b.name) || rank(a) - rank(b));
-  // ~/.claude.json and settings.json are each read by two passes here; keep one error per file.
-  // (Unreachable today: assertScope and listPlugins already throw on those two files before either
-  // pass runs. Real once projectPaths()/listPlugins() stop hard-failing on a broken file.)
+  // settings.json is read up to three times here (listPlugins, the managed source, approvalOf);
+  // keep one error per file. ~/.claude.json never needs it: a broken one fails assertScope first
+  // for a project scope, and approvalOf (its other reader) never runs for a global one.
   const deduped = errors.filter((e, i) => errors.findIndex((x) => x.file === e.file) === i);
   return { entries, errors: deduped };
 }
