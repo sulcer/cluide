@@ -63,7 +63,7 @@ for it at session start.
 the entry `name` in that file. The etag is the hash of that file's `mcpServers` slice.
 `POST /api/mcp/approval` is only valid for a `project` entry and a project scope.
 
-A source file that exists but does not parse is skipped: it appears in `errors` with its path and
+A file the list reads that exists but does not parse is skipped: it appears in `errors` with its path and
 the parse message, and every other source is returned as usual. Writes to that file still answer
 `422`, since a file that cannot be parsed cannot be patched. *Planned; `Changes:`
 [`2026-09-15-pre-release-refinements.md`](../../adr/2026-09-15-pre-release-refinements.md).*

@@ -55,7 +55,7 @@ export function listMcp(scopeArg: string): McpList {
     etag: null,
   });
 
-  const approved = scope === "global" ? (_name: string) => null : approvalOf(scope);
+  const approved = scope === "global" ? (_name: string) => null : approvalOf(scope, errors);
   const entries: McpEntry[] = [];
   for (const source of sources) {
     for (const [name, config] of Object.entries(source.servers)) {
@@ -80,10 +80,14 @@ export function listMcp(scopeArg: string): McpList {
     for (const shadowed of group.slice(1)) shadowed.shadowedBy = group[0].scope;
   }
   entries.sort((a, b) => a.name.localeCompare(b.name) || rank(a) - rank(b));
-  return { entries, errors };
+  // ~/.claude.json and settings.json are each read by two passes here; keep one error per file.
+  // (Unreachable today: assertScope and listPlugins already throw on those two files before either
+  // pass runs. Real once projectPaths()/listPlugins() stop hard-failing on a broken file.)
+  const deduped = errors.filter((e, i) => errors.findIndex((x) => x.file === e.file) === i);
+  return { entries, errors: deduped };
 }
 
-function approvalOf(project: string): (name: string) => boolean {
+function approvalOf(project: string, errors: McpSourceError[]): (name: string) => boolean {
   const files = [
     join(claudeDir(), "settings.json"),
     join(claudeDir(), "settings.local.json"),
@@ -93,8 +97,8 @@ function approvalOf(project: string): (name: string) => boolean {
   let all = false;
   const enabled = new Set<string>();
   const disabled = new Set<string>();
-  const leftover = readJsonOrEmpty(claudeJsonPath()).projects?.[project] ?? {};
-  for (const json of [...files.map(readJsonOrEmpty), leftover]) {
+  const leftover = readSource(claudeJsonPath(), errors).projects?.[project] ?? {};
+  for (const json of [...files.map((f) => readSource(f, errors)), leftover]) {
     if (json.enableAllProjectMcpServers === true) all = true;
     for (const name of json.enabledMcpjsonServers ?? []) enabled.add(name);
     for (const name of json.disabledMcpjsonServers ?? []) disabled.add(name);

@@ -241,6 +241,91 @@ describe("listMcp", () => {
       errors: [{ file: pluginMcpJson, message: ".mcp.json is not valid JSON" }],
     });
   });
+  test("a project settings.local.json that does not parse contributes no approvals, the rest still comes back", () => {
+    const claudeJson = join(t.home, ".claude.json");
+    const mcpJson = join(t.project, ".mcp.json");
+    const pluginFile = join(t.claude, "plugins", "cache", "shop", "tool", "1", ".mcp.json");
+    const settings = join(t.claude, "settings.json");
+    const settingsLocal = join(t.project, ".claude", "settings.local.json");
+    const expected: McpEntry[] = [
+      {
+        name: "corp",
+        scope: "managed",
+        file: settings,
+        config: { type: "http", url: "https://corp" },
+        effective: true,
+        shadowedBy: null,
+        enabled: null,
+        etag: null,
+      },
+      {
+        name: "db",
+        scope: "project",
+        file: mcpJson,
+        config: { command: "psql" },
+        effective: true,
+        shadowedBy: null,
+        enabled: false,
+        etag: sliceEtag(projectServers),
+      },
+      {
+        name: "github",
+        scope: "user",
+        file: claudeJson,
+        config: { type: "http", url: "https://api" },
+        effective: true,
+        shadowedBy: null,
+        enabled: null,
+        etag: sliceEtag(userServers),
+      },
+      {
+        name: "plugin_tool_es",
+        scope: "plugin",
+        file: pluginFile,
+        config: { command: "es" },
+        effective: true,
+        shadowedBy: null,
+        enabled: null,
+        etag: null,
+      },
+      {
+        name: "shared",
+        scope: "local",
+        file: claudeJson,
+        config: { command: "local-shared" },
+        effective: true,
+        shadowedBy: null,
+        enabled: null,
+        etag: sliceEtag(localServers),
+      },
+      {
+        name: "shared",
+        scope: "project",
+        file: mcpJson,
+        config: { command: "project-shared" },
+        effective: false,
+        shadowedBy: "local",
+        enabled: false,
+        etag: sliceEtag(projectServers),
+      },
+      {
+        name: "shared",
+        scope: "user",
+        file: claudeJson,
+        config: { command: "user-shared" },
+        effective: false,
+        shadowedBy: "local",
+        enabled: null,
+        etag: sliceEtag(userServers),
+      },
+    ];
+    // db was only approved via this file; breaking it drops that approval instead of failing the list.
+    writeFileSync(settingsLocal, "{broken");
+    expect(listMcp(t.project)).toEqual({
+      entries: expected,
+      errors: [{ file: settingsLocal, message: "settings.local.json is not valid JSON" }],
+    });
+  });
 });
 
 describe("putMcp", () => {
