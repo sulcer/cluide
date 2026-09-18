@@ -90,6 +90,16 @@ export interface McpEntry {
   etag: string | null;
 }
 
+export interface McpSourceError {
+  file: string;
+  message: string;
+}
+
+export interface McpList {
+  entries: McpEntry[];
+  errors: McpSourceError[];
+}
+
 export interface PutMcpBody {
   scope: Scope;
   target: McpTarget;

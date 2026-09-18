@@ -505,6 +505,20 @@ test.describe("render", () => {
     await shot(page, "mcp-project-1024");
   });
 
+  test("mcp-broken-source: a source that does not parse is listed, the rest still renders", async ({ page }) => {
+    await page.route("**/api/mcp?*", async (route) => {
+      const res = await route.fetch();
+      const body = await res.json();
+      body.errors = [{ file: "/tmp/plugin/.mcp.json", message: ".mcp.json is not valid JSON" }];
+      await route.fulfill({ response: res, body: JSON.stringify(body) });
+    });
+    await page.goto(`${projectUrl("fetcher")}/mcp`);
+    await expect(main(page).getByText("does not parse")).toBeVisible();
+    await expect(main(page).getByText(".mcp.json is not valid JSON")).toBeVisible();
+    await expect(main(page).getByRole("row").nth(1)).toBeVisible();
+    await shot(page, "mcp-broken-source");
+  });
+
   test("command menu's Add server opens the dialog", async ({ page }) => {
     await page.goto("/global/settings");
     await page.keyboard.press("ControlOrMeta+k");

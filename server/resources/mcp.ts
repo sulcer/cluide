@@ -1,7 +1,7 @@
-import { join } from "node:path";
-import type { McpConfig, McpEntry, McpScope, Scope, WriteResult } from "@shared/api";
+import { basename, join } from "node:path";
+import type { McpConfig, McpEntry, McpList, McpScope, McpSourceError, Scope, WriteResult } from "@shared/api";
 import { ApiError, requireBoolean, requireString } from "../errors";
-import { patchJson, readJsonOrEmpty, sliceEtag } from "../fs";
+import { patchJson, readJsonDoc, readJsonOrEmpty, sliceEtag } from "../fs";
 import { assertScope, claudeDir, claudeJsonPath } from "../paths";
 import { listPlugins } from "./plugins";
 
@@ -14,15 +14,26 @@ interface Source {
   etag: string | null;
 }
 
-export function listMcp(scopeArg: string): McpEntry[] {
+// A source that exists but does not parse is skipped and reported; the rest of the list still loads.
+function readSource(path: string, errors: McpSourceError[]): Record<string, any> {
+  const doc = readJsonDoc(path);
+  if (doc.exists && doc.json === null) {
+    errors.push({ file: path, message: `${basename(path)} is not valid JSON` });
+    return {};
+  }
+  return doc.json ?? {};
+}
+
+export function listMcp(scopeArg: string): McpList {
   const scope = assertScope(scopeArg);
-  const claudeJson = readJsonOrEmpty(claudeJsonPath());
+  const errors: McpSourceError[] = [];
+  const claudeJson = readSource(claudeJsonPath(), errors);
   const sources: Source[] = [];
   if (scope !== "global") {
     const local = claudeJson.projects?.[scope]?.mcpServers ?? {};
     sources.push({ scope: "local", file: claudeJsonPath(), servers: local, etag: sliceEtag(local) });
     const mcpJsonPath = join(scope, ".mcp.json");
-    const project = readJsonOrEmpty(mcpJsonPath).mcpServers ?? {};
+    const project = readSource(mcpJsonPath, errors).mcpServers ?? {};
     sources.push({ scope: "project", file: mcpJsonPath, servers: project, etag: sliceEtag(project) });
   }
   const user = claudeJson.mcpServers ?? {};
@@ -30,7 +41,7 @@ export function listMcp(scopeArg: string): McpEntry[] {
   for (const plugin of listPlugins()) {
     if (!plugin.enabled || !plugin.hasMcp) continue;
     const file = join(plugin.installPath, ".mcp.json");
-    const servers = readJsonOrEmpty(file).mcpServers ?? {};
+    const servers = readSource(file, errors).mcpServers ?? {};
     const prefixed = Object.fromEntries(
       Object.entries(servers).map(([name, config]) => [`plugin_${plugin.name}_${name}`, config as McpConfig]),
     );
@@ -40,7 +51,7 @@ export function listMcp(scopeArg: string): McpEntry[] {
   sources.push({
     scope: "managed",
     file: settingsPath,
-    servers: readJsonOrEmpty(settingsPath).managedMcpServers ?? {},
+    servers: readSource(settingsPath, errors).managedMcpServers ?? {},
     etag: null,
   });
 
@@ -68,7 +79,8 @@ export function listMcp(scopeArg: string): McpEntry[] {
     group[0].effective = true;
     for (const shadowed of group.slice(1)) shadowed.shadowedBy = group[0].scope;
   }
-  return entries.sort((a, b) => a.name.localeCompare(b.name) || rank(a) - rank(b));
+  entries.sort((a, b) => a.name.localeCompare(b.name) || rank(a) - rank(b));
+  return { entries, errors };
 }
 
 function approvalOf(project: string): (name: string) => boolean {

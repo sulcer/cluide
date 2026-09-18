@@ -1,6 +1,6 @@
-import type { McpEntry, Scope } from "@shared/api";
+import type { McpEntry, McpList, Scope } from "@shared/api";
 import { cn } from "cn";
-import { CornerDownRight, Lock } from "lucide-react";
+import { CircleAlert, CornerDownRight, Lock } from "lucide-react";
 import { useState } from "react";
 import { useLocation } from "react-router";
 import { type ApiError, api, q } from "@/api/client";
@@ -19,11 +19,12 @@ const keyOf = (e: McpEntry) => `${e.scope}:${e.name}`;
 
 export function McpScreen({ scope }: { scope: Scope }) {
   const location = useLocation();
-  const list = useResource<McpEntry[]>(`/api/mcp${q({ scope })}`);
+  const list = useResource<McpList>(`/api/mcp${q({ scope })}`);
   const [openKey, setOpenKey] = useState<string>();
   const [adding, setAdding] = useState(() => (location.state as { primary?: boolean } | null)?.primary === true);
   useWindowEvent("cluide:primary", () => setAdding(true));
-  const entries = list.data;
+  const entries = list.data?.entries;
+  const errors = list.data?.errors ?? [];
   const open = entries?.find((e) => keyOf(e) === openKey);
   const effective = entries?.filter((e) => e.effective).length ?? 0;
 
@@ -44,7 +45,9 @@ export function McpScreen({ scope }: { scope: Scope }) {
       return;
     }
     // Updater form, not the closed-over snapshot: two quick toggles must not revert each other.
-    list.setData((prev) => prev?.map((e) => (e === entry ? { ...e, enabled } : e)));
+    list.setData(
+      (prev) => prev && { ...prev, entries: prev.entries.map((e) => (e === entry ? { ...e, enabled } : e)) },
+    );
     toast({
       title: enabled ? `Approved ${entry.name}` : `Approval removed for ${entry.name}`,
       description: `${scope}/.claude/settings.local.json`,
@@ -57,6 +60,18 @@ export function McpScreen({ scope }: { scope: Scope }) {
         <SkeletonRows />
       ) : (
         <>
+          {errors.map((err) => (
+            <div
+              key={err.file}
+              className="mx-4 mt-3 flex items-center gap-2 rounded-md border border-destructive px-2.5 py-1.5 text-xs text-destructive"
+            >
+              <CircleAlert className="size-4 shrink-0" />
+              <span className="font-mono">{err.file.split("/").pop()}</span>
+              <span>does not parse</span>
+              <div className="flex-1" />
+              <span className="font-mono opacity-80">{err.message}</span>
+            </div>
+          ))}
           <table className="w-full table-fixed text-[13px]">
             <thead>
               <tr className="h-8 border-b text-left text-xs font-medium text-muted-foreground">
