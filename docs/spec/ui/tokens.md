@@ -81,6 +81,12 @@ through fontsource so the app looks the same offline; system fallbacks are
 - Overlays: command menu `rgba(0,0,0,.4)`, sheets `.3`, dialogs `.45`.
 - Focus: `2px solid var(--ring)` outline, offset `-1px` on inputs and textareas, `1px` on buttons,
   only for `:focus-visible` on buttons.
+- Scrollbars: the root carries `color-scheme: dark` or `light` with the theme, so the browser's own
+  bars and controls match. Every scroll area shows the same bar: 10px wide, no track, no buttons,
+  the thumb `--input` with a 4px transparent inset border and radius 8px, `--muted-foreground` on
+  hover. The width is constant, so a pane that can scroll never shifts its content. The command
+  menu is the exception and hides its bar. Changes:
+  [`2026-09-19-theme-the-scrollbars.md`](../../adr/2026-09-19-theme-the-scrollbars.md).
 
 ## Controls
 
