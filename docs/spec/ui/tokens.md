@@ -84,8 +84,9 @@ through fontsource so the app looks the same offline; system fallbacks are
 - Scrollbars: the root carries `color-scheme: dark` or `light` with the theme, so the browser's own
   bars and controls match. Every scroll area shows the same bar: 10px wide, no track, no buttons,
   the thumb `--input` with a 4px transparent inset border and radius 8px, `--muted-foreground` on
-  hover. The width is constant, so a pane that can scroll never shifts its content. The command
-  menu is the exception and hides its bar. Changes:
+  hover. Where the platform draws a classic scrollbar, the bar takes its 10px from the pane; where
+  the platform overlays scrollbars, macOS by default, it floats over the content in these colours
+  instead of the browser's. The command menu is the exception and hides its bar. Changes:
   [`2026-09-19-theme-the-scrollbars.md`](../../adr/2026-09-19-theme-the-scrollbars.md).
 
 ## Controls
