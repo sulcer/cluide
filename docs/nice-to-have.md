@@ -84,15 +84,20 @@ trigger to revisit, reference. Add an item when deferring. Remove it when it lan
 
 ---
 
-## Per-source errors in the MCP list
+## Tolerant scope guard for a broken `~/.claude.json`
 
-- **What:** When one source file does not parse (a plugin's `.mcp.json`, a repo's `.mcp.json`),
-  return the other sources and mark the broken one with its parse error, instead of failing the
-  whole list with `422`.
-- **Why deferred:** The settings screen has a raw-text repair path; adding one for every MCP
-  source is a shape change to `McpEntry` and a screen change, for a file state that is rare.
-- **Trigger:** The first time a broken plugin file hides a user's own servers.
-- **Reference:** [`api/mcp.md`](spec/api/mcp.md), `readJsonOrEmpty` in the write-safety spec.
+- **What:** Let `assertScope`/`projectPaths` (`server/paths.ts`) do something other than throw `422`
+  for every project scope when `~/.claude.json` does not parse, so a project-scope MCP list (and
+  every other project-scope resource) is not the one case the per-source-errors work still fails.
+- **Why deferred:** `assertAllowed` uses the same project list to decide which paths may be read or
+  written; degrading it either still refuses every project scope (no improvement) or accepts any
+  absolute path when the file is broken, which drops that check. Picking between them is its own
+  decision, not a side effect of the MCP list.
+- **Trigger:** A broken `~/.claude.json` hiding a user's MCP servers becomes a real complaint — the
+  user's own `mcpServers` and every project's `local` servers are stored in that file, so when it
+  does not parse, even a global-scope list returns only the plugin and managed servers plus the
+  error, and the servers that file defines are unreadable in every scope.
+- **Reference:** [`api/mcp.md`](spec/api/mcp.md), `assertScope`/`assertAllowed` in `server/paths.ts`.
 
 ---
 
@@ -103,21 +108,20 @@ Found reconciling the built frontend against its specs; each too small for its o
 - Reserved browser chords (`⌘⇧T`, `⌘1`–`⌘9`) must be pressed by hand in Chrome once — Playwright's
   `page.keyboard.press` bypasses the browser's own shortcut layer.
 - e2e per-test independence: seed a home per worker instead of sharing one across the whole run.
-- A linter/formatter (`eslint-plugin-react-hooks`) and the partial `useEffect` dependency arrays it
-  would flag.
-- The `Toaster` is `aria-hidden` behind an open Radix dialog or sheet — portal it outside, or make
-  it `aria-live` from outside.
-- `bun` in `src/tsconfig.json`'s `types` lets a stray `Bun.*` call typecheck in browser code.
+- A toast raised while a Radix dialog or sheet is open is still `aria-hidden`. The delete and
+  add-server dialogs show a failed action inline with `role="alert"`. The MCP sheet's failed save
+  is now inline for every status too (`useDraft` no longer gates it to 400 or 422), but its
+  `Editor` error `div` carries no `role="alert"`, so it is visible, not announced. What remains:
+  give that error `role="alert"`, and announce a success (the conflict flow's `Saved` and
+  `Reloaded`, the MCP sheet's `Saved`), which needs the sheet's save bar to carry it.
 - The MCP sheet's width comes from an explicit `max-width` over the generated `w-3/4` — a comment
   in `sheet.tsx`, not a cleaner fix.
-- `0 plugins · 0 enabled` shows for one frame while `PluginsScreen` is loading.
 - The plugin toggle e2e case proves only the toggled row's own etag updates.
 - The hooks screen's "Read from" separator is untested with exactly two source files.
 - `flattenHooks` has no test for a plain-string (non-array) `matcher`.
 - The scripts list under the hooks empty state has no render case.
-- Command-menu hint spacing renders at 10px; `shell.md` says 8px.
-- `describeJsonError` shows Chrome's raw `JSON.parse` message, which carries no line number in
-  Chrome.
+- Chrome's "value expected" errors carry no position at all, so showing a line and column needs a
+  JSON position tokenizer of our own, with its own tests.
 - The SchemaStore schema types `managedMcpServers` as an array; the backend reads it as a map.
 - Untested: the `Schema unavailable` badge, a `409` on the settings path, and `Retry` after a
   failed write.

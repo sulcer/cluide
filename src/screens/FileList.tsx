@@ -60,7 +60,7 @@ export function FileList({ kind, entries, selected, onSelect, creating, onCreate
               onClick={() => onSelect(e)}
               className={cn(
                 "flex h-8 w-full min-w-0 items-center gap-2 rounded-sm px-2 text-left hover:bg-accent",
-                e.path === selected?.path && "selected bg-accent",
+                e.path === selected?.path && "selected bg-secondary hover:bg-secondary",
               )}
             >
               <Icon className="size-4 shrink-0 text-muted-foreground" />

@@ -10,11 +10,12 @@
     "skipLibCheck": true,
     "verbatimModuleSyntax": true,
     "allowImportingTsExtensions": true,
-    "types": ["vite/client", "bun"],
+    "types": ["vite/client"],
     "paths": {
       "@shared/*": ["../shared/*"],
       "@/*": ["./*"]
     }
   },
-  "include": [".", "../shared"]
+  "include": [".", "../shared"],
+  "exclude": ["tests"]
 }

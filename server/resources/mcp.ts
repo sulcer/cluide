@@ -1,7 +1,7 @@
 import { join } from "node:path";
-import type { McpConfig, McpEntry, McpScope, Scope, WriteResult } from "@shared/api";
+import type { McpConfig, McpEntry, McpList, McpScope, McpSourceError, Scope, WriteResult } from "@shared/api";
 import { ApiError, requireBoolean, requireString } from "../errors";
-import { patchJson, readJsonOrEmpty, sliceEtag } from "../fs";
+import { patchJson, readJsonOrEmpty, readSource, sliceEtag } from "../fs";
 import { assertScope, claudeDir, claudeJsonPath } from "../paths";
 import { listPlugins } from "./plugins";
 
@@ -14,23 +14,24 @@ interface Source {
   etag: string | null;
 }
 
-export function listMcp(scopeArg: string): McpEntry[] {
+export function listMcp(scopeArg: string): McpList {
   const scope = assertScope(scopeArg);
-  const claudeJson = readJsonOrEmpty(claudeJsonPath());
+  const errors: McpSourceError[] = [];
+  const claudeJson = readSource(claudeJsonPath(), errors);
   const sources: Source[] = [];
   if (scope !== "global") {
     const local = claudeJson.projects?.[scope]?.mcpServers ?? {};
     sources.push({ scope: "local", file: claudeJsonPath(), servers: local, etag: sliceEtag(local) });
     const mcpJsonPath = join(scope, ".mcp.json");
-    const project = readJsonOrEmpty(mcpJsonPath).mcpServers ?? {};
+    const project = readSource(mcpJsonPath, errors).mcpServers ?? {};
     sources.push({ scope: "project", file: mcpJsonPath, servers: project, etag: sliceEtag(project) });
   }
   const user = claudeJson.mcpServers ?? {};
   sources.push({ scope: "user", file: claudeJsonPath(), servers: user, etag: sliceEtag(user) });
-  for (const plugin of listPlugins()) {
+  for (const plugin of listPlugins(errors)) {
     if (!plugin.enabled || !plugin.hasMcp) continue;
     const file = join(plugin.installPath, ".mcp.json");
-    const servers = readJsonOrEmpty(file).mcpServers ?? {};
+    const servers = readSource(file, errors).mcpServers ?? {};
     const prefixed = Object.fromEntries(
       Object.entries(servers).map(([name, config]) => [`plugin_${plugin.name}_${name}`, config as McpConfig]),
     );
@@ -40,11 +41,11 @@ export function listMcp(scopeArg: string): McpEntry[] {
   sources.push({
     scope: "managed",
     file: settingsPath,
-    servers: readJsonOrEmpty(settingsPath).managedMcpServers ?? {},
+    servers: readSource(settingsPath, errors).managedMcpServers ?? {},
     etag: null,
   });
 
-  const approved = scope === "global" ? (_name: string) => null : approvalOf(scope);
+  const approved = scope === "global" ? (_name: string) => null : approvalOf(scope, errors);
   const entries: McpEntry[] = [];
   for (const source of sources) {
     for (const [name, config] of Object.entries(source.servers)) {
@@ -68,10 +69,15 @@ export function listMcp(scopeArg: string): McpEntry[] {
     group[0].effective = true;
     for (const shadowed of group.slice(1)) shadowed.shadowedBy = group[0].scope;
   }
-  return entries.sort((a, b) => a.name.localeCompare(b.name) || rank(a) - rank(b));
+  entries.sort((a, b) => a.name.localeCompare(b.name) || rank(a) - rank(b));
+  // settings.json is read up to three times here (listPlugins, the managed source, approvalOf);
+  // keep one error per file. ~/.claude.json never needs it: a broken one fails assertScope first
+  // for a project scope, and approvalOf (its other reader) never runs for a global one.
+  const deduped = errors.filter((e, i) => errors.findIndex((x) => x.file === e.file) === i);
+  return { entries, errors: deduped };
 }
 
-function approvalOf(project: string): (name: string) => boolean {
+function approvalOf(project: string, errors: McpSourceError[]): (name: string) => boolean {
   const files = [
     join(claudeDir(), "settings.json"),
     join(claudeDir(), "settings.local.json"),
@@ -81,8 +87,8 @@ function approvalOf(project: string): (name: string) => boolean {
   let all = false;
   const enabled = new Set<string>();
   const disabled = new Set<string>();
-  const leftover = readJsonOrEmpty(claudeJsonPath()).projects?.[project] ?? {};
-  for (const json of [...files.map(readJsonOrEmpty), leftover]) {
+  const leftover = readSource(claudeJsonPath(), errors).projects?.[project] ?? {};
+  for (const json of [...files.map((f) => readSource(f, errors)), leftover]) {
     if (json.enableAllProjectMcpServers === true) all = true;
     for (const name of json.enabledMcpjsonServers ?? []) enabled.add(name);
     for (const name of json.disabledMcpjsonServers ?? []) disabled.add(name);

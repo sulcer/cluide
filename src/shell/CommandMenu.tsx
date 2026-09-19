@@ -166,7 +166,7 @@ function Item(props: { icon: React.ReactNode; label: string; hint?: string; kbd?
     >
       <span className="text-muted-foreground">{props.icon}</span>
       <span>{props.label}</span>
-      {props.hint && <span className="truncate font-mono text-[11px] text-muted-foreground">{props.hint}</span>}
+      {props.hint && <span className="-ml-0.5 truncate font-mono text-[11px] text-muted-foreground">{props.hint}</span>}
       {props.kbd && <Kbd className="ml-auto">{props.kbd}</Kbd>}
     </CommandPrimitive.Item>
   );

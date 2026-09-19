@@ -1,7 +1,7 @@
 import { existsSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, test } from "@playwright/test";
-import { homeDir, main, projectUrl, shot, toast, toastUnderModal } from "./helpers";
+import { homeDir, main, projectUrl, shot, toast } from "./helpers";
 
 test.describe("render", () => {
   test("shell: fonts load and / redirects", async ({ page }) => {
@@ -52,6 +52,16 @@ test.describe("render", () => {
     await shot(page, "command-menu-query");
     await page.keyboard.press("Enter");
     await expect(page).toHaveURL(/\/global\/plugins$/);
+  });
+
+  test("command-menu hint sits 8px after the label", async ({ page }) => {
+    await page.goto("/global/settings");
+    await page.keyboard.press("ControlOrMeta+k");
+    const item = page.locator("[cmdk-item]").first();
+    const label = item.locator("span").nth(1);
+    const hint = item.locator("span.font-mono");
+    const [labelBox, hintBox] = await Promise.all([label.boundingBox(), hint.boundingBox()]);
+    expect(Math.round(hintBox!.x - (labelBox!.x + labelBox!.width))).toBe(8);
   });
 
   test("shortcuts: ⌘n follows the visible items and the theme flips from the menu", async ({ page }) => {
@@ -144,7 +154,12 @@ test.describe("render", () => {
     await page.keyboard.type("style");
     await page.keyboard.press("Enter");
     await expect(page.getByText("Created style.md")).toBeVisible();
-    await expect(page.getByRole("button", { name: "style.md" })).toHaveClass(/selected/);
+    const row = page.getByRole("button", { name: "style.md" });
+    await expect(row).toHaveClass(/selected/);
+    const bg = () => row.evaluate((el) => getComputedStyle(el).backgroundColor);
+    const before = await bg();
+    await row.hover();
+    await expect.poll(bg).toBe(before);
   });
 
   test("editor-create for a missing fixed file", async ({ page }) => {
@@ -266,7 +281,8 @@ test.describe("render", () => {
     await page.keyboard.press("ControlOrMeta+s");
     await expect(page.getByText("changed on disk")).toBeVisible();
     await page.getByRole("button", { name: "Overwrite" }).click();
-    await expect(toastUnderModal(page)).toContainText("Saved");
+    // ConflictDialog is still mounted (open or mid-exit-animation) when the toast lands, hiding it from getByRole.
+    await expect(page.locator('[role="status"]')).toContainText("Saved");
     expect(readFileSync(claudeMd, "utf8")).toBe(edited);
   });
 
@@ -287,7 +303,8 @@ test.describe("render", () => {
     await expect(ta).toHaveValue("");
     await ta.fill("# Back");
     await page.keyboard.press("ControlOrMeta+s");
-    await expect(toastUnderModal(page)).toContainText("Saved");
+    // The dismissed conflict dialog is still mid-exit-animation when the toast lands, hiding it from getByRole.
+    await expect(page.locator('[role="status"]')).toContainText("Saved");
     expect(existsSync(join(homeDir(), ".claude", "rules", "testing.md"))).toBe(true);
   });
 
@@ -326,12 +343,17 @@ test.describe("render", () => {
     await page.getByRole("button", { name: "Delete" }).click();
     await expect(page.getByText("Delete security.md?")).toBeVisible();
     await page.getByRole("button", { name: "Delete", exact: true }).last().click();
-    // The open delete dialog marks the toaster aria-hidden, so match the toast text, not its role.
-    await expect(page.getByText("Delete failed")).toBeVisible();
-    await expect(page.getByText("409 · security.md changed on disk")).toBeVisible();
+    await expect(page.getByRole("dialog").getByText("Delete failed · 409 · security.md changed on disk")).toBeVisible();
+    await expect(page.getByRole("alert")).toHaveText("Delete failed · 409 · security.md changed on disk");
     await expect(page.getByText("Delete security.md?")).toBeVisible();
     await page.keyboard.press("Escape");
+    await expect(page.getByRole("dialog")).toHaveCount(0);
     await expect(page.getByRole("button", { name: "security.md" })).toBeVisible();
+    // The error clears on reopen instead of lingering from the previous attempt.
+    await page.getByRole("button", { name: "Delete" }).click();
+    await expect(page.getByText("Delete security.md?")).toBeVisible();
+    await expect(page.getByRole("dialog").getByText("Delete failed", { exact: false })).toHaveCount(0);
+    await page.keyboard.press("Escape");
   });
 
   test("esc: an open layer takes Esc before the editor", async ({ page }) => {
@@ -437,7 +459,8 @@ test.describe("render", () => {
     await page.getByRole("row", { name: /^asana/ }).click();
     await expect(page.getByRole("dialog")).toContainText("Config");
     await expect(page.getByRole("dialog").locator("textarea")).toBeFocused();
-    expect((await page.getByRole("dialog").boundingBox())?.width).toBe(520);
+    // Linux lays the sheet out a fraction of a pixel wide, so compare rounded.
+    expect(Math.round((await page.getByRole("dialog").boundingBox())?.width ?? 0)).toBe(520);
     await shot(page, "mcp-sheet");
     const ta = page.getByRole("dialog").locator("textarea");
     await ta.fill("not json");
@@ -445,7 +468,8 @@ test.describe("render", () => {
     await expect(page.getByRole("dialog").getByText("config must be valid JSON")).toBeVisible();
     await ta.fill('{\n  "type": "http",\n  "url": "https://mcp.asana.com/mcp",\n  "headers": {}\n}\n');
     await page.keyboard.press("ControlOrMeta+s");
-    await expect(toastUnderModal(page)).toContainText("Saved");
+    // The MCP sheet stays open on success and hides the toast from getByRole.
+    await expect(page.locator('[role="status"]')).toContainText("Saved");
     await page.keyboard.press("Escape");
 
     await page.getByRole("row", { name: /^corp-proxy/ }).click();
@@ -495,6 +519,25 @@ test.describe("render", () => {
     await expect(page.getByRole("button", { name: /^Project/ })).toHaveClass(/bg-background/);
   });
 
+  test("a failed add keeps the dialog open and shows the error inside it", async ({ page }) => {
+    await page.route("**/api/mcp", (route) =>
+      route.request().method() === "PUT"
+        ? route.fulfill({
+            status: 500,
+            contentType: "application/json",
+            body: JSON.stringify({ error: { code: "internal", message: "backup failed" } }),
+          })
+        : route.continue(),
+    );
+    await page.goto(`${projectUrl("fetcher")}/mcp`);
+    await page.getByRole("button", { name: "Add server" }).click();
+    await page.getByPlaceholder("my-server").fill("echo");
+    await page.getByPlaceholder("npx").fill("echo");
+    await page.getByRole("dialog").getByRole("button", { name: "Add server" }).click();
+    await expect(page.getByRole("dialog").getByText("Save failed · 500 · backup failed")).toBeVisible();
+    await expect(page.getByRole("alert")).toHaveText("Save failed · 500 · backup failed");
+  });
+
   test("mcp-project-1024", async ({ page }) => {
     await page.setViewportSize({ width: 1024, height: 768 });
     await page.goto(`${projectUrl("fetcher")}/mcp`);
@@ -503,6 +546,20 @@ test.describe("render", () => {
       await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth),
     ).toBe(true);
     await shot(page, "mcp-project-1024");
+  });
+
+  test("mcp-broken-source: a source that does not parse is listed, the rest still renders", async ({ page }) => {
+    await page.route("**/api/mcp?*", async (route) => {
+      const res = await route.fetch();
+      const body = await res.json();
+      body.errors = [{ file: "/tmp/plugin/.mcp.json", message: ".mcp.json is not valid JSON" }];
+      await route.fulfill({ response: res, body: JSON.stringify(body) });
+    });
+    await page.goto(`${projectUrl("fetcher")}/mcp`);
+    await expect(main(page).getByText("does not parse")).toBeVisible();
+    await expect(main(page).getByText(".mcp.json is not valid JSON")).toBeVisible();
+    await expect(main(page).getByRole("row").nth(1)).toBeVisible();
+    await shot(page, "mcp-broken-source");
   });
 
   test("command menu's Add server opens the dialog", async ({ page }) => {
@@ -515,7 +572,13 @@ test.describe("render", () => {
   });
 
   test("plugins", async ({ page }) => {
+    await page.route("**/api/plugins", async (route) => {
+      if (route.request().method() === "GET") await new Promise((r) => setTimeout(r, 300));
+      await route.continue();
+    });
     await page.goto("/global/plugins");
+    await expect(page.locator(".animate-pulse").first()).toBeVisible();
+    expect(await page.getByText(/0 plugins/).count()).toBe(0);
     await expect(page.getByText("9 plugins · 6 enabled")).toBeVisible();
     await shot(page, "plugins");
     await page.getByRole("switch", { name: "Enable code-review" }).click();

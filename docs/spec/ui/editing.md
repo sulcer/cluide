@@ -1,6 +1,6 @@
 # Editing
 
-Status: Stable · Built · 2026-09-12 · The file editor shared by memory, rules, agents, skills, commands, hook scripts and keybindings, and the save experience every editor in cluide follows.
+Status: Stable · Built · 2026-09-15 · The file editor shared by memory, rules, agents, skills, commands, hook scripts and keybindings, and the save experience every editor in cluide follows.
 
 ## At a glance
 
@@ -23,8 +23,9 @@ states and the same dialogs are reused by the settings editor and the MCP server
   case-insensitive. The footer then shows the count, 28px, 11px muted, 1px top border: `34 skills`.
 - **Items** 32px, gap 8px, padding 0 8px, radius 4px, `min-width: 0`: icon muted (`FileText`;
   `Folder` for skills; `FileCode` for hook scripts), then the name with ellipsis. Skills show the
-  folder name and `/SKILL.md` muted after it. Selected: `--accent` plus inset bar. Hover: `--accent`.
-  `j`/`k` move the selection; clicking selects.
+  folder name and `/SKILL.md` muted after it. Selected: `--secondary` background. Hover: `--accent`.
+  `j`/`k` move the selection; clicking selects. Changes:
+  [`2026-09-15-pre-release-refinements.md`](../../adr/2026-09-15-pre-release-refinements.md).
 - **Loading**: six skeleton rows, 32px, a 16px square and a bar of 62, 48, 71, 55, 40 and 66 percent
   width, `--muted`, pulsing at 1.6s.
 - **New file**, after the header's primary button: an input row at the top of the list, padding
@@ -97,7 +98,10 @@ From the header's trash button, or the sheet's `Delete`. Dialog 440px. Title `De
 the name in mono. Body: `This removes <path> from disk.` (for a server: `This removes the server from
 <file>.`) `A copy is kept in ~/.cluide/backups.` Footer, right-aligned: secondary `Cancel` with
 focus, destructive `Delete`. Delete calls `DELETE /api/file?path&etag`, selects the next file,
-toasts `Deleted <name>` with `backup in ~/.cluide/backups`.
+toasts `Deleted <name>` with `backup in ~/.cluide/backups`. A failed delete keeps the dialog open
+and shows `Delete failed · <status> · <message>` in 12px `--destructive` under the body; no toast,
+since an open dialog hides one from assistive technology. Changes:
+[`2026-09-15-pre-release-refinements.md`](../../adr/2026-09-15-pre-release-refinements.md).
 
 ## Behaviour rules
 

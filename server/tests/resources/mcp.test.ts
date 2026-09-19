@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import type { ErrorCode, McpEntry } from "@shared/api";
 import { ApiError } from "../../errors";
@@ -141,10 +141,13 @@ describe("listMcp", () => {
         etag: null,
       },
     ];
-    expect(listMcp(t.project)).toEqual(expected.sort((a, b) => a.name.localeCompare(b.name)));
+    expect(listMcp(t.project)).toEqual({
+      entries: expected.sort((a, b) => a.name.localeCompare(b.name)),
+      errors: [],
+    });
   });
   test("global scope sees only user, plugin and managed", () => {
-    expect(listMcp("global").map((e) => `${e.scope}:${e.name}`)).toEqual([
+    expect(listMcp("global").entries.map((e) => `${e.scope}:${e.name}`)).toEqual([
       "managed:corp",
       "user:github",
       "plugin:plugin_tool_es",
@@ -155,13 +158,334 @@ describe("listMcp", () => {
     t.write("repo/.claude/settings.json", JSON.stringify({ enableAllProjectMcpServers: true }));
     expect(
       listMcp(t.project)
-        .filter((e) => e.scope === "project")
+        .entries.filter((e) => e.scope === "project")
         .map((e) => e.enabled),
     ).toEqual([true, true]);
   });
   test("a disabled plugin contributes no servers", () => {
     t.write(".claude/settings.json", JSON.stringify({ enabledPlugins: {} }));
-    expect(listMcp("global").some((e) => e.scope === "plugin")).toBe(false);
+    expect(listMcp("global").entries.some((e) => e.scope === "plugin")).toBe(false);
+  });
+  test("a plugin .mcp.json that does not parse is listed as an error, the rest still comes back", () => {
+    const claudeJson = join(t.home, ".claude.json");
+    const mcpJson = join(t.project, ".mcp.json");
+    const pluginMcpJson = join(t.claude, "plugins", "cache", "shop", "tool", "1", ".mcp.json");
+    const settings = join(t.claude, "settings.json");
+    const scope = t.project;
+    const entriesWithoutThePlugin: McpEntry[] = [
+      {
+        name: "corp",
+        scope: "managed",
+        file: settings,
+        config: { type: "http", url: "https://corp" },
+        effective: true,
+        shadowedBy: null,
+        enabled: null,
+        etag: null,
+      },
+      {
+        name: "db",
+        scope: "project",
+        file: mcpJson,
+        config: { command: "psql" },
+        effective: true,
+        shadowedBy: null,
+        enabled: true,
+        etag: sliceEtag(projectServers),
+      },
+      {
+        name: "github",
+        scope: "user",
+        file: claudeJson,
+        config: { type: "http", url: "https://api" },
+        effective: true,
+        shadowedBy: null,
+        enabled: null,
+        etag: sliceEtag(userServers),
+      },
+      {
+        name: "shared",
+        scope: "local",
+        file: claudeJson,
+        config: { command: "local-shared" },
+        effective: true,
+        shadowedBy: null,
+        enabled: null,
+        etag: sliceEtag(localServers),
+      },
+      {
+        name: "shared",
+        scope: "project",
+        file: mcpJson,
+        config: { command: "project-shared" },
+        effective: false,
+        shadowedBy: "local",
+        enabled: false,
+        etag: sliceEtag(projectServers),
+      },
+      {
+        name: "shared",
+        scope: "user",
+        file: claudeJson,
+        config: { command: "user-shared" },
+        effective: false,
+        shadowedBy: "local",
+        enabled: null,
+        etag: sliceEtag(userServers),
+      },
+    ];
+    // Seed exactly as the plugin-prefix case does, then break the plugin file.
+    writeFileSync(pluginMcpJson, "{broken");
+    expect(listMcp(scope)).toEqual({
+      entries: entriesWithoutThePlugin,
+      errors: [{ file: pluginMcpJson, message: ".mcp.json is not valid JSON" }],
+    });
+  });
+  test("a project settings.local.json that does not parse contributes no approvals, the rest still comes back", () => {
+    const claudeJson = join(t.home, ".claude.json");
+    const mcpJson = join(t.project, ".mcp.json");
+    const pluginFile = join(t.claude, "plugins", "cache", "shop", "tool", "1", ".mcp.json");
+    const settings = join(t.claude, "settings.json");
+    const settingsLocal = join(t.project, ".claude", "settings.local.json");
+    const expected: McpEntry[] = [
+      {
+        name: "corp",
+        scope: "managed",
+        file: settings,
+        config: { type: "http", url: "https://corp" },
+        effective: true,
+        shadowedBy: null,
+        enabled: null,
+        etag: null,
+      },
+      {
+        name: "db",
+        scope: "project",
+        file: mcpJson,
+        config: { command: "psql" },
+        effective: true,
+        shadowedBy: null,
+        enabled: false,
+        etag: sliceEtag(projectServers),
+      },
+      {
+        name: "github",
+        scope: "user",
+        file: claudeJson,
+        config: { type: "http", url: "https://api" },
+        effective: true,
+        shadowedBy: null,
+        enabled: null,
+        etag: sliceEtag(userServers),
+      },
+      {
+        name: "plugin_tool_es",
+        scope: "plugin",
+        file: pluginFile,
+        config: { command: "es" },
+        effective: true,
+        shadowedBy: null,
+        enabled: null,
+        etag: null,
+      },
+      {
+        name: "shared",
+        scope: "local",
+        file: claudeJson,
+        config: { command: "local-shared" },
+        effective: true,
+        shadowedBy: null,
+        enabled: null,
+        etag: sliceEtag(localServers),
+      },
+      {
+        name: "shared",
+        scope: "project",
+        file: mcpJson,
+        config: { command: "project-shared" },
+        effective: false,
+        shadowedBy: "local",
+        enabled: false,
+        etag: sliceEtag(projectServers),
+      },
+      {
+        name: "shared",
+        scope: "user",
+        file: claudeJson,
+        config: { command: "user-shared" },
+        effective: false,
+        shadowedBy: "local",
+        enabled: null,
+        etag: sliceEtag(userServers),
+      },
+    ];
+    // db was only approved via this file; breaking it drops that approval instead of failing the list.
+    writeFileSync(settingsLocal, "{broken");
+    expect(listMcp(t.project)).toEqual({
+      entries: expected,
+      errors: [{ file: settingsLocal, message: "settings.local.json is not valid JSON" }],
+    });
+  });
+  test("a global settings.json that does not parse is one error, not two, and drops managed and plugins", () => {
+    const claudeJson = join(t.home, ".claude.json");
+    const settings = join(t.claude, "settings.json");
+    // Read by listPlugins (enabledPlugins), the managed source, and would be by approvalOf too,
+    // were it called in global scope: proves the dedupe collapses every one of those to one error.
+    writeFileSync(settings, "{broken");
+    expect(listMcp("global")).toEqual({
+      entries: [
+        {
+          name: "github",
+          scope: "user",
+          file: claudeJson,
+          config: { type: "http", url: "https://api" },
+          effective: true,
+          shadowedBy: null,
+          enabled: null,
+          etag: sliceEtag(userServers),
+        },
+        {
+          name: "shared",
+          scope: "user",
+          file: claudeJson,
+          config: { command: "user-shared" },
+          effective: true,
+          shadowedBy: null,
+          enabled: null,
+          etag: sliceEtag(userServers),
+        },
+      ],
+      errors: [{ file: settings, message: "settings.json is not valid JSON" }],
+    });
+  });
+  test("a broken installed_plugins.json returns the non-plugin sources with that file in errors", () => {
+    const claudeJson = join(t.home, ".claude.json");
+    const settings = join(t.claude, "settings.json");
+    const registry = join(t.claude, "plugins", "installed_plugins.json");
+    writeFileSync(registry, "{broken");
+    expect(listMcp("global")).toEqual({
+      entries: [
+        {
+          name: "corp",
+          scope: "managed",
+          file: settings,
+          config: { type: "http", url: "https://corp" },
+          effective: true,
+          shadowedBy: null,
+          enabled: null,
+          etag: null,
+        },
+        {
+          name: "github",
+          scope: "user",
+          file: claudeJson,
+          config: { type: "http", url: "https://api" },
+          effective: true,
+          shadowedBy: null,
+          enabled: null,
+          etag: sliceEtag(userServers),
+        },
+        {
+          name: "shared",
+          scope: "user",
+          file: claudeJson,
+          config: { command: "user-shared" },
+          effective: true,
+          shadowedBy: null,
+          enabled: null,
+          etag: sliceEtag(userServers),
+        },
+      ],
+      errors: [{ file: registry, message: "installed_plugins.json is not valid JSON" }],
+    });
+  });
+  test("a broken known_marketplaces.json leaves every source listed, with that file in errors", () => {
+    const claudeJson = join(t.home, ".claude.json");
+    const settings = join(t.claude, "settings.json");
+    const pluginFile = join(t.claude, "plugins", "cache", "shop", "tool", "1", ".mcp.json");
+    const marketplaces = join(t.claude, "plugins", "known_marketplaces.json");
+    writeFileSync(marketplaces, "{broken");
+    expect(listMcp("global")).toEqual({
+      entries: [
+        {
+          name: "corp",
+          scope: "managed",
+          file: settings,
+          config: { type: "http", url: "https://corp" },
+          effective: true,
+          shadowedBy: null,
+          enabled: null,
+          etag: null,
+        },
+        {
+          name: "github",
+          scope: "user",
+          file: claudeJson,
+          config: { type: "http", url: "https://api" },
+          effective: true,
+          shadowedBy: null,
+          enabled: null,
+          etag: sliceEtag(userServers),
+        },
+        {
+          name: "plugin_tool_es",
+          scope: "plugin",
+          file: pluginFile,
+          config: { command: "es" },
+          effective: true,
+          shadowedBy: null,
+          enabled: null,
+          etag: null,
+        },
+        {
+          name: "shared",
+          scope: "user",
+          file: claudeJson,
+          config: { command: "user-shared" },
+          effective: true,
+          shadowedBy: null,
+          enabled: null,
+          etag: sliceEtag(userServers),
+        },
+      ],
+      errors: [{ file: marketplaces, message: "known_marketplaces.json is not valid JSON" }],
+    });
+  });
+  test("a broken ~/.claude.json in global scope drops the user servers it defines, keeps managed and plugin", () => {
+    const claudeJson = join(t.home, ".claude.json");
+    const settings = join(t.claude, "settings.json");
+    const pluginFile = join(t.claude, "plugins", "cache", "shop", "tool", "1", ".mcp.json");
+    writeFileSync(claudeJson, "{broken");
+    expect(listMcp("global")).toEqual({
+      entries: [
+        {
+          name: "corp",
+          scope: "managed",
+          file: settings,
+          config: { type: "http", url: "https://corp" },
+          effective: true,
+          shadowedBy: null,
+          enabled: null,
+          etag: null,
+        },
+        {
+          name: "plugin_tool_es",
+          scope: "plugin",
+          file: pluginFile,
+          config: { command: "es" },
+          effective: true,
+          shadowedBy: null,
+          enabled: null,
+          etag: null,
+        },
+      ],
+      errors: [{ file: claudeJson, message: ".claude.json is not valid JSON" }],
+    });
+  });
+  test("a broken ~/.claude.json in a project scope is 422: the scope guard reads it to validate the scope itself", () => {
+    const claudeJson = join(t.home, ".claude.json");
+    writeFileSync(claudeJson, "{broken");
+    rejects(() => listMcp(t.project), 422, "unprocessable");
   });
 });
 

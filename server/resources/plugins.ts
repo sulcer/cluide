@@ -1,8 +1,8 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import type { Plugin, WriteResult } from "@shared/api";
+import type { McpSourceError, Plugin, WriteResult } from "@shared/api";
 import { ApiError, requireBoolean, requireString } from "../errors";
-import { patchJson, readJsonOrEmpty, sliceEtag } from "../fs";
+import { patchJson, readJsonOrEmpty, readSource, sliceEtag } from "../fs";
 import { claudeDir } from "../paths";
 
 interface Install {
@@ -15,10 +15,13 @@ const registryPath = (): string => join(claudeDir(), "plugins", "installed_plugi
 const marketplacesPath = (): string => join(claudeDir(), "plugins", "known_marketplaces.json");
 const settingsPath = (): string => join(claudeDir(), "settings.json");
 
-export function listPlugins(): Plugin[] {
-  const registry: Record<string, Install[]> = readJsonOrEmpty(registryPath()).plugins ?? {};
-  const marketplaces = readJsonOrEmpty(marketplacesPath());
-  const enabled: Record<string, boolean> = readJsonOrEmpty(settingsPath()).enabledPlugins ?? {};
+// With errors given, a file that does not parse contributes nothing and is reported instead of
+// thrown; without it (the default, used by the plugins resource itself), a broken file is a 422.
+export function listPlugins(errors?: McpSourceError[]): Plugin[] {
+  const read = errors ? (path: string) => readSource(path, errors) : readJsonOrEmpty;
+  const registry: Record<string, Install[]> = read(registryPath()).plugins ?? {};
+  const marketplaces = read(marketplacesPath());
+  const enabled: Record<string, boolean> = read(settingsPath()).enabledPlugins ?? {};
   const etag = sliceEtag(enabled);
   return Object.entries(registry)
     .map(([id, installs]) => {

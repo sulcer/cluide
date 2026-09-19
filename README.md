@@ -4,6 +4,18 @@ A tiny local web UI to view and edit your Claude Code setup: `~/.claude`, `~/.cl
 each project's `CLAUDE.md`, `.claude/` and `.mcp.json`. Settings with schema warnings, memory,
 rules, agents, skills, commands, hooks, MCP servers with their precedence, and plugins.
 
+![The plugins screen with the provides badges and indigo enable switches](docs/readme/plugins.png)
+
+## Screens
+
+- **Settings** with the SchemaStore warnings beside the file, for the user, project and local files.
+- **Memory, rules, agents, skills and commands** as plain files, with a diff after every save.
+- **Hooks** grouped by event, with the scripts they call.
+- **MCP servers** merged across every scope, with what shadows what and project approval.
+- **Plugins** with their marketplace, version and an enable switch.
+
+Every screen shares one editor: `⌘S` saves, a conflict shows both versions, `⌘K` finds anything.
+
 ## Run
 
 ```

@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, unlinkSync, writeFileSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
-import type { WriteResult } from "@shared/api";
+import type { McpSourceError, WriteResult } from "@shared/api";
 import { ApiError } from "./errors";
 import { assertAllowed, cluideDir } from "./paths";
 
@@ -73,6 +73,17 @@ export function readJsonOrEmpty(path: string): Record<string, any> {
   const doc = readJsonDoc(path);
   if (doc.exists && doc.json === null) {
     throw new ApiError(422, "unprocessable", `${basename(doc.path)} is not valid JSON`);
+  }
+  return doc.json ?? {};
+}
+
+// Like readJsonOrEmpty, but a file that exists and does not parse is skipped and reported instead
+// of thrown, so the rest of a multi-source read (the MCP list, the plugin registry) still loads.
+export function readSource(path: string, errors: McpSourceError[]): Record<string, any> {
+  const doc = readJsonDoc(path);
+  if (doc.exists && doc.json === null) {
+    errors.push({ file: path, message: `${basename(path)} is not valid JSON` });
+    return {};
   }
   return doc.json ?? {};
 }

@@ -1,6 +1,6 @@
 # MCP servers screen
 
-Status: Stable · Built · 2026-09-12 · The merged server list, the server sheet, the add dialog, and approval.
+Status: Stable · Built · 2026-09-15 · The merged server list, the server sheet, the add dialog, and approval.
 
 ## At a glance
 
@@ -13,8 +13,8 @@ the save bar; `Add server` in the header opens a dialog that writes to the chose
 ## Table
 
 `table-layout: fixed`, 13px. Header cells 32px, 12px 500 muted, 1px bottom border. Rows 36px, 1px
-bottom border, `cursor: pointer`, hover `--accent`, the row whose sheet is open has `--accent` and the
-inset bar.
+bottom border, `cursor: pointer`, hover `--accent`, the row whose sheet is open has `--secondary`
+background.
 
 | Column | Width | Content |
 |---|---|---|
@@ -28,6 +28,12 @@ inset bar.
 Rows are grouped by name and sorted by name; within a name, by precedence, so the winner is first.
 Shadowed rows are at 50% opacity. Under the table a 32px line in 11px muted:
 `<n> effective · <m> shadowed · precedence local › project › user › plugin › managed`.
+
+Above the table, one line per entry in the list's `errors`, in the shape of the settings screen's
+parse banner: 12px `--destructive` text on a 1px `--destructive` border, radius 6px, margin 12px 16px
+0, `CircleAlert`, the file's basename in mono, `does not parse`, and the message in mono at 80% on
+the right. The parsed entries render under it as usual. Changes:
+[`2026-09-15-pre-release-refinements.md`](../../adr/2026-09-15-pre-release-refinements.md).
 
 At 1024px the Command column truncates and nothing scrolls horizontally.
 
@@ -75,7 +81,10 @@ Dialog 480px. Header padding 16px 16px 12px, 1px bottom border: `Add server` in 
 Footer, right-aligned: secondary `Cancel`, primary `Add server` with a `⌘↵` kbd, disabled at 50%
 opacity until a name and a command or URL are present. Submit builds the config, `{ command, args }`
 or `{ type, url, headers }` with empty parts omitted, calls `PUT /api/mcp`, closes, reloads the list,
-and toasts `Added <name>` with the file written.
+and toasts `Added <name>` with the file written. A failed save keeps the dialog open and shows
+`Save failed · <status> · <message>` in 12px `--destructive` under the fields; no toast, since an open
+dialog hides one from assistive technology. Changes:
+[`2026-09-15-pre-release-refinements.md`](../../adr/2026-09-15-pre-release-refinements.md).
 
 ## Open questions
 

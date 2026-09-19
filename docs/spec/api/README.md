@@ -36,7 +36,7 @@ Decided in: [`2026-09-12-hybrid-config-model.md`](../../adr/2026-09-12-hybrid-co
 | 403 | `forbidden` | A guard in `security.ts` failed |
 | 404 | `not_found` | A required file or entry does not exist |
 | 409 | `conflict` | Etag mismatch (`current` carries the on-disk content and its etag), or Create on a path that exists |
-| 422 | `unprocessable` | A file that must parse as JSON does not |
+| 422 | `unprocessable` | A file that must parse as JSON does not; `GET /api/mcp` is the exception, it skips such a source and lists it in `errors` |
 | 500 | `internal` | Backup or write failed; nothing was changed |
 
 The server never throws raw. Every route returns this shape.

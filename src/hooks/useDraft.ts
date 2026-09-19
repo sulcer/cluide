@@ -75,7 +75,7 @@ export function useDraft(loaded: Loaded | undefined, save: SaveFn, name: string,
       if (mapped?.etag !== undefined) {
         setConflict(mapped);
       } else {
-        if (err.status === 400 || err.status === 422) setError({ status: err.status, message: err.message });
+        setError({ status: err.status, message: err.message });
         toast({
           title: "Save failed",
           description: err.status ? `${err.status} · ${err.message}` : err.message,
