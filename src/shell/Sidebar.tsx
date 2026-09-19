@@ -43,12 +43,10 @@ export function Sidebar({ rail, scope, screen, projects, onOpenMenu }: Props) {
               <NavLink
                 to={screenUrl(scope, def.id)}
                 aria-label={def.label}
-                className={({ isActive }) =>
-                  cn(
-                    "flex size-8 items-center justify-center rounded-md text-muted-foreground hover:bg-sidebar-accent",
-                    isActive && "bg-sidebar-accent text-sidebar-foreground",
-                  )
-                }
+                className={cn(
+                  "flex size-8 items-center justify-center rounded-md text-muted-foreground hover:bg-sidebar-accent",
+                  def.id === screen && "bg-sidebar-accent text-sidebar-foreground",
+                )}
               >
                 <ScreenIcon id={def.id} className="size-4" />
               </NavLink>

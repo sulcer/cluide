@@ -21,11 +21,38 @@ test.describe("render", () => {
     await page.getByRole("button", { name: "Toggle sidebar" }).click();
     // Rail mode drops the <nav> landmark, so a link missing from <nav> proves the collapse.
     await expect(page.locator("nav").getByRole("link", { name: "Settings" })).toHaveCount(0);
-    await expect(page.getByRole("link", { name: "Settings" })).toBeVisible();
+    const link = page.getByRole("link", { name: "Settings" });
+    await expect(link).toBeVisible();
+    // A rail icon is wrapped in <TooltipTrigger asChild>: Radix's Slot merges className by string
+    // concatenation, so a function className (react-router's render-prop) used to render as its
+    // stringified source, breaking `flex` and pushing the icon off-centre. Assert geometry, not class names.
+    const rail = page.locator("aside.w-12");
+    const [display, linkBox, railBox] = await Promise.all([
+      link.evaluate((el) => getComputedStyle(el).display),
+      link.evaluate((el) => el.getBoundingClientRect()),
+      rail.evaluate((el) => el.getBoundingClientRect()),
+    ]);
+    expect(display).toBe("flex");
+    expect(Math.round(linkBox.x + linkBox.width / 2)).toBe(Math.round(railBox.x + railBox.width / 2));
     await shot(page, "shell-collapsed");
     await page.reload();
     await expect(page.locator("nav").getByRole("link", { name: "Settings" })).toHaveCount(0); // persisted
     await page.getByRole("button", { name: "Toggle sidebar" }).click();
+  });
+
+  test("scrollbars: color-scheme follows the theme and every scroll area is themed", async ({ page }) => {
+    await page.goto("/global/rules");
+    await expect.poll(() => page.evaluate(() => getComputedStyle(document.documentElement).colorScheme)).toBe("dark");
+    // getComputedStyle(el, "::-webkit-scrollbar") resolves the rule statically in Chrome, without needing
+    // the list to actually overflow.
+    const list = page.locator(".overflow-y-auto").first();
+    await expect(list.evaluate((el) => getComputedStyle(el, "::-webkit-scrollbar").width)).resolves.toBe("10px");
+    await page.keyboard.press("ControlOrMeta+k");
+    const cmdList = page.locator(".no-scrollbar");
+    await expect(cmdList.evaluate((el) => getComputedStyle(el, "::-webkit-scrollbar").display)).resolves.toBe("none");
+    await page.keyboard.press("Escape");
+    await page.getByRole("button", { name: "Toggle theme" }).click();
+    await expect.poll(() => page.evaluate(() => getComputedStyle(document.documentElement).colorScheme)).toBe("light");
   });
 
   test("shell-scope-open", async ({ page }) => {
