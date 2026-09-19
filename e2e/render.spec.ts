@@ -459,7 +459,8 @@ test.describe("render", () => {
     await page.getByRole("row", { name: /^asana/ }).click();
     await expect(page.getByRole("dialog")).toContainText("Config");
     await expect(page.getByRole("dialog").locator("textarea")).toBeFocused();
-    expect((await page.getByRole("dialog").boundingBox())?.width).toBe(520);
+    // Linux lays the sheet out a fraction of a pixel wide, so compare rounded.
+    expect(Math.round((await page.getByRole("dialog").boundingBox())?.width ?? 0)).toBe(520);
     await shot(page, "mcp-sheet");
     const ta = page.getByRole("dialog").locator("textarea");
     await ta.fill("not json");
