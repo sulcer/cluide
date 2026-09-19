@@ -40,6 +40,21 @@ test.describe("render", () => {
     await page.getByRole("button", { name: "Toggle sidebar" }).click();
   });
 
+  test("scrollbars: color-scheme follows the theme and every scroll area is themed", async ({ page }) => {
+    await page.goto("/global/rules");
+    await expect.poll(() => page.evaluate(() => getComputedStyle(document.documentElement).colorScheme)).toBe("dark");
+    // getComputedStyle(el, "::-webkit-scrollbar") resolves the rule statically in Chrome, without needing
+    // the list to actually overflow.
+    const list = page.locator(".overflow-y-auto").first();
+    await expect(list.evaluate((el) => getComputedStyle(el, "::-webkit-scrollbar").width)).resolves.toBe("10px");
+    await page.keyboard.press("ControlOrMeta+k");
+    const cmdList = page.locator(".no-scrollbar");
+    await expect(cmdList.evaluate((el) => getComputedStyle(el, "::-webkit-scrollbar").display)).resolves.toBe("none");
+    await page.keyboard.press("Escape");
+    await page.getByRole("button", { name: "Toggle theme" }).click();
+    await expect.poll(() => page.evaluate(() => getComputedStyle(document.documentElement).colorScheme)).toBe("light");
+  });
+
   test("shell-scope-open", async ({ page }) => {
     await page.goto("/global/settings");
     await page
