@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.2.0 (2026-09-19)
+
+<!-- Release notes generated using configuration in .github/release.yml at main -->
+
+## What's Changed
+### Features
+* feat: give the page one accent and keep the mcp list alive past a broken file by @sulcer in https://github.com/sulcer/cluide/pull/6
+
+
+**Full Changelog**: https://github.com/sulcer/cluide/compare/v0.1.0...v0.2.0
+
 ## 0.1.0 (2026-09-14)
 
 <!-- Release notes generated using configuration in .github/release.yml at main -->
