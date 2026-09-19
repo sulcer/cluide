@@ -13,8 +13,8 @@ the save bar; `Add server` in the header opens a dialog that writes to the chose
 ## Table
 
 `table-layout: fixed`, 13px. Header cells 32px, 12px 500 muted, 1px bottom border. Rows 36px, 1px
-bottom border, `cursor: pointer`, hover `--accent`, the row whose sheet is open has `--accent` and the
-inset bar.
+bottom border, `cursor: pointer`, hover `--accent`, the row whose sheet is open has `--secondary`
+background.
 
 | Column | Width | Content |
 |---|---|---|

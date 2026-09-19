@@ -93,8 +93,10 @@ trigger to revisit, reference. Add an item when deferring. Remove it when it lan
   written; degrading it either still refuses every project scope (no improvement) or accepts any
   absolute path when the file is broken, which drops that check. Picking between them is its own
   decision, not a side effect of the MCP list.
-- **Trigger:** A broken `~/.claude.json` hiding a user's MCP servers in project scope becomes a real
-  complaint — today they can still see them in global scope, where the guard is not consulted.
+- **Trigger:** A broken `~/.claude.json` hiding a user's MCP servers becomes a real complaint — the
+  user's own `mcpServers` and every project's `local` servers are stored in that file, so when it
+  does not parse, even a global-scope list returns only the plugin and managed servers plus the
+  error, and the servers that file defines are unreadable in every scope.
 - **Reference:** [`api/mcp.md`](spec/api/mcp.md), `assertScope`/`assertAllowed` in `server/paths.ts`.
 
 ---
@@ -106,10 +108,12 @@ Found reconciling the built frontend against its specs; each too small for its o
 - Reserved browser chords (`⌘⇧T`, `⌘1`–`⌘9`) must be pressed by hand in Chrome once — Playwright's
   `page.keyboard.press` bypasses the browser's own shortcut layer.
 - e2e per-test independence: seed a home per worker instead of sharing one across the whole run.
-- A toast raised while a Radix dialog or sheet is open is still `aria-hidden`; the failure paths
-  now show their error inside the dialog, so what remains is announcing a success (the conflict
-  flow's `Saved` and `Reloaded`, the MCP sheet's `Saved`), which needs the sheet's save bar to
-  carry it.
+- A toast raised while a Radix dialog or sheet is open is still `aria-hidden`. The delete and
+  add-server dialogs show a failed action inline with `role="alert"`. The MCP sheet's failed save
+  is now inline for every status too (`useDraft` no longer gates it to 400 or 422), but its
+  `Editor` error `div` carries no `role="alert"`, so it is visible, not announced. What remains:
+  give that error `role="alert"`, and announce a success (the conflict flow's `Saved` and
+  `Reloaded`, the MCP sheet's `Saved`), which needs the sheet's save bar to carry it.
 - The MCP sheet's width comes from an explicit `max-width` over the generated `w-3/4` — a comment
   in `sheet.tsx`, not a cleaner fix.
 - The plugin toggle e2e case proves only the toggled row's own etag updates.

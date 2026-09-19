@@ -451,6 +451,42 @@ describe("listMcp", () => {
       errors: [{ file: marketplaces, message: "known_marketplaces.json is not valid JSON" }],
     });
   });
+  test("a broken ~/.claude.json in global scope drops the user servers it defines, keeps managed and plugin", () => {
+    const claudeJson = join(t.home, ".claude.json");
+    const settings = join(t.claude, "settings.json");
+    const pluginFile = join(t.claude, "plugins", "cache", "shop", "tool", "1", ".mcp.json");
+    writeFileSync(claudeJson, "{broken");
+    expect(listMcp("global")).toEqual({
+      entries: [
+        {
+          name: "corp",
+          scope: "managed",
+          file: settings,
+          config: { type: "http", url: "https://corp" },
+          effective: true,
+          shadowedBy: null,
+          enabled: null,
+          etag: null,
+        },
+        {
+          name: "plugin_tool_es",
+          scope: "plugin",
+          file: pluginFile,
+          config: { command: "es" },
+          effective: true,
+          shadowedBy: null,
+          enabled: null,
+          etag: null,
+        },
+      ],
+      errors: [{ file: claudeJson, message: ".claude.json is not valid JSON" }],
+    });
+  });
+  test("a broken ~/.claude.json in a project scope is 422: the scope guard reads it to validate the scope itself", () => {
+    const claudeJson = join(t.home, ".claude.json");
+    writeFileSync(claudeJson, "{broken");
+    rejects(() => listMcp(t.project), 422, "unprocessable");
+  });
 });
 
 describe("putMcp", () => {

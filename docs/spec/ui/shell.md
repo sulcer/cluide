@@ -22,9 +22,10 @@ scroll.
 - **Navigation.** Padding 4px 8px, groups 12px apart. Group label 24px tall, 12px 500 muted:
   `Config`, `Extensions`, `MCP`. Items 28px tall, gap 8px, padding 0 8px, radius 4px, weight 500,
   icon and label `--muted-foreground`; active item `--sidebar-accent` background,
-  `--sidebar-foreground` text and icon, inset 2px bar; hover `--sidebar-accent` only. A kbd hint
+  `--sidebar-foreground` text and icon; hover `--sidebar-accent` only. A kbd hint
   `⌘1` to `⌘9` sits at the right in 11px muted at 70% opacity, numbered by the item's position
-  among the items shown. `Keybindings` and `Plugins` are shown only in global scope.
+  among the items shown. `Keybindings` and `Plugins` are shown only in global scope. Changes:
+  [`2026-09-15-pre-release-refinements.md`](../../adr/2026-09-15-pre-release-refinements.md).
 - **Footer.** 40px, 1px top border, padding 0 12px, gap 4px: a 28×28 icon button toggling the theme
   (`Sun` in dark, `Moon` in light), the version in mono 11px muted, a spacer, and a 24px bordered
   button showing the `Command` icon and `K` that opens the command menu.

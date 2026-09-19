@@ -81,8 +81,8 @@ behaviour.
 
 - `GET /api/mcp` changes shape; `api/mcp.md`, `shared/api.ts`, `McpScreen` and the e2e mocks
   change together. The 422 row in `api/README.md` gains the exception.
-- `readJsonOrEmpty` stays the write-side gate; the list uses `readJsonDoc` directly to tell
-  "missing" from "broken".
+- `readJsonOrEmpty` stays the write-side gate; the list uses `readSource`, which wraps `readJsonDoc`,
+  to tell "missing" from "broken".
 - `editing.md` (delete dialog) and `ui/mcp.md` (add dialog, list) carry `Changes:` backlinks here.
 - `tokens.md` carries the new values with a `Changes:` backlink; `settings.md` follows the badge.
   Every render in `e2e/renders/` changes; the render suite's colour assertions (the cursor case,

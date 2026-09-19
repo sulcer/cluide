@@ -39,7 +39,8 @@ the name in 11px muted Inter. The save bar sits at the right of the same row.
 - Header 32px, padding 0 12px, 12px 500: `Warnings`, the count badge (`--secondary` with `--foreground` text
   above zero, `--muted` at zero), then when the read carried `schema: "unavailable"` a dashed badge
   with `TriangleAlert` and `Schema unavailable`, tooltip `Last fetch failed. Validated against the
-  cached copy.`; a spacer; and `schemastore.org` in 11px muted, hidden when the badge shows.
+  cached copy.`; a spacer; and `schemastore.org` in 11px muted, hidden when the badge shows. Changes:
+  [`2026-09-15-pre-release-refinements.md`](../../adr/2026-09-15-pre-release-refinements.md).
 - Zero warnings: padding 16px 12px, `Check` in `--success`, `Valid against the published schema`
   in 12px muted.
 - Rows, one per `SchemaError`: padding 6px 12px, 1px bottom border, the JSON pointer in mono 12px on
