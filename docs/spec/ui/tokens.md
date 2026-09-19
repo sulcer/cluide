@@ -25,7 +25,7 @@ unchanged; Tailwind reads them through `@theme inline`. Changes:
 | `--popover-foreground` | `oklch(0.925 0.002 60)` | `oklch(0.2 0.002 60)` |
 | `--primary` | `oklch(0.537 0.158 273)` | `oklch(0.537 0.158 273)` |
 | `--primary-foreground` | `oklch(0.985 0 0)` | `oklch(0.985 0 0)` |
-| `--secondary` | `oklch(0.272 0.002 60)` | `oklch(0.93 0.002 60)` |
+| `--secondary` | `oklch(0.272 0.002 60)` | `oklch(0.92 0.002 60)` |
 | `--secondary-hover` | `oklch(0.3 0.002 60)` | `oklch(0.9 0.002 60)` |
 | `--secondary-foreground` | `oklch(0.925 0.002 60)` | `oklch(0.2 0.002 60)` |
 | `--muted` | `oklch(0.235 0.002 60)` | `oklch(0.96 0.002 60)` |

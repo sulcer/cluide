@@ -154,7 +154,12 @@ test.describe("render", () => {
     await page.keyboard.type("style");
     await page.keyboard.press("Enter");
     await expect(page.getByText("Created style.md")).toBeVisible();
-    await expect(page.getByRole("button", { name: "style.md" })).toHaveClass(/selected/);
+    const row = page.getByRole("button", { name: "style.md" });
+    await expect(row).toHaveClass(/selected/);
+    const bg = () => row.evaluate((el) => getComputedStyle(el).backgroundColor);
+    const before = await bg();
+    await row.hover();
+    await expect.poll(bg).toBe(before);
   });
 
   test("editor-create for a missing fixed file", async ({ page }) => {
