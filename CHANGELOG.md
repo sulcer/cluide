@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.2 (2026-09-20)
+
+<!-- Release notes generated using configuration in .github/release.yml at main -->
+
+
+
+**Full Changelog**: https://github.com/sulcer/cluide/compare/v0.3.1...v0.3.2
+
 ## 0.3.1 (2026-09-20)
 
 <!-- Release notes generated using configuration in .github/release.yml at main -->
