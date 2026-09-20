@@ -72,7 +72,9 @@ jobs:
           esac
           echo "tgz=$TGZ" >> "$GITHUB_OUTPUT"
           echo "dist_tag=$DIST_TAG" >> "$GITHUB_OUTPUT"
-      - run: npm install -g npm@11
+      # A global install writes man pages under /usr/local, which the runner user cannot
+      # create; trusted publishing needs npm 11 or newer.
+      - run: sudo npm install -g npm@11
       - run: npm publish "${{ steps.pack.outputs.tgz }}" --provenance --access public --tag "${{ steps.pack.outputs.dist_tag }}"
       - run: gh release upload "$TAG" "${{ steps.pack.outputs.tgz }}" --clobber
         env:
