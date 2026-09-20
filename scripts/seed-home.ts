@@ -11,8 +11,8 @@ export function seedHome(): string {
     mkdirSync(dirname(path), { recursive: true });
     writeFileSync(path, content);
   };
-  const fetcher = join(home, "fetcher");
-  const reporting = join(home, "reporting-api");
+  const acmeApi = join(home, "acme-api");
+  const acmeWeb = join(home, "acme-web");
   const cluide = join(home, "cluide");
   const gone = join(home, "old-repo");
   const cache = join(home, ".claude", "plugins", "cache");
@@ -29,7 +29,7 @@ export function seedHome(): string {
         webstorm: { command: "/Applications/WebStorm.app/Contents/MacOS/webstorm", args: ["mcpServer"] },
       },
       projects: {
-        [fetcher]: {
+        [acmeApi]: {
           mcpServers: {
             "chrome-devtools": {
               command: "npx",
@@ -37,7 +37,7 @@ export function seedHome(): string {
             },
           },
         },
-        [reporting]: {},
+        [acmeWeb]: {},
         [cluide]: {},
         [gone]: {},
       },
@@ -197,30 +197,30 @@ export function seedHome(): string {
   write(".claude/plugins/installed_plugins.json", json({ version: 1, plugins: registry }));
   write(".claude/plugins/known_marketplaces.json", json(marketplaces));
 
-  write("fetcher/CLAUDE.md", "# fetcher\n\nA service that pulls metrics from third-party APIs.\n");
+  write("acme-api/CLAUDE.md", "# acme-api\n\nThe public API. Bun and Postgres.\n");
   write(
-    "fetcher/.claude/settings.json",
+    "acme-api/.claude/settings.json",
     json({
       hooks: {
-        PreToolUse: [{ matcher: "Bash", hooks: [{ type: "command", command: `${fetcher}/.claude/hooks/check.sh` }] }],
+        PreToolUse: [{ matcher: "Bash", hooks: [{ type: "command", command: `${acmeApi}/.claude/hooks/check.sh` }] }],
       },
     }),
   );
-  write("fetcher/.claude/settings.local.json", json({ enabledMcpjsonServers: ["fetcher-postgres-local"] }));
+  write("acme-api/.claude/settings.local.json", json({ enabledMcpjsonServers: ["acme-postgres-local"] }));
   write(
-    "fetcher/.mcp.json",
+    "acme-api/.mcp.json",
     json({
       mcpServers: {
-        "fetcher-postgres-local": {
+        "acme-postgres-local": {
           command: "docker",
-          args: ["exec", "-i", "fetcher-db", "psql", "-U", "fetcher", "-d", "fetcher"],
+          args: ["exec", "-i", "acme-db", "psql", "-U", "acme", "-d", "acme"],
         },
       },
     }),
   );
-  write("fetcher/.claude/rules/api.md", "# API rules\n\nEvery endpoint returns the error shape.\n");
-  write("fetcher/.claude/hooks/check.sh", "#!/bin/sh\nexit 0\n");
-  write("reporting-api/CLAUDE.md", "# reporting-api\n");
+  write("acme-api/.claude/rules/api.md", "# API rules\n\nEvery endpoint returns the error shape.\n");
+  write("acme-api/.claude/hooks/check.sh", "#!/bin/sh\nexit 0\n");
+  write("acme-web/CLAUDE.md", "# acme-web\n");
   write("cluide/CLAUDE.md", "# cluide\n");
   write("cluide/.claude/settings.json", json({}));
   write("cluide/.claude/settings.local.json", '{\n  "permissions": {\n    "allow": [\n  }\n}\n');
