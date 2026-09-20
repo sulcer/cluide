@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.3.0 (2026-09-19)
+
+<!-- Release notes generated using configuration in .github/release.yml at main -->
+
+## What's Changed
+### Fixes
+* fix: centre the rail icons and theme the scrollbars by @sulcer in https://github.com/sulcer/cluide/pull/8
+
+
+**Full Changelog**: https://github.com/sulcer/cluide/compare/v0.2.0...v0.3.0
+
 ## 0.2.0 (2026-09-19)
 
 <!-- Release notes generated using configuration in .github/release.yml at main -->
