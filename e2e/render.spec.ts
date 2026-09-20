@@ -64,8 +64,8 @@ test.describe("render", () => {
     await expect(page.getByPlaceholder("Switch scope")).toBeFocused();
     await expect(page.getByText("4 projects")).toBeVisible();
     await shot(page, "shell-scope-open");
-    await page.getByText("fetcher", { exact: true }).click();
-    await expect(page).toHaveURL(/\/p\/.*fetcher\/settings$/);
+    await page.getByText("acme-api", { exact: true }).click();
+    await expect(page).toHaveURL(/\/p\/.*acme-api\/settings$/);
   });
 
   test("command-menu", async ({ page }) => {
@@ -95,7 +95,7 @@ test.describe("render", () => {
     await page.goto("/global/settings");
     await page.keyboard.press("ControlOrMeta+9");
     await expect(page).toHaveURL(/\/global\/plugins$/);
-    await page.goto(`${projectUrl("fetcher")}/settings`);
+    await page.goto(`${projectUrl("acme-api")}/settings`);
     await page.keyboard.press("ControlOrMeta+8");
     await expect(page).toHaveURL(/\/mcp$/);
     await page.keyboard.press("ControlOrMeta+Shift+t"); // Chrome's reopen-closed-tab; the page must ignore it
@@ -168,7 +168,7 @@ test.describe("render", () => {
   });
 
   test("editor-empty", async ({ page }) => {
-    await page.goto(`${projectUrl("reporting-api")}/rules`);
+    await page.goto(`${projectUrl("acme-web")}/rules`);
     await expect(page.getByText("No rules in this scope")).toBeVisible();
     await shot(page, "editor-empty");
   });
@@ -190,12 +190,12 @@ test.describe("render", () => {
   });
 
   test("editor-create for a missing fixed file", async ({ page }) => {
-    await page.goto(`${projectUrl("reporting-api")}/memory`);
+    await page.goto(`${projectUrl("acme-web")}/memory`);
     await page.getByRole("button", { name: "CLAUDE.local.md" }).click();
     await expect(page.getByText("CLAUDE.local.md does not exist in this scope")).toBeVisible();
     await shot(page, "editor-create");
     await page.getByRole("button", { name: "Create CLAUDE.local.md" }).click();
-    await expect(page.locator("textarea")).toHaveValue("# reporting-api\n\n");
+    await expect(page.locator("textarea")).toHaveValue("# acme-web\n\n");
     await expect(page.getByText("Unsaved changes")).toBeVisible();
     await page.keyboard.press("ControlOrMeta+s");
     await expect(page.getByText("Created CLAUDE.local.md")).toBeVisible();
@@ -461,7 +461,7 @@ test.describe("render", () => {
   });
 
   test("hooks-empty", async ({ page }) => {
-    await page.goto(`${projectUrl("reporting-api")}/hooks`);
+    await page.goto(`${projectUrl("acme-web")}/hooks`);
     await expect(page.getByText("No hooks in this scope")).toBeVisible();
     await shot(page, "hooks-empty");
   });
@@ -474,14 +474,14 @@ test.describe("render", () => {
   });
 
   test("mcp-project with approval, shadowing and the sheet", async ({ page }) => {
-    await page.goto(`${projectUrl("fetcher")}/mcp`);
+    await page.goto(`${projectUrl("acme-api")}/mcp`);
     await expect(page.getByText("Shadowed by local")).toBeVisible();
-    await expect(page.getByRole("switch", { name: "Approve fetcher-postgres-local" })).toBeChecked();
+    await expect(page.getByRole("switch", { name: "Approve acme-postgres-local" })).toBeChecked();
     await shot(page, "mcp-project");
-    await page.getByRole("switch", { name: "Approve fetcher-postgres-local" }).click();
-    await expect(page.getByText("Approval removed for fetcher-postgres-local")).toBeVisible();
-    await page.getByRole("switch", { name: "Approve fetcher-postgres-local" }).click();
-    await expect(page.getByText("Approved fetcher-postgres-local")).toBeVisible();
+    await page.getByRole("switch", { name: "Approve acme-postgres-local" }).click();
+    await expect(page.getByText("Approval removed for acme-postgres-local")).toBeVisible();
+    await page.getByRole("switch", { name: "Approve acme-postgres-local" }).click();
+    await expect(page.getByText("Approved acme-postgres-local")).toBeVisible();
 
     await page.getByRole("row", { name: /^asana/ }).click();
     await expect(page.getByRole("dialog")).toContainText("Config");
@@ -506,7 +506,7 @@ test.describe("render", () => {
   });
 
   test("mcp-approval failure keeps the switch checked and toasts", async ({ page }) => {
-    await page.goto(`${projectUrl("fetcher")}/mcp`);
+    await page.goto(`${projectUrl("acme-api")}/mcp`);
     await page.route("**/api/mcp/approval", (route) =>
       route.fulfill({
         status: 500,
@@ -514,7 +514,7 @@ test.describe("render", () => {
         body: JSON.stringify({ error: { code: "internal", message: "backup failed" } }),
       }),
     );
-    const sw = page.getByRole("switch", { name: "Approve fetcher-postgres-local" });
+    const sw = page.getByRole("switch", { name: "Approve acme-postgres-local" });
     await expect(sw).toBeChecked();
     await sw.click();
     await expect(toast(page)).toContainText("Save failed");
@@ -523,7 +523,7 @@ test.describe("render", () => {
   });
 
   test("mcp-add", async ({ page }) => {
-    await page.goto(`${projectUrl("fetcher")}/mcp`);
+    await page.goto(`${projectUrl("acme-api")}/mcp`);
     await page.getByRole("button", { name: "Add server" }).click();
     await expect(page.getByPlaceholder("my-server")).toBeFocused();
     await shot(page, "mcp-add");
@@ -556,7 +556,7 @@ test.describe("render", () => {
           })
         : route.continue(),
     );
-    await page.goto(`${projectUrl("fetcher")}/mcp`);
+    await page.goto(`${projectUrl("acme-api")}/mcp`);
     await page.getByRole("button", { name: "Add server" }).click();
     await page.getByPlaceholder("my-server").fill("echo");
     await page.getByPlaceholder("npx").fill("echo");
@@ -567,7 +567,7 @@ test.describe("render", () => {
 
   test("mcp-project-1024", async ({ page }) => {
     await page.setViewportSize({ width: 1024, height: 768 });
-    await page.goto(`${projectUrl("fetcher")}/mcp`);
+    await page.goto(`${projectUrl("acme-api")}/mcp`);
     await expect(page.getByText("Shadowed by local")).toBeVisible();
     expect(
       await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth),
@@ -582,7 +582,7 @@ test.describe("render", () => {
       body.errors = [{ file: "/tmp/plugin/.mcp.json", message: ".mcp.json is not valid JSON" }];
       await route.fulfill({ response: res, body: JSON.stringify(body) });
     });
-    await page.goto(`${projectUrl("fetcher")}/mcp`);
+    await page.goto(`${projectUrl("acme-api")}/mcp`);
     await expect(main(page).getByText("does not parse")).toBeVisible();
     await expect(main(page).getByText(".mcp.json is not valid JSON")).toBeVisible();
     await expect(main(page).getByRole("row").nth(1)).toBeVisible();
@@ -669,7 +669,7 @@ test.describe("light", () => {
   });
 
   test("light-mcp-project and light-plugins", async ({ page }) => {
-    await page.goto(`${projectUrl("fetcher")}/mcp`);
+    await page.goto(`${projectUrl("acme-api")}/mcp`);
     await expect(page.getByText("Shadowed by local")).toBeVisible();
     await shot(page, "light-mcp-project");
     await page.goto("/global/plugins");

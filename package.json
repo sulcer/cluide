@@ -43,6 +43,7 @@
     "format": "biome check --write .",
     "e2e": "bunx playwright test -c e2e/playwright.config.ts",
     "render": "bunx playwright test -c e2e/playwright.config.ts render.spec.ts",
+    "gif": "GIF=1 bunx playwright test -c e2e/playwright.config.ts tour.spec.ts && rm -rf e2e/test-results/frames && mkdir -p e2e/test-results/frames && ffmpeg -y -loglevel error -ss 0.35 -i e2e/test-results/tour.webm -vf fps=12 e2e/test-results/frames/%04d.png && gifski -o docs/readme/tour.gif --fps 12 --quality 70 --motion-quality 92 --width 1536 e2e/test-results/frames/*.png && ls -lh docs/readme/tour.gif",
     "check-docs": "bun scripts/check-docs.ts",
     "prepack": "bun run build"
   },
