@@ -14,28 +14,50 @@ test.use({ viewport: SIZE, video: { mode: "on", size: SIZE } });
 const PRIVATE = [homedir(), process.env.USER, process.env.TMPDIR].filter((s): s is string => !!s && s !== "/");
 
 // A beat: hold a finished state long enough to read, and check it before the frames are kept.
-async function beat(page: Page, ms = 1100) {
+async function beat(page: Page, ms = 800) {
   const text = await page.locator("body").innerText();
   for (const secret of PRIVATE) expect(text, `the page shows ${secret}`).not.toContain(secret);
   await page.waitForTimeout(ms);
 }
 
 // Playwright's video has no mouse cursor, so the tour drives the app the way the app asks to be
-// driven: ⌘K, ⌘1…⌘9, ⌘S.
+// driven: ⌘1…⌘9 down the sidebar, then ⌘K and ⌘S.
 test("tour", async ({ page }) => {
   await page.goto("/global/settings");
   await expect(page.getByRole("complementary", { name: "Warnings" }).getByText("/modelSettings")).toBeVisible();
-  await beat(page, 1300);
+  await beat(page, 1500);
 
-  await page.keyboard.press("ControlOrMeta+k");
-  await expect(page.getByPlaceholder("Type a command or search")).toBeFocused();
-  await beat(page, 500);
-  await page.keyboard.type("plug", { delay: 90 });
-  await beat(page, 500);
-  await page.keyboard.press("Enter");
-  await expect(page).toHaveURL(/\/global\/plugins$/);
-  await beat(page, 900);
+  await page.keyboard.press("ControlOrMeta+2");
+  await expect(page.locator("textarea")).toHaveValue(/# Global instructions/);
+  await beat(page);
 
+  await page.keyboard.press("ControlOrMeta+3");
+  await expect(page.getByRole("button", { name: "security.md" })).toBeVisible();
+  await beat(page);
+
+  await page.keyboard.press("ControlOrMeta+4");
+  await expect(page.getByRole("button", { name: "keybindings.json" })).toBeVisible();
+  await beat(page, 700);
+
+  await page.keyboard.press("ControlOrMeta+5");
+  await expect(page.getByRole("button", { name: "reviewer.md" })).toBeVisible();
+  await beat(page);
+
+  await page.keyboard.press("ControlOrMeta+6");
+  await expect(page.getByText("brainstorming", { exact: true })).toBeVisible();
+  await beat(page);
+
+  await page.keyboard.press("ControlOrMeta+7");
+  await expect(page.getByRole("button", { name: "commit.md" })).toBeVisible();
+  await beat(page, 700);
+
+  await page.keyboard.press("ControlOrMeta+8");
+  await expect(page.getByText("PreToolUse")).toBeVisible();
+  await beat(page, 1200);
+
+  await page.keyboard.press("ControlOrMeta+9");
+  await expect(page.getByRole("switch", { name: "Enable code-review" })).toBeVisible();
+  await beat(page, 1100);
   await page.getByRole("switch", { name: "Enable code-review" }).click();
   await expect(page.getByText("Enabled code-review")).toBeVisible();
   await beat(page, 1100);
@@ -46,7 +68,7 @@ test("tour", async ({ page }) => {
   await beat(page, 500);
   await page.keyboard.press("Enter");
   await expect(page.getByText(/precedence local/)).toBeVisible();
-  await beat(page, 1200);
+  await beat(page, 1400);
 
   // The scope switcher keeps the screen and changes the files under it.
   await page
@@ -59,7 +81,7 @@ test("tour", async ({ page }) => {
   await beat(page, 500);
   await page.getByText("acme-api", { exact: true }).click();
   await expect(page).toHaveURL(new RegExp(`${projectUrl("acme-api")}/mcp$`));
-  await beat(page, 1300);
+  await beat(page, 1400);
 
   await page.keyboard.press("ControlOrMeta+3");
   await page.getByRole("button", { name: "api.md" }).click();
@@ -78,7 +100,11 @@ test("tour", async ({ page }) => {
   await expect(diff.getByText("+1", { exact: true })).toBeVisible();
   await beat(page, 1600);
   await page.keyboard.press("Escape");
-  await beat(page, 600);
+  await beat(page, 500);
+
+  await page.getByRole("button", { name: "Toggle theme" }).click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  await beat(page, 1500);
 
   await page.close();
   await page.video()?.saveAs(fileURLToPath(new URL("./test-results/tour.webm", import.meta.url)));
