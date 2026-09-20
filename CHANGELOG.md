@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.3.1 (2026-09-20)
+
+<!-- Release notes generated using configuration in .github/release.yml at main -->
+
+## What's Changed
+### Other changes
+* build: bump the minor-and-patch group with 3 updates by @dependabot[bot] in https://github.com/sulcer/cluide/pull/10
+* docs: record a tour gif for the readme by @sulcer in https://github.com/sulcer/cluide/pull/11
+
+## New Contributors
+* @dependabot[bot] made their first contribution in https://github.com/sulcer/cluide/pull/10
+
+**Full Changelog**: https://github.com/sulcer/cluide/compare/v0.3.0...v0.3.1
+
 ## 0.3.0 (2026-09-19)
 
 <!-- Release notes generated using configuration in .github/release.yml at main -->
