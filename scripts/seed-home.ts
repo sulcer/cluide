@@ -1,11 +1,17 @@
-import { mkdirSync, mkdtempSync, utimesSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, utimesSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 
 const json = (v: unknown) => `${JSON.stringify(v, null, 2)}\n`;
 
-export function seedHome(): string {
-  const home = mkdtempSync(join(tmpdir(), "cluide-e2e-"));
+// `dir` is for the gif, whose frames show paths: it seeds a fixed neutral home instead of a
+// temporary one. It is wiped first, so every recording starts from the same fixture.
+export function seedHome(dir?: string): string {
+  const home = dir ?? mkdtempSync(join(tmpdir(), "cluide-e2e-"));
+  if (dir) {
+    rmSync(dir, { recursive: true, force: true });
+    mkdirSync(dir, { recursive: true });
+  }
   const write = (rel: string, content: string) => {
     const path = join(home, rel);
     mkdirSync(dirname(path), { recursive: true });

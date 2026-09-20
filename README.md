@@ -4,7 +4,7 @@ A tiny local web UI to view and edit your Claude Code setup: `~/.claude`, `~/.cl
 each project's `CLAUDE.md`, `.claude/` and `.mcp.json`. Settings with schema warnings, memory,
 rules, agents, skills, commands, hooks, MCP servers with their precedence, and plugins.
 
-![The plugins screen with the provides badges and indigo enable switches](docs/readme/plugins.png)
+![A tour: schema warnings beside settings.json, ⌘K to the plugins screen, MCP servers merged across scopes, and the diff after a save](docs/readme/tour.gif)
 
 ## Screens
 
@@ -39,6 +39,7 @@ bun run dev          # Vite on :5173, API on :8787
 bun run test         # unit tests against a temporary home
 bun run e2e          # Playwright against a seeded temporary home
 bun run typecheck
+bun run gif          # re-record the tour above; needs ffmpeg and gifsicle
 ```
 
 The design lives in [`docs/spec`](docs/spec/README.md); decisions in [`docs/adr`](docs/adr/README.md).

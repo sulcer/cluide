@@ -43,6 +43,7 @@
     "format": "biome check --write .",
     "e2e": "bunx playwright test -c e2e/playwright.config.ts",
     "render": "bunx playwright test -c e2e/playwright.config.ts render.spec.ts",
+    "gif": "GIF=1 bunx playwright test -c e2e/playwright.config.ts tour.spec.ts && ffmpeg -y -loglevel error -i e2e/test-results/tour.webm -vf 'fps=10,split[a][b];[a]palettegen=max_colors=64:stats_mode=diff[p];[b][p]paletteuse=dither=none:diff_mode=rectangle' -loop 0 e2e/test-results/tour.gif && gifsicle -O3 --lossy=60 e2e/test-results/tour.gif -o docs/readme/tour.gif && ls -lh docs/readme/tour.gif",
     "check-docs": "bun scripts/check-docs.ts",
     "prepack": "bun run build"
   },
