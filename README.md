@@ -4,7 +4,6 @@ A tiny local web UI to view and edit your Claude Code setup: `~/.claude`, `~/.cl
 each project's `CLAUDE.md`, `.claude/` and `.mcp.json`. Settings with schema warnings, memory,
 rules, agents, skills, commands, hooks, MCP servers with their precedence, and plugins.
 
-![A pass over every screen: settings with its schema warnings, memory, rules, agents, skills, commands, hooks, plugins, MCP servers merged across scopes, then an edit, a save and its diff](docs/readme/tour.gif)
 
 ## Screens
 
