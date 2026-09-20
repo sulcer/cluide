@@ -6,8 +6,15 @@ import { projectUrl } from "./helpers";
 // Recorded for the README gif only; `bun run e2e` skips it. Run it with `bun run gif`.
 test.skip(!process.env.GIF, "set GIF=1 (bun run gif)");
 
+// Recorded at two device pixels per CSS pixel: a 1x recording is drawn twice as large on the
+// retina display it is read on, which softens every glyph. gifski scales it back down.
 const SIZE = { width: 1024, height: 680 };
-test.use({ viewport: SIZE, video: { mode: "on", size: SIZE } });
+test.use({
+  viewport: SIZE,
+  deviceScaleFactor: 2,
+  launchOptions: { args: ["--force-device-scale-factor=2"] },
+  video: { mode: "on", size: { width: SIZE.width * 2, height: SIZE.height * 2 } },
+});
 
 // Every frame is published, so nothing from this machine may reach one. The seeded demo home is
 // the only home on screen; if a real path ever renders, the recording fails instead of shipping.
